@@ -1,0 +1,45 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.11", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.11.21"
+          python-version: ${{ matrix.python }}
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Run tests
+        run: uv run --locked --python ${{ matrix.python }} pytest
+      - name: Check lint
+        run: uv run --locked --python ${{ matrix.python }} ruff check .
+      - name: Check formatting
+        run: uv run --locked --python ${{ matrix.python }} ruff format --check .
+      - name: Build distributions
+        run: uv build
+      - name: Verify installed wheel and all reference programs
+        timeout-minutes: 5
+        run: >-
+          uv run --isolated --no-project
+          --python ${{ matrix.python }}
+          --with dist/pytuitor-1.0.0rc1-py3-none-any.whl
+          python -I scripts/smoke_installed.py

@@ -1,0 +1,147 @@
+Screen {
+    background: #151719;
+    color: #dddcd7;
+}
+*:focus { border: none; }
+.topbar {
+    height: 3;
+    padding: 1 3 0 3;
+    background: #151719;
+}
+.brand { width: 17; }
+.topbar .brand-detail { width: 1fr; text-align: right; margin: 0; }
+.eyebrow { color: #a2aaa9; text-style: bold; height: auto; margin: 1 0; }
+.muted { color: #9ba3a5; height: auto; }
+.topic-preview { height: auto; color: #86bde8; margin: 1 0; }
+VerticalScroll, OptionList, SelectionList { scrollbar-size: 1 1; }
+.hero { text-style: bold; color: #eee9e0; height: auto; margin-bottom: 1; }
+.title { text-style: bold; height: auto; color: #eee9e0; }
+.intro { margin: 1 0 2 0; }
+.fine-print { margin-top: 1; }
+Button {
+    background: #24282b;
+    color: #dddcd7;
+    border: none;
+    height: 3;
+    min-width: 10;
+    padding: 0 2;
+}
+Button:hover { background: #33393c; }
+Button:focus { background: #384044; text-style: bold; }
+Button.-primary { background: #3776ab; color: #ffffff; }
+Button.-primary:hover, Button.-primary:focus { background: #2d6391; color: #ffffff; }
+Button:disabled { opacity: 45%; }
+.actions { height: auto; margin: 1 0; }
+.actions Button { margin-right: 2; }
+Select { margin: 0 0 1 0; }
+SelectCurrent { border: tall #303639; background: #1c1f22; }
+Select:focus SelectCurrent { border: tall #3776ab; }
+OptionList, SelectionList { background: #1c1f22; border: none; padding: 1; }
+OptionList:focus, SelectionList:focus { border: none; }
+OptionList > .option-list--option-highlighted,
+SelectionList > .option-list--option-highlighted { background: #353b3e; color: #ffd343; }
+Footer { background: #151719; color: #9ba3a5; }
+#onboarding-scroll { padding: 1 4; align-horizontal: center; }
+#onboarding-card { width: 76; max-width: 100%; height: auto; padding: 1 3 2 3; }
+#onboarding-concepts { height: 8; }
+#dashboard-body { padding: 1 3 0 3; align-horizontal: center; }
+#dashboard-main { width: 110; max-width: 100%; height: 1fr; }
+#path-header { height: 3; align-vertical: middle; }
+#path-title { width: 1fr; margin: 0; }
+#preferences { height: 1; padding: 0 1; background: transparent; color: #a2aaa9; }
+#preferences:focus, #preferences:hover { background: #384044; color: #eee9e0; }
+#dashboard-summary { height: 1; }
+#resume-card { height: 4; margin-top: 1; padding: 0 1; background: #222629; align-vertical: middle; }
+#continue-summary { width: 1fr; height: auto; padding: 0 1; color: #ffd343; }
+#continue { margin-left: 1; }
+#course-heading { height: 1; margin: 1 0; }
+#lesson-list { width: 100%; height: 1fr; min-height: 4; }
+#lesson-list-help { height: auto; margin-top: 1; }
+#dashboard-bottom { height: 2; margin-top: 1; }
+#dashboard-bottom Static { width: 1fr; }
+#restart { height: 1; padding: 0 1; background: transparent; color: #9ba3a5; }
+#restart:focus, #restart:hover { background: #384044; color: #eee9e0; }
+Dashboard.narrow .topbar { height: 2; }
+Dashboard.narrow #dashboard-body { padding: 0 2; }
+Dashboard.narrow #path-header { height: 2; }
+Dashboard.narrow #resume-card { height: 3; }
+Dashboard.narrow #course-heading { margin: 1 0 0 0; }
+Dashboard.narrow #lesson-list-help { margin-top: 0; }
+Dashboard.narrow #dashboard-bottom { height: 1; margin-top: 0; }
+#lesson-toolbar { height: 3; margin: 1 3 0 3; align-vertical: middle; }
+#lesson-name { width: 1fr; padding: 1 2 0 2; }
+#save-status { width: 15; padding-top: 1; }
+#lesson-body { height: 1fr; padding: 1 3; }
+#reading-panel { width: 2fr; padding: 0 2 1 0; }
+#lesson-markdown { padding: 0; background: transparent; }
+#lesson-markdown MarkdownH2 { color: #ffd343; margin: 1 0; }
+#lesson-markdown MarkdownFence { background: #222629; }
+#prediction { height: auto; margin: 1 0; }
+#prediction-choices { height: auto; max-height: 9; margin-bottom: 1; }
+#prediction-feedback { margin-bottom: 1; }
+#hint { margin-top: 1; }
+#workbench { width: 3fr; background: #1c1f22; }
+.file-label { height: 2; margin: 0; padding: 0 2; content-align: left middle; }
+#editor { height: 1fr; min-height: 5; border: none; background: #1c1f22; }
+#editor:focus { border: none; }
+#execution-actions { height: 3; background: #151719; }
+#execution-actions Button { margin-right: 1; min-width: 8; }
+#console-pane { height: 13; background: #1c1f22; }
+#console-status { height: 1; margin: 0; padding: 0 1; }
+#console-input { height: 3; border: tall #414749; margin: 0 1; }
+#console-input:focus { border: tall #3776ab; }
+#console-input:disabled { display: none; }
+#results-scroll { height: 1fr; }
+#results { height: auto; color: #c3cdc5; padding: 1; }
+LessonScreen.narrow #lesson-body { padding: 0 1; }
+LessonScreen.narrow #lesson-toolbar { margin: 0 1; }
+LessonScreen.narrow #lesson-name { display: none; }
+LessonScreen.narrow #save-status { width: 1fr; padding-left: 2; }
+LessonScreen.narrow #reading-panel { display: none; width: 100%; padding: 0 1; }
+LessonScreen.narrow #workbench { display: none; width: 100%; }
+LessonScreen.narrow.show-lesson #reading-panel { display: block; }
+LessonScreen.narrow.show-editor #workbench,
+LessonScreen.narrow.show-console #workbench { display: block; }
+LessonScreen.narrow.show-editor #console-pane { display: none; }
+LessonScreen.narrow.show-console #editor,
+LessonScreen.narrow.show-console .file-label { display: none; }
+LessonScreen.narrow.show-console #console-pane { height: 1fr; }
+ModalScreen { align: center middle; background: #000000 60%; }
+.dialog { width: 76; max-width: 94%; height: auto; max-height: 92%; padding: 2 3; background: #222629; border: tall #414749; }
+.dialog .title { margin-bottom: 1; }
+#concepts { height: 16; max-height: 65%; margin: 1 0; }
+
+#stage-navigation { height: 3; margin: 0 3; }
+#stage-navigation Button { margin-right: 1; width: 1fr; }
+.stage-instructions { height: auto; padding: 1; background: #222629; color: #ffd343; }
+#reading-panel, #editor, #console-pane { border: solid transparent; }
+#reading-panel:focus, #reading-panel:focus-within,
+#editor:focus, #console-pane:focus-within { border: solid #3776ab; }
+LessonScreen.narrow .topbar { height: 2; }
+LessonScreen.narrow #lesson-toolbar { height: 1; }
+LessonScreen.narrow #lesson-toolbar Button { height: 1; }
+LessonScreen.narrow #save-status { padding-top: 0; }
+LessonScreen.narrow #stage-navigation { height: 1; margin: 0 1; }
+LessonScreen.narrow #stage-navigation Button { height: 1; padding: 0 1; }
+
+#file-toolbar { height: 3; padding: 0; }
+#file-toolbar Select { width: 1fr; margin: 0; }
+#file-toolbar Button { min-width: 8; padding: 0 1; }
+#solution-dialog { height: 90%; }
+#solution-code { height: 1fr; min-height: 10; }
+#solution { margin-top: 1; }
+#environment-result, #feedback-result { height: auto; margin: 1 0; }
+#chapter-picker { height: 3; margin: 0; }
+#chapter-outcome { height: auto; max-height: 2; }
+#review, #study-notes { height: 1; padding: 0 1; background: transparent; color: #86bde8; }
+#review:focus, #study-notes:focus { background: #384044; }
+#run-files-dialog { height: 90%; }
+#run-file-code { height: 1fr; min-height: 6; }
+#run-files-dialog, #solution-dialog { padding: 1 2; }
+#run-files-dialog .actions { height: 3; margin: 0; }
+#run-file-code, #solution-code { min-height: 3; }
+#environment-dialog { height: 90%; padding: 1 2; }
+.environment-actions { height: 3; margin-top: 1; }
+.environment-actions Button { margin-right: 1; }
+#package-name { width: 1fr; }
+#environment-output { height: 1fr; min-height: 2; }
