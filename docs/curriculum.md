@@ -1,7 +1,7 @@
 # Curriculum map
 
 The release candidate has 48 lessons and 12 chapter projects, split evenly between Beginner and Experienced.
-Every course unit uses blank Build followed by Repair; each chapter project also unlocks one independent practice exercise.
+Every course unit uses blank Build followed by Repair.
 Prerequisites are advisory, and familiar topics remain available from the dashboard.
 
 ## Beginner

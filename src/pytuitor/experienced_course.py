@@ -1,9 +1,9 @@
-"""Python depth: six chapters, authored exercises, and independent reviews."""
+"""Python depth: six chapters and authored exercises."""
 
 from dataclasses import replace
 
 from pytuitor.legacy import BY_ID as LEGACY
-from pytuitor.models import Chapter, Check, Lesson, Review, code, lesson_text
+from pytuitor.models import Chapter, Check, Lesson, code, lesson_text
 
 CHAPTERS = (
     Chapter(
@@ -66,7 +66,6 @@ def unit(
     *,
     project=False,
     files=None,
-    review=None,
 ):
     solution_files = {name: code(source) for name, source in files[0].items()} if files else None
     repair_files = {name: code(source) for name, source in files[1].items()} if files else None
@@ -92,14 +91,11 @@ def unit(
         files=tuple(solution_files) if solution_files else ("lesson.py",),
         solution_files=solution_files,
         repair_files=repair_files,
-        review=review,
     )
 
 
-def legacy(lesson_id, chapter, *, project=False, review=None):
-    return replace(
-        LEGACY[lesson_id], chapter_id=chapter, revision=4, project=project, review=review
-    )
+def legacy(lesson_id, chapter, *, project=False):
+    return replace(LEGACY[lesson_id], chapter_id=chapter, revision=4, project=project)
 
 
 LESSONS = (
@@ -241,28 +237,6 @@ LESSONS = (
             "Copy the whole record deeply after validating its identifier.",
         ],
         project=True,
-        review=Review(
-            (
-                "Return to aliasing in a new setting.\nWrite `merge_settings(base, update"
-                "s)` returning a deeply independent dictionary with update keys replacing"
-                " base keys.\nDo not mutate either input.\nBoth inputs are dictionaries w"
-                "ith copyable values.\nNo printing is required."
-            ),
-            (
-                "from copy import deepcopy\ndef merge_settings(base, updates):\n    retur"
-                "n deepcopy({**base, **updates})\n"
-            ),
-            (
-                check(
-                    "Updates win", "merge_settings({'a': 1}, {'a': 2, 'b': 3})", {"a": 2, "b": 3}
-                ),
-                check(
-                    "No nested sharing",
-                    "(lambda x: merge_settings(x, {})['a'] is x['a'])({'a': []})",
-                    False,
-                ),
-            ),
-        ),
     ),
     legacy("functions-with-memory", "python-composition"),
     legacy("lazy-by-design", "python-composition"),
@@ -429,32 +403,6 @@ LESSONS = (
             "Keep a running total and yield after each accepted number.",
         ],
         project=True,
-        review=Review(
-            (
-                "Write the generator `pairwise_differences(numbers)`.\nFor each value aft"
-                "er the first, yield that value minus its predecessor.\nAccept one-pass a"
-                "nd infinite iterables without collecting them into a list.\nEmpty and on"
-                "e-item inputs yield nothing.\nFor `[8, 3, 9]`, yield `-5`, then `6`."
-            ),
-            (
-                "def pairwise_differences(numbers):\n    iterator = iter(numbers)\n    tr"
-                "y:\n        previous = next(iterator)\n    except StopIteration:\n      "
-                "  return\n    for current in iterator:\n        yield current - previous"
-                "\n        previous = current\n"
-            ),
-            (
-                check("Adjacent differences", "list(pairwise_differences([8,3,9]))", [-5, 6]),
-                check("Empty", "list(pairwise_differences([]))", []),
-                check(
-                    "Lazy input",
-                    (
-                        "list(__import__('itertools').islice(pairwise_differences(__impor"
-                        "t__('itertools').count()), 3))"
-                    ),
-                    [1, 1, 1],
-                ),
-            ),
-        ),
     ),
     legacy("ready-to-ship", "python-design"),
     unit(
@@ -687,25 +635,6 @@ LESSONS = (
             """,
             },
         ),
-        review=Review(
-            (
-                "Write `validate_tags(tags)` returning a new list of stripped, nonempty s"
-                "trings in input order.\nKeep duplicates.\nRaise `ValueError` when a tag "
-                "is not a string or becomes empty after stripping.\nThe input is a finite"
-                " iterable.\nDo not mutate it or print."
-            ),
-            (
-                "def validate_tags(tags):\n    result = []\n    for tag in tags:\n       "
-                " if not isinstance(tag, str) or not tag.strip():\n            raise Valu"
-                "eError('Invalid tag')\n        result.append(tag.strip())\n    return re"
-                "sult\n"
-            ),
-            (
-                check("Normalize", "validate_tags([' py ', 'cli', 'py'])", ["py", "cli", "py"]),
-                check("Reject blank", "__raises_value_error__(validate_tags, [' '])", True),
-                check("Reject other types", "__raises_value_error__(validate_tags, [3])", True),
-            ),
-        ),
     ),
     unit(
         "coroutine-basics",
@@ -910,38 +839,6 @@ LESSONS = (
             ),
         ],
         project=True,
-        review=Review(
-            (
-                "Write `async def first_nonempty(source)` for an async iterable of string"
-                "s.\nReturn the first nonempty stripped string, stopping immediately.\nRe"
-                "turn `None` if the stream ends without one.\nDo not consume the rest onc"
-                "e a match is found."
-            ),
-            (
-                "async def first_nonempty(source):\n    async for text in source:\n      "
-                "  if text.strip():\n            return text.strip()\n    return None\n"
-            ),
-            (
-                check(
-                    "First match only",
-                    (
-                        "(lambda: (exec(\"async def source():\\n    yield '  '\\n    yie"
-                        "ld ' yes '\\n    raise AssertionError('consumed too far')\", "
-                        "globals()), __import__('asyncio').run(first_nonempty(source())))"
-                        "[1])()"
-                    ),
-                    "yes",
-                ),
-                check(
-                    "No match",
-                    (
-                        "(lambda: (exec(\"async def source():\\n    yield ' '\", globals("
-                        ")), __import__('asyncio').run(first_nonempty(source())))[1])()"
-                    ),
-                    None,
-                ),
-            ),
-        ),
     ),
     unit(
         "module-boundaries",
@@ -1149,31 +1046,6 @@ LESSONS = (
         "signal-from-noise",
         "python-delivery",
         project=True,
-        review=Review(
-            (
-                "Write `parse_levels(text)` for comma-separated log levels.\nStrip whites"
-                "pace, uppercase each level, and return unique levels in first-seen order"
-                ".\nAllowed levels are INFO, WARNING, ERROR.\nIgnore empty pieces, but ra"
-                "ise ValueError for any other level.\nAn empty string returns an empty li"
-                "st."
-            ),
-            (
-                "def parse_levels(text):\n    result = []\n    for piece in text.split(',"
-                "'):\n        level = piece.strip().upper()\n        if not level:\n     "
-                "       continue\n        if level not in ('INFO', 'WARNING', 'ERROR'):\n"
-                "            raise ValueError('Unknown level')\n        if level not in r"
-                "esult:\n            result.append(level)\n    return result\n"
-            ),
-            (
-                check(
-                    "Normalize and deduplicate",
-                    "parse_levels(' info, ERROR, info, ,warning')",
-                    ["INFO", "ERROR", "WARNING"],
-                ),
-                check("Reject unknown", "__raises_value_error__(parse_levels, 'DEBUG')", True),
-                check("Empty", "parse_levels('')", []),
-            ),
-        ),
     ),
     unit(
         "descriptors",
@@ -1538,40 +1410,6 @@ LESSONS = (
                     return text
             """,
             },
-        ),
-        review=Review(
-            (
-                "Write the non-data descriptor `Constant(value)`.\nWhen installed as a cl"
-                "ass attribute, reading it through an instance returns value.\nReading it"
-                " through the class returns the descriptor itself.\nSince it has no __set"
-                "__, an instance assignment may shadow it.\nFor `class Example: label = C"
-                "onstant('ready')`, `Example().label` is `'ready'`."
-            ),
-            (
-                "class Constant:\n    def __init__(self, value):\n        self.value = va"
-                "lue\n    def __get__(self, instance, owner=None):\n        if instance i"
-                "s None:\n            return self\n        return self.value\n"
-            ),
-            (
-                check(
-                    "Instance read",
-                    "type('Example', (), {'label': Constant('ready')})().label",
-                    "ready",
-                ),
-                check(
-                    "Class read",
-                    "isinstance(type('Example', (), {'label': Constant('ready')}).label, Constant)",
-                    True,
-                ),
-                check(
-                    "Instance may shadow",
-                    (
-                        "(lambda item: (setattr(item, 'label', 'custom'), item.label)[1])"
-                        "(type('Example', (), {'label': Constant('ready')})())"
-                    ),
-                    "custom",
-                ),
-            ),
         ),
     ),
 )

@@ -43,7 +43,7 @@ async def test_path_settings_are_explicit_and_progress_is_path_specific(tmp_path
         assert app.screen.lesson.id == "names-and-voices"
 
 
-async def test_completed_path_keeps_review_and_settings_available(tmp_path):
+async def test_completed_path_keeps_lessons_and_settings_available(tmp_path):
     from textual.widgets import Button
 
     from pytuitor.screens import Dashboard
@@ -61,3 +61,19 @@ async def test_completed_path_keeps_review_and_settings_available(tmp_path):
         assert app.screen.lesson.id == "first-light"
         await pilot.press("ctrl+b", "p")
         assert app.screen.query("#path")
+
+
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)])
+async def test_dashboard_centers_continue_and_omits_retired_features(tmp_path, size):
+    app = TutorApp(tmp_path)
+    app.store.data.update(onboarded=True, track="beginner")
+    async with app.run_test(size=size) as pilot:
+        await pilot.pause()
+        assert not app.screen.query("#review, #study-notes")
+        button = app.screen.query_one("#continue")
+        rows = [strip.text.strip() for strip in button.render_lines(button.size.region)]
+        occupied = [index for index, text in enumerate(rows) if text]
+        assert occupied == [len(rows) // 2]
+        assert len(rows) % 2 == 1
+        await pilot.click("#continue")
+        assert app.screen.lesson.id == "first-light"

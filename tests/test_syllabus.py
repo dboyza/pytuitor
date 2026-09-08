@@ -20,8 +20,6 @@ def assert_path_content(screen, track):
         assert f"{lesson.minutes} min" in source
         for concept in lesson.concepts:
             assert concept in source
-    assert "optional" in source.lower()
-    assert "practice" in source.lower()
     if track != "custom":
         other = "experienced" if track == "beginner" else "beginner"
         for chapter in track_chapters(other):

@@ -4,9 +4,8 @@ from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.containers import Horizontal, Vertical
 from textual.events import Click, Resize
-from textual.screen import ModalScreen
 from textual.widgets import (
     Button,
     Footer,
@@ -37,51 +36,6 @@ class LessonList(OptionList):
             if event.chain == 2:
                 self.action_select()
         event.stop()
-
-
-class ReviewDialog(ModalScreen[Lesson | None]):
-    BINDINGS = [Binding("escape", "close", "Close")]
-    DEFAULT_CSS = """
-    #review-dialog { height: 80%; }
-    #review-list { height: 1fr; min-height: 4; margin: 1 0; }
-    """
-
-    def compose(self) -> ComposeResult:
-        reviews = self.app.store.due_reviews(include_future=True)
-        due = {lesson.id for lesson in self.app.store.due_reviews()}
-        with VerticalScroll(classes="dialog", id="review-dialog"):
-            yield Static("Optional practice", classes="title")
-            yield Static(
-                "Fresh exercises revisit completed chapters. Practice whenever you like; "
-                "unfinished drafts are saved. Completed practice starts fresh next time."
-            )
-            yield LessonList(
-                *[
-                    Option(
-                        Text(
-                            f"{lesson.title}\n"
-                            + ("Due now" if lesson.id in due else "Scheduled - practice anytime")
-                        ),
-                        id=lesson.id,
-                    )
-                    for lesson in reviews
-                ],
-                id="review-list",
-            )
-            if not reviews:
-                yield Static("Complete a chapter project to add its practice here.")
-            yield Button("Close", id="close-review")
-
-    def on_mount(self) -> None:
-        self.query_one("#review-list", OptionList).focus()
-
-    @on(OptionList.OptionSelected, "#review-list")
-    def choose(self, event: OptionList.OptionSelected) -> None:
-        self.dismiss(BY_ID[event.option.id])
-
-    @on(Button.Pressed, "#close-review")
-    def action_close(self) -> None:
-        self.dismiss(None)
 
 
 class Dashboard(TutorScreen):
@@ -123,8 +77,6 @@ class Dashboard(TutorScreen):
                 )
                 with Horizontal(id="dashboard-bottom"):
                     yield Static("Saved locally", classes="muted")
-                    yield Button("Practice", id="review")
-                    yield Button("Study notes", id="study-notes")
                     yield Button("Start over", id="restart")
         yield Footer(show_command_palette=False)
 
@@ -178,10 +130,6 @@ class Dashboard(TutorScreen):
             or [("Your lessons", "")]
         )
         picker.value = self.chapter_id or ""
-        due_count = len(self.store.due_reviews())
-        self.query_one("#review", Button).label = (
-            f"Practice ({due_count})" if due_count else "Practice"
-        )
         self.show_course()
 
     @on(Select.Changed, "#chapter-picker")
@@ -239,9 +187,8 @@ class Dashboard(TutorScreen):
         self.open_lesson(BY_ID[event.option.id])
 
     def open_lesson(self, lesson: Lesson) -> None:
-        if not lesson.review_of:
-            self.store.data["last_lesson"] = lesson.id
-            self.chapter_id = lesson.chapter_id
+        self.store.data["last_lesson"] = lesson.id
+        self.chapter_id = lesson.chapter_id
         if not self.tutor.persist():
             return
         self.app.push_screen(LessonScreen(lesson))
@@ -263,28 +210,6 @@ class Dashboard(TutorScreen):
         from pytuitor.syllabus import Syllabus
 
         self.app.push_screen(Syllabus())
-
-    @on(Button.Pressed, "#review")
-    def review(self) -> None:
-        self.app.push_screen(ReviewDialog(), self.open_review)
-
-    def open_review(self, lesson: Lesson | None) -> None:
-        if lesson is None:
-            return
-        entry = self.store.entry(lesson)
-        if entry.get("completed"):
-            previous = entry.copy()
-            entry.clear()
-            if not self.tutor.persist():
-                entry.update(previous)
-                return
-        self.open_lesson(lesson)
-
-    @on(Button.Pressed, "#study-notes")
-    def study_notes(self) -> None:
-        from pytuitor.learning_tools import FeedbackDialog
-
-        self.app.push_screen(FeedbackDialog())
 
     @on(Button.Pressed, "#restart")
     def restart(self) -> None:

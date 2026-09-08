@@ -22,8 +22,6 @@ When your program asks a question, type the answer in the console and press Ente
 Use the file menu for multi-file projects and **Ctrl+P** for export, reset, and project tools.
 
 Progress and separate Build/Repair drafts are saved locally.
-Optional review practice becomes available after chapter projects, without streaks or daily requirements.
-**Study notes** offers opt-in local feedback recording and export; nothing is sent automatically.
 **Start over** resets the active profile after confirmation; exported work is kept.
 Use `uv run --locked pytuitor --data-dir ./practice-profile` for a separate profile.
 

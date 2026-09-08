@@ -7,7 +7,7 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
-from textual.widgets import Button, Checkbox, Input, Select, Static, TextArea
+from textual.widgets import Button, Input, Select, Static, TextArea
 
 from pytuitor.models import Lesson
 from pytuitor.workspace import (
@@ -167,44 +167,6 @@ class EnvironmentDialog(ModalScreen):
     def action_close(self) -> None:
         if self.busy:
             self.workers.cancel_node(self)
-        self.dismiss()
-
-
-class FeedbackDialog(ModalScreen):
-    BINDINGS = [Binding("escape", "close", "Close")]
-
-    def compose(self) -> ComposeResult:
-        with VerticalScroll(classes="dialog"):
-            yield Static("Local study notes", classes="title")
-            yield Static(
-                "Optionally record lesson IDs, dates, hint/solution requests and check outcomes. "
-                "No code, keyboard answers, machine details or network telemetry. "
-                "Export only when you want to inspect or share these records."
-            )
-            yield Checkbox(
-                "Record local study events",
-                value=self.app.store.data["feedback_enabled"],
-                id="feedback-opt-in",
-            )
-            yield Button("Export local feedback", id="export-feedback")
-            yield Static("", id="feedback-result", markup=False)
-            yield Button("Close", id="close-feedback")
-
-    @on(Checkbox.Changed, "#feedback-opt-in")
-    def toggle(self, event: Checkbox.Changed) -> None:
-        self.app.store.data["feedback_enabled"] = event.value
-        self.app.persist()
-
-    @on(Button.Pressed, "#export-feedback")
-    def export(self) -> None:
-        try:
-            path = self.app.store.export_feedback()
-            self.query_one("#feedback-result", Static).update(f"Exported to {path}")
-        except OSError as exc:
-            self.query_one("#feedback-result", Static).update(f"Could not export: {exc}")
-
-    @on(Button.Pressed, "#close-feedback")
-    def action_close(self) -> None:
         self.dismiss()
 
 

@@ -9,7 +9,7 @@ from pathlib import Path
 from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import CHAPTERS, LESSONS, REVIEWS, default_input
+from pytuitor.curriculum import CHAPTERS, LESSONS, default_input
 from pytuitor.runner import execute
 from pytuitor.screens import Dashboard, LessonScreen
 
@@ -17,9 +17,9 @@ from pytuitor.screens import Dashboard, LessonScreen
 async def main():
     assert len(LESSONS) == 60
     assert sum(lesson.project for lesson in LESSONS) == 12
-    assert len(CHAPTERS) == len(REVIEWS) == 12
+    assert len(CHAPTERS) == 12
     assert files("pytuitor").joinpath("theme.tcss").is_file()
-    for lesson in (*LESSONS, *REVIEWS):
+    for lesson in LESSONS:
         assert lesson.body.strip()
         result = await execute(
             lesson, lesson.solution, default_input(lesson), files=lesson.solution_files
@@ -46,7 +46,7 @@ async def main():
                     await pilot.pause()
             assert app.store.status(screen.lesson) == "completed"
     print(
-        f"Pytuitor {version('pytuitor')}: installed content and all 72 reference programs passed."
+        f"Pytuitor {version('pytuitor')}: installed content and all 60 reference programs passed."
     )
 
 

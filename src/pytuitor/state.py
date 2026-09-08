@@ -4,7 +4,6 @@ import fcntl
 import json
 import os
 import tempfile
-from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from platformdirs import user_data_path
@@ -24,9 +23,6 @@ def fresh_profile() -> dict:
         "familiar": [],
         "lessons": {},
         "last_lesson": None,
-        "reviews": {},
-        "feedback_enabled": False,
-        "feedback": [],
     }
 
 
@@ -82,18 +78,6 @@ class Store:
             raise ValueError("Invalid concepts")
         if not isinstance(data.get("lessons"), dict):
             raise ValueError("Invalid lessons")
-        if not isinstance(data.get("reviews", {}), dict):
-            raise ValueError("Invalid review schedule")
-        for item in data.get("reviews", {}).values():
-            if not isinstance(item, dict) or type(item.get("level", 0)) is not int:
-                raise ValueError("Invalid review progress")
-            due = datetime.fromisoformat(item["due"])
-            if due.tzinfo is None or not 0 <= item.get("level", 0) <= 4:
-                raise ValueError("Invalid review date")
-        if not isinstance(data.get("feedback_enabled", False), bool):
-            raise ValueError("Invalid feedback setting")
-        if not isinstance(data.get("feedback", []), list):
-            raise ValueError("Invalid feedback records")
         for entry in data["lessons"].values():
             if not isinstance(entry, dict):
                 raise ValueError("Invalid lesson progress")
@@ -192,57 +176,3 @@ class Store:
 
     def set_familiar(self, concepts: list[str]) -> None:
         self.data["familiar"] = [concept for concept in concepts if concept in CONCEPTS]
-
-    def schedule_review(self, lesson: Lesson, *, practiced: bool = False) -> None:
-        """Optional practice never affects course completion or navigation."""
-        key = lesson.review_of or lesson.id
-        if not practiced and key in self.data["reviews"]:
-            return
-        previous = self.data["reviews"].get(key, {})
-        level = min(previous.get("level", 0) + int(practiced), 4)
-        days = (1, 3, 7, 14, 30)[level]
-        self.data["reviews"][key] = {
-            "level": level,
-            "due": (datetime.now(UTC) + timedelta(days=days)).isoformat(),
-        }
-
-    def due_reviews(self, *, include_future: bool = False) -> list[Lesson]:
-        from pytuitor.curriculum import REVIEWS
-
-        now = datetime.now(UTC)
-        result = []
-        for lesson in REVIEWS:
-            if self.data["track"] != "custom" and lesson.track != self.data["track"]:
-                continue
-            schedule = self.data["reviews"].get(lesson.review_of)
-            if schedule and (include_future or datetime.fromisoformat(schedule["due"]) <= now):
-                result.append(lesson)
-        return result
-
-    def record_feedback(self, lesson: Lesson, event: str, stage: str) -> None:
-        if self.data["feedback_enabled"]:
-            self.data["feedback"].append(
-                {
-                    "lesson": lesson.id,
-                    "event": event,
-                    "stage": stage,
-                    "date": datetime.now(UTC).date().isoformat(),
-                }
-            )
-            self.data["feedback"] = self.data["feedback"][-2000:]
-
-    def export_feedback(self) -> Path:
-        """Export only an explicit allowlist; never source, stdin, or host paths."""
-        directory = self.directory / "exports"
-        directory.mkdir(exist_ok=True)
-        path = directory / ("feedback-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".json")
-        records = [
-            {key: record.get(key) for key in ("lesson", "event", "stage", "date")}
-            for record in self.data["feedback"]
-            if isinstance(record, dict)
-        ]
-        with path.open("x", encoding="utf-8") as stream:
-            json.dump(
-                {"schema": 1, "track": self.data["track"], "events": records}, stream, indent=2
-            )
-        return path

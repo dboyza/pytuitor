@@ -103,6 +103,5 @@ Adding that workflow does not mean those remote jobs have run; local validation 
 2. Expand the experienced lessons into focused modules with multiple transfer exercises per concept.
 3. Add multi-file projects, guided environments, and a packaging lab.
 4. Add curated execution walkthroughs with variables and call frames.
-5. Introduce spaced review based on observed mistakes and independent follow-up challenges.
 
 Accounts, cloud synchronization, AI tutoring, third-party course loading, and Windows support are outside this MVP.

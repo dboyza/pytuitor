@@ -12,7 +12,7 @@ Verify implementation details against code.
 
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
-- The v1 candidate has 48 lessons, 12 chapter projects, and 12 optional practice exercises.
+- The v1 candidate has 48 lessons and 12 chapter projects.
 - Each path has six chapters of four lessons plus a project; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Onboarding is Beginner, Experienced, or Custom with chapter previews and known concepts; no diagnostic or background questions.
@@ -20,7 +20,6 @@ Verify implementation details against code.
 - Dashboard browses only the selected path's chapters; Continue resumes globally within that path.
 - Every course unit has blank Build followed by broken Repair, with separate saved drafts and both required for new completion.
 - Prerequisites advise without blocking; reference solutions require explicit reveal and never replace drafts.
-- Practice is optional, separately scheduled, and never changes course navigation or completion.
 - Learner studies are user-run; automated tests do not establish teaching effectiveness.
 
 ## Teaching standards
@@ -31,7 +30,7 @@ Verify implementation details against code.
 - Make blank-editor exercises solvable: specify names, signatures, input handling, output, and edge cases.
 - Prefer natural explanations and worked examples distinct from the required solution.
 - Distinguish variables/values, print/return, and user input/prompt text.
-- Verify correct reference programs pass, broken Repair programs fail meaningfully, and blank review programs fail.
+- Verify correct reference programs pass and broken Repair programs fail meaningfully.
 - Accept valid alternative implementations; test observable behavior rather than source spelling.
 - Keep prose, hints, checks, repair code, and references synchronized.
 - Omit generic repeated quizzes; optional questions should teach something specific.
@@ -43,7 +42,8 @@ Verify implementation details against code.
 - Footer order is numbered function keys, Ctrl shortcuts, then other keys.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
 - Dashboard single-click selects; double-click or Enter opens.
-- Label the dashboard chapter selector and its lesson list explicitly; vertically center resume-card content.
+- Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
+- Retired practice and study-note profile fields remain loadable but inert.
 - Syllabus browses authored paths without changing the learner's saved path or progress.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.
 - Check reports each operation, input, expected/actual result, printed output, and running/pass/fail status.
@@ -53,16 +53,15 @@ Verify implementation details against code.
 - Run files previews generated text; saving explicitly backs up the workspace and refuses newer-draft conflicts.
 - Project environments are optional; creation is offline and package installation is an explicit network action.
 - Install named wheels into a project venv, without shell interpolation, source builds, or automatic downloads.
-- Study recording is opt-in and local; exports exclude code, stdin, and machine details.
 
 ## Code map and pitfalls
 
-- `models.py` defines contracts; `beginner_course.py` and `experienced_course.py` author courses; `curriculum.py` assembles catalog/reviews; `legacy.py` preserves original contracts.
+- `models.py` defines contracts; `beginner_course.py` and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
-- `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation/practice; `setup.py` owns onboarding.
-- `learning_tools.py` owns file, reference, environment, and feedback dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
+- `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
+- `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
 - `syllabus.py` renders the browsable outline from the curriculum catalog.
-- `state.py` owns version 3 profiles, atomic writes, migration backups, locks, and review schedules.
+- `state.py` owns version 3 profiles, atomic writes, migration backups and locks.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
 - `runner.py` launches `_worker.py` with isolated Python; worker must remain standard-library-only.
 - Checks receive fresh namespaces, local imports, working directories, and supplied stdin.

@@ -8,7 +8,6 @@ A configured CI workflow is not evidence that its jobs passed, and a built wheel
 - Verify the course contains 48 teaching lessons and 12 chapter projects across both supported paths.
 - Verify every Build reference passes, every original Repair fails meaningfully, and every corrected Repair passes.
 - Check prerequisite order, worked examples, input/output contracts, and unfamiliar syntax in each chapter.
-- Check review exercises are fresh practice with their own correct references.
 - Complete the [learner study](learner-study.md) and resolve observed blockers.
 - Preserve existing profiles, drafts, known topics, and completion information during upgrades.
 - Confirm reference-solution reveal does not replace a learner's code.

@@ -49,7 +49,7 @@ Allow about 45 minutes and use an experienced programmer's existing knowledge wi
 7. Open a project with more than one file, edit a supporting module, and verify Run and Check use the current files.
 8. Create an environment and inspect the package-installation explanation without installing anything.
 9. Open an advanced lesson about descriptors, metaclasses, or internals and identify its prerequisite knowledge.
-10. Find review practice, complete one exercise when available, and explain how it differs from repeating a completed lesson.
+10. Browse the syllabus and explain the next chapter's learning outcomes.
 
 ## Acceptance notes
 
@@ -58,10 +58,3 @@ Capture confusing wording verbatim along with the lesson identifier.
 Treat missing prerequisites, unclear exercise contracts, lost drafts, blocked keyboard navigation, and misleading checks as release blockers.
 Retest every corrected blocker through the same learner journey.
 Also inspect the app at 80 × 24 and 140 × 44, including error messages, dialogs, file controls, and focus outlines.
-
-## Optional feedback export
-
-If using a local feedback export, inspect the resulting file before sharing it.
-It should contain only learning metadata such as lesson identifiers, stage outcomes, hint or solution use, and app version.
-It should exclude code, typed input, environment variables, machine identifiers, and personal paths.
-The export must remain an explicit local action; there is no automatic upload or account requirement.

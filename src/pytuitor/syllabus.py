@@ -59,7 +59,6 @@ class Syllabus(TutorScreen):
             f"{projects} projects · about {minutes // 60} hr {minutes % 60} min",
             "Build from scratch, then Repair a broken program to complete each unit. "
             "Learn entirely offline.",
-            "Optional practice follows each chapter project and does not affect completion.",
         ]
         for index, chapter in enumerate(chapters, 1):
             lines.extend([f"## Chapter {index}: {chapter.title}", chapter.outcome])

@@ -3,7 +3,7 @@
 from dataclasses import replace
 
 from pytuitor.legacy import LESSONS as LEGACY
-from pytuitor.models import Chapter, Check, Lesson, Review, code, lesson_text
+from pytuitor.models import Chapter, Check, Lesson, code, lesson_text
 
 CHAPTERS = (
     Chapter(
@@ -58,7 +58,6 @@ def exercise(
     project=False,
     files=None,
     entrypoint="lesson.py",
-    review=None,
     stdin="",
 ):
     return Lesson(
@@ -84,7 +83,6 @@ def exercise(
         entrypoint=entrypoint,
         solution_files=files[0] if files else None,
         repair_files=files[1] if files else None,
-        review=review,
         stdin=stdin,
     )
 
@@ -108,9 +106,9 @@ def add(*args, **kwargs):
     _units.append(exercise(*args, **kwargs))
 
 
-def reuse(identifier, chapter, *, review=None, stdin=""):
+def reuse(identifier, chapter, *, stdin=""):
     old = next(lesson for lesson in LEGACY if lesson.id == identifier)
-    _units.append(replace(old, revision=4, chapter_id=chapter, review=review, stdin=stdin))
+    _units.append(replace(old, revision=4, chapter_id=chapter, stdin=stdin))
 
 
 reuse("first-light", "b-foundations")
@@ -210,26 +208,6 @@ add(
         12
         return
     """),
-    review=Review(
-        (lesson_text("review-ticket-desk")),
-        (
-            code("""
-                weight = int(input("Grams: "))
-                if weight <= 100:
-                    cost = 3
-                elif weight <= 500:
-                    cost = 5
-                else:
-                    cost = 9
-                print(cost)
-            """)
-        ),
-        tuple(
-            case(f"Weight {w}", "cost", c, stdin=f"{w}\n", output=str(c))
-            for w, c in ((100, 3), (101, 5), (500, 5), (501, 9))
-        ),
-        stdin="101\n",
-    ),
 )
 
 reuse("pack-your-bag", "b-collections", stdin="2 5 1\n")
@@ -423,23 +401,6 @@ add(
     ),
     project=True,
     stdin="rope lamp rope map lamp\n",
-    review=Review(
-        (lesson_text("review-supply-report")),
-        (
-            code("""
-                guests = []
-                for name in input("Names: ").split():
-                    if name not in guests:
-                        guests.append(name)
-                print(len(guests))
-            """)
-        ),
-        (
-            case("Repeated names", "guests", ["Ada", "Lin"], stdin="Ada Lin Ada\n", output="2"),
-            case("No names", "guests", [], stdin="\n", output="0"),
-        ),
-        stdin="Ada Lin Ada\n",
-    ),
 )
 
 reuse("small-superpowers", "b-functions")
@@ -548,27 +509,6 @@ reuse(
     "lantern-quest",
     "b-functions",
     stdin="east take west\n",
-    review=Review(
-        (lesson_text("review-lantern-quest")),
-        (
-            code("""
-                def travel(fuel, costs):
-                    stops = 0
-                    for cost in costs:
-                        if fuel < cost:
-                            break
-                        fuel = fuel - cost
-                        stops = stops + 1
-                    return stops
-            """)
-        ),
-        (
-            case("Stop before overspending", "travel(8, [3, 4, 2])", 2),
-            case("No stops", "travel(8, [])", 0),
-            case("Free stop", "travel(0, [0, 1])", 1),
-        ),
-        stdin="",
-    ),
 )
 
 add(
@@ -862,25 +802,6 @@ add(
         'Use totals.get(category, 0) + int(row["amount"]) so earlier rows are retained.',
     ),
     project=True,
-    review=Review(
-        (lesson_text("review-expense-report")),
-        (
-            code("""
-                import json
-
-                def roster(text):
-                    names = []
-                    for record in json.loads(text):
-                        names.append(record["name"])
-                    return names
-            """)
-        ),
-        (
-            case("Two people", 'roster(\'[{"name": "Mia"}, {"name": "Jo"}]\')', ["Mia", "Jo"]),
-            case("Empty roster", "roster('[]')", []),
-        ),
-        stdin="",
-    ),
 )
 
 add(
@@ -1218,36 +1139,6 @@ add(
                 """)
             ),
         },
-    ),
-    review=Review(
-        (lesson_text("review-task-workspace")),
-        (
-            code("""
-                class Counter:
-                    def __init__(self, limit):
-                        self.limit = limit
-                        self.value = 0
-
-                    def advance(self):
-                        if self.value < self.limit:
-                            self.value = self.value + 1
-                        return self.value
-            """)
-        ),
-        (
-            case(
-                "Stop at limit",
-                "(lambda c: [c.advance(), c.advance(), c.advance()])(Counter(2))",
-                [1, 2, 2],
-            ),
-            case("Zero limit", "Counter(0).advance()", 0),
-            case(
-                "Separate counters",
-                "(lambda a,b: (a.advance(), b.value)[1])(Counter(3),Counter(3))",
-                0,
-            ),
-        ),
-        stdin="",
     ),
 )
 
@@ -1614,35 +1505,6 @@ add(
                 """)
             ),
         },
-    ),
-    review=Review(
-        (lesson_text("review-notes-archiver")),
-        (
-            code("""
-                from datetime import date
-
-                def overdue(tasks, today):
-                    current = date.fromisoformat(today)
-                    titles = []
-                    for task in tasks:
-                        if date.fromisoformat(task["due"]) < current:
-                            titles.append(task["title"])
-                    return sorted(titles)
-            """)
-        ),
-        (
-            case(
-                "Past, today, and future",
-                (
-                    "overdue([{'title':'Zebra','due':'2024-02-28'},{'title':'Today','d"
-                    "ue':'2024-03-01'},{'title':'Apple','due':'2024-02-29'}], '2024-03"
-                    "-01')"
-                ),
-                ["Apple", "Zebra"],
-            ),
-            case("No tasks", "overdue([], '2024-03-01')", []),
-        ),
-        stdin="",
     ),
 )
 

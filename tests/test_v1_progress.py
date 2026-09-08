@@ -1,12 +1,9 @@
 import json
-from dataclasses import replace
-from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from pytuitor.curriculum import LESSONS
-from pytuitor.models import Review
-from pytuitor.state import ProfileError, Store
+from pytuitor.state import Store
 
 
 def test_version_two_migration_backs_up_original_and_preserves_stage_drafts(tmp_path):
@@ -34,55 +31,39 @@ def test_version_two_migration_backs_up_original_and_preserves_stage_drafts(tmp_
     store.close()
 
 
-def test_review_is_optional_local_and_spaced(tmp_path):
-    store = Store(tmp_path)
-    project = replace(LESSONS[0], review=Review("Practice", "", ()))
-    store.schedule_review(project)
-    first = store.data["reviews"][project.id]
-    assert first["level"] == 0
-    assert datetime.fromisoformat(first["due"]) > datetime.now(UTC)
-    next_before = store.next_lesson()
-    store.schedule_review(replace(project, review_of=project.id), practiced=True)
-    second = store.data["reviews"][project.id]
-    assert second["level"] == 1
-    assert datetime.fromisoformat(second["due"]) > datetime.fromisoformat(first["due"]) + timedelta(
-        days=1
-    )
-    assert store.next_lesson() == next_before
-    store.close()
-
-
-def test_feedback_is_opt_in_and_export_omits_source_and_input(tmp_path):
-    store = Store(tmp_path)
-    lesson = LESSONS[0]
-    store.entry(lesson).update(code="SECRET", input="PRIVATE")
-    store.record_feedback(lesson, "hint", "build")
-    assert store.data["feedback"] == []
-    store.data["feedback_enabled"] = True
-    store.record_feedback(lesson, "hint", "build")
-    store.data["feedback"][0]["code"] = "INJECTED"
-    exported = store.export_feedback().read_text()
-    assert "hint" in exported
-    assert all(
-        secret not in exported for secret in ("SECRET", "PRIVATE", "INJECTED", str(tmp_path))
-    )
-    store.close()
-
-
 @pytest.mark.parametrize(
-    "schedule",
+    "reviews",
     [
-        {"level": 0},
-        {"level": 0, "due": "2026-01-01"},
-        {"level": -1, "due": "2026-01-01T00:00:00+00:00"},
+        {"chapter": {"level": 0, "due": "2026-01-01T00:00:00+00:00"}},
+        {"chapter": {"level": 0}},
+        {"chapter": {"level": -1, "due": "2026-01-01"}},
     ],
 )
-def test_malformed_review_profile_fails_without_modifying_data(tmp_path, schedule):
+def test_retired_practice_and_study_data_is_preserved_but_ignored(tmp_path, reviews):
     store = Store(tmp_path)
-    store.data["reviews"]["chapter"] = schedule
+    retired = {
+        "reviews": reviews,
+        "feedback_enabled": True,
+        "feedback": [{"lesson": LESSONS[0].id, "event": "hint", "stage": "build"}],
+    }
+    store.data.update(retired)
+    store.data["last_lesson"] = "practice-retired-project"
+    store.data["lessons"]["practice-retired-project"] = {"code": "# saved practice draft"}
     store.save()
     store.close()
-    before = (tmp_path / "profile.json").read_bytes()
-    with pytest.raises(ProfileError):
-        Store(tmp_path)
-    assert (tmp_path / "profile.json").read_bytes() == before
+
+    store = Store(tmp_path)
+    assert store.next_lesson() == LESSONS[0]
+    store.entry(LESSONS[0])["code"] = "# new course draft"
+    store.save()
+    saved = json.loads((tmp_path / "profile.json").read_text())
+    assert all(saved[key] == value for key, value in retired.items())
+    assert saved["lessons"]["practice-retired-project"]["code"] == "# saved practice draft"
+    assert saved["lessons"][LESSONS[0].id]["code"] == "# new course draft"
+    store.close()
+
+
+def test_new_profiles_omit_retired_features(tmp_path):
+    store = Store(tmp_path)
+    assert not {"reviews", "feedback_enabled", "feedback"} & store.data.keys()
+    store.close()

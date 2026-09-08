@@ -68,7 +68,7 @@ Syllabus.narrow .topbar { height: 2; }
 Syllabus.narrow #syllabus-body { padding: 0 2; }
 Syllabus.narrow #syllabus-header { height: 2; }
 #dashboard-summary { height: 1; }
-#resume-card { height: 4; margin-top: 1; padding: 0 1; background: #222629; align-vertical: middle; }
+#resume-card { height: 5; margin-top: 1; padding: 0 1; background: #222629; align-vertical: middle; }
 #continue-summary { width: 1fr; height: 100%; content-align: left middle; padding: 0 1; color: #ffd343; }
 #continue { height: 100%; content-align: center middle; margin-left: 1; }
 #course-heading { height: 1; margin: 1 0 0 0; }
@@ -147,11 +147,9 @@ LessonScreen.narrow #stage-navigation Button { height: 1; padding: 0 1; }
 #solution-dialog { height: 90%; }
 #solution-code { height: 1fr; min-height: 10; }
 #solution { margin-top: 1; }
-#environment-result, #feedback-result { height: auto; margin: 1 0; }
+#environment-result { height: auto; margin: 1 0; }
 #chapter-picker { height: 3; margin: 0; }
 #chapter-outcome { height: auto; max-height: 2; }
-#review, #study-notes { height: 1; padding: 0 1; background: transparent; color: #86bde8; }
-#review:focus, #review:hover, #study-notes:focus, #study-notes:hover { background: #384044; }
 #run-files-dialog { height: 90%; }
 #run-file-code { height: 1fr; min-height: 6; }
 #run-files-dialog, #solution-dialog { padding: 1 2; }

@@ -17,15 +17,14 @@ No account, telemetry, automatic package installation, or mandatory daily practi
 1. Curriculum: coherent prerequisites, complete exercise contracts, blank Build then broken Repair, chapter projects, and verified reference implementations.
 2. Workspace: multiple files, saved stage drafts, local imports, isolated check fixtures, exports, environments, and explicit package installation.
 3. Learning feedback: progressive hints, useful error explanations, transparent checks, and explicitly revealed reference solutions.
-4. Navigation and practice: chapter browsing within the selected path, advisory prerequisites, and optional scheduled practice with fresh exercises.
-5. Learner validation: self-run study scripts and an optional local feedback export that excludes learner source and input.
+4. Navigation: chapter browsing within the selected path, advisory prerequisites, and a browsable syllabus.
+5. Learner validation: self-run study scripts and user-recorded observations.
 6. Release readiness: migration checks, installed-package validation, secure installation guidance, macOS/Linux CI, and release checks.
 
 ## Completion evidence
 
 Run the reference solution and broken Repair program for every course unit.
-Validate each review exercise independently.
-Exercise onboarding, chapter browsing, editing, checking, repair, review, reset, persistence, and multi-file exports through the TUI.
+Exercise onboarding, chapter browsing, editing, checking, repair, reset, persistence, and multi-file exports through the TUI.
 Inspect the interface at 80 × 24 and 140 × 44.
 Run the test suite, lint, formatting, package build, and an installed-wheel smoke test.
 Remote CI and learner studies remain unverified until actually run.

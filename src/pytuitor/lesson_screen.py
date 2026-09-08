@@ -177,8 +177,6 @@ class LessonScreen(TutorScreen):
 
     def on_mount(self) -> None:
         self.query_one("#run-files").display = False
-        if self.lesson.review_of:
-            self.query_one("#stage-navigation").display = False
         if not self.lesson.choices:
             for selector in (
                 "#prediction-heading",
@@ -280,7 +278,6 @@ class LessonScreen(TutorScreen):
 
     @on(Button.Pressed, "#solution")
     def action_solution(self) -> None:
-        self.store.record_feedback(self.lesson, "solution", self.stage)
         self.stage_entry()["solution_seen"] = True
         self.tutor.persist()
         self.app.push_screen(SolutionDialog(self.lesson))
@@ -323,14 +320,7 @@ class LessonScreen(TutorScreen):
             "Run and Check to investigate, then fix it to meet the same requirements. "
             "Your Build draft is saved separately."
         )
-        if self.lesson.review_of:
-            self.query_one("#stage-instructions", Static).update(
-                "OPTIONAL PRACTICE · Write this fresh program from scratch, then Check. "
-                "Practice never blocks your course progress."
-            )
-        self.query_one("#next", Button).label = (
-            "Done →" if self.lesson.review_of else "Repair →" if self.stage == "build" else "Next →"
-        )
+        self.query_one("#next", Button).label = "Repair →" if self.stage == "build" else "Next →"
         self.query_one("#next", Button).disabled = not self.stage_passed(self.stage)
 
     @on(Button.Pressed, "#stage-build, #stage-repair")
@@ -459,16 +449,11 @@ class LessonScreen(TutorScreen):
         self.tutor.persist()
 
     def mark_complete(self) -> bool:
-        complete = self.stage_passed("build") and (
-            bool(self.lesson.review_of) or self.stage_passed("repair")
-        )
+        complete = self.stage_passed("build") and self.stage_passed("repair")
         if complete:
             entry = self.store.entry(self.lesson)
-            was_complete = entry.get("completed", False)
             entry["completed"] = True
             entry["completed_revision"] = self.lesson.revision
-            if not was_complete and (self.lesson.review or self.lesson.review_of):
-                self.store.schedule_review(self.lesson, practiced=bool(self.lesson.review_of))
         self.update_stage_ui()
         return complete
 
@@ -485,7 +470,6 @@ class LessonScreen(TutorScreen):
         entry = self.stage_entry()
         entry["hints"] = min(entry.get("hints", 0) + 1, len(self.lesson.hints))
         self.show_hints()
-        self.store.record_feedback(self.lesson, "hint", self.stage)
         self.tutor.persist()
         self.select_pane("lesson")
         self.query_one("#hint-copy").scroll_visible(animate=False)
@@ -632,10 +616,6 @@ class LessonScreen(TutorScreen):
                 self.render_checks()
                 if result.error:
                     lines.extend(["Execution stopped:", result.error])
-                self.store.record_feedback(
-                    self.lesson, "check_pass" if result.passed else "check_fail", self.stage
-                )
-                self.tutor.persist()
                 if result.passed:
                     if source != self.capture_editor():
                         lines.append(
@@ -648,9 +628,7 @@ class LessonScreen(TutorScreen):
                         entry["checked_revision"] = self.lesson.revision
                         if self.mark_complete():
                             lines.append(
-                                "✓ PRACTICE COMPLETE · Your next review is scheduled."
-                                if self.lesson.review_of
-                                else "✓ LESSON COMPLETE · Both stages passed. "
+                                "✓ LESSON COMPLETE · Both stages passed. "
                                 "Ctrl+N for the next lesson."
                             )
                         else:
@@ -752,10 +730,6 @@ class LessonScreen(TutorScreen):
     @on(Button.Pressed, "#next")
     def next_lesson(self) -> None:
         if self.running:
-            return
-        if self.lesson.review_of:
-            self.save_draft()
-            self.app.pop_screen()
             return
         if self.stage == "build":
             if self.stage_passed("build"):

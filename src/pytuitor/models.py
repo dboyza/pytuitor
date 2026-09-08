@@ -43,8 +43,6 @@ class Lesson:
     solution_files: dict[str, str] | None = None
     repair_files: dict[str, str] | None = None
     stdin: str = ""
-    review: "Review | None" = None
-    review_of: str = ""
 
     @property
     def starter(self) -> str:
@@ -65,11 +63,3 @@ class Chapter:
     track: str
     title: str
     outcome: str
-
-
-@dataclass(frozen=True)
-class Review:
-    body: str
-    solution: str
-    checks: tuple[Check, ...]
-    stdin: str = ""
