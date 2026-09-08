@@ -19,6 +19,7 @@ from pytuitor.curriculum import (
     BY_ID,
     CHAPTERS,
     LESSONS,
+    SECTIONS,
     Lesson,
     chapter_lessons,
 )
@@ -119,9 +120,13 @@ class Dashboard(TutorScreen):
             if not self.chapter_id and chapters:
                 self.chapter_id = chapters[0].id
         picker = self.query_one("#chapter-picker", Select)
+        section_titles = {section.id: section.title for section in SECTIONS}
         picker.set_options(
             [
-                (f"Chapter {index}: {chapter.title}", chapter.id)
+                (
+                    f"{section_titles[chapter.section_id]} · Chapter {index}: {chapter.title}",
+                    chapter.id,
+                )
                 for index, chapter in enumerate(chapters, 1)
             ]
             or [("Your lessons", "")]

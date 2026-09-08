@@ -24,3 +24,27 @@ async def test_dashboard_browsing_does_not_change_active_chapter(tmp_path, size)
             assert app.screen.query_one(control).region.bottom <= size[1] - 1
         await pilot.press("c")
         assert app.screen.lesson.id == active[1].id
+
+
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)])
+async def test_chapter_dropdown_identifies_sections_and_preserves_resume(tmp_path, size):
+    from pytuitor.curriculum import SECTIONS
+
+    app = TutorApp(tmp_path)
+    app.store.data.update(onboarded=True, last_lesson="first-light")
+    async with app.run_test(size=size) as pilot:
+        picker = app.screen.query_one("#chapter-picker", Select)
+        picker.focus()
+        await pilot.press("enter")
+        await pilot.pause()
+        options = picker.query_one(OptionList)
+        titles = {section.id: section.title for section in SECTIONS}
+        for index, chapter in enumerate(CHAPTERS):
+            label = str(options.get_option_at_index(index).prompt)
+            assert label.startswith(titles[chapter.section_id] + " · ")
+            assert chapter.title in label
+            assert len(label) <= options.scrollable_content_region.width
+        await pilot.press("end", "enter")
+        await pilot.pause()
+        assert picker.value == CHAPTERS[-1].id
+        assert app.store.data["last_lesson"] == "first-light"
