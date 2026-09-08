@@ -39,11 +39,16 @@ async def test_chapter_dropdown_identifies_sections_and_preserves_resume(tmp_pat
         await pilot.pause()
         options = picker.query_one(OptionList)
         titles = {section.id: section.title for section in SECTIONS}
+        chapter_columns = set()
+        title_columns = set()
         for index, chapter in enumerate(CHAPTERS):
             label = str(options.get_option_at_index(index).prompt)
-            assert label.startswith(titles[chapter.section_id] + " · ")
+            assert label.split(" · ")[0].rstrip() == titles[chapter.section_id]
             assert chapter.title in label
             assert len(label) <= options.scrollable_content_region.width
+            chapter_columns.add(label.index("Chapter"))
+            title_columns.add(label.index(": ") + 2)
+        assert len(chapter_columns) == len(title_columns) == 1
         await pilot.press("end", "enter")
         await pilot.pause()
         assert picker.value == CHAPTERS[-1].id

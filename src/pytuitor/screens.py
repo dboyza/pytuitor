@@ -121,10 +121,13 @@ class Dashboard(TutorScreen):
                 self.chapter_id = chapters[0].id
         picker = self.query_one("#chapter-picker", Select)
         section_titles = {section.id: section.title for section in SECTIONS}
+        section_width = max(map(len, section_titles.values()))
+        number_width = len(str(len(chapters)))
         picker.set_options(
             [
                 (
-                    f"{section_titles[chapter.section_id]} · Chapter {index}: {chapter.title}",
+                    f"{section_titles[chapter.section_id]:<{section_width}} · "
+                    f"Chapter {index:>{number_width}}: {chapter.title}",
                     chapter.id,
                 )
                 for index, chapter in enumerate(chapters, 1)
