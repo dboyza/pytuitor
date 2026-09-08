@@ -12,7 +12,7 @@ Automated checks and a developer's walkthrough do not establish that first-time 
 
 ## Session notes
 
-Record the operating system, terminal application, terminal dimensions, selected path, lesson identifier, and the step where difficulty occurred.
+Record the operating system, terminal application, terminal dimensions, selected section and chapter, lesson identifier, and the step where difficulty occurred.
 Record what you expected, what happened, and whether help was needed.
 Avoid recording personal input, complete source code, account details, filesystem paths, or terminal history.
 Keep notes locally unless you deliberately choose to share them.
@@ -21,8 +21,8 @@ Keep notes locally unless you deliberately choose to share them.
 
 Allow about 45 minutes and begin without knowing the intended interface flow.
 
-1. Open the app and explain the difference between the available paths in your own words.
-2. Choose Beginner, locate the next lesson, and open it using only the keyboard.
+1. Open the app and explain what Start learning and Browse syllabus will do.
+2. Select Start learning using only the keyboard and confirm the first lesson opens directly.
 3. Explain a string and an integer using the first lesson's examples.
 4. Complete Build without starter code, run it, and check the result.
 5. Deliberately enter an incorrect answer and explain the expected and actual values shown by Check.
@@ -40,16 +40,16 @@ Confirm the project can be understood without revealing the reference solution.
 
 Allow about 45 minutes and use an experienced programmer's existing knowledge without assuming familiarity with Python syntax.
 
-1. Choose Experienced, mark familiar concepts, and explain which items Continue will skip.
-2. Reopen a skipped lesson and confirm its content remains available.
+1. Choose Browse syllabus, identify where your existing knowledge fits, then use Known topics on the dashboard to mark familiar concepts.
+2. Explain which items Continue will skip, then reopen a skipped lesson and confirm its content remains available.
 3. Complete one Python semantics lesson using an alternative correct implementation.
 4. Inspect every check's inputs, output, expected result, and pass/fail status.
 5. Complete a Repair stage and explain the Python-specific behavior that caused the defect.
 6. Use progressive hints, then deliberately reveal a reference solution and return to the untouched draft.
 7. Open a project with more than one file, edit a supporting module, and verify Run and Check use the current files.
 8. Create an environment and inspect the package-installation explanation without installing anything.
-9. Open an advanced lesson about descriptors, metaclasses, or internals and identify its prerequisite knowledge.
-10. Browse the syllabus and explain the next chapter's learning outcomes.
+9. Explicitly choose Specialized topics, open a lesson about descriptors, metaclasses, or internals, and identify its prerequisite knowledge.
+10. Browse the syllabus, explain the next chapter's learning outcomes, and distinguish the core progression from optional depth.
 
 ## Acceptance notes
 

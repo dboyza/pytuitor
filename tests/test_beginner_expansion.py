@@ -6,7 +6,7 @@ import pytest
 from textual.widgets import Collapsible, OptionList, Select, TextArea
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import BY_ID, track_lessons
+from pytuitor.curriculum import BY_ID, LESSONS
 from pytuitor.state import Store
 
 NEW_LESSONS = ("decimal-measurements", "tuples-and-sets", "loop-helpers")
@@ -62,10 +62,10 @@ async def test_new_lesson_build_repair_and_saved_drafts(tmp_path, identifier):
 async def test_returning_learner_keeps_progress_and_discovers_added_lessons(tmp_path):
     store = Store(tmp_path)
     store.data.update(onboarded=True, track="beginner")
-    for lesson in track_lessons("beginner"):
+    for lesson in LESSONS:
         if lesson.id not in NEW_LESSONS:
             store.entry(lesson).update(completed=True, code=f"# saved {lesson.id}")
-    store.data["last_lesson"] = "notes-archiver"
+    store.data["last_lesson"] = "first-light"
     previous = deepcopy(store.data["lessons"])
     store.save()
     store.close()
@@ -74,10 +74,16 @@ async def test_returning_learner_keeps_progress_and_discovers_added_lessons(tmp_
         assert app.store.data["lessons"] == previous
         assert app.store.next_lesson().id == NEW_LESSONS[0]
         await pilot.press("s")
-        first = app.screen.query_one("#syllabus-b-foundations", Collapsible)
-        second = app.screen.query_one("#syllabus-b-collections", Collapsible)
-        assert first.title.split()[-2:] == ["5", "1"]
-        assert second.title.split()[-2:] == ["9", "1"]
+        for identifier in NEW_LESSONS:
+            chapter_id = BY_ID[identifier].chapter_id
+            chapter = app.screen.query_one(f"#syllabus-{chapter_id}", Collapsible)
+            units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter_id]
+            assert chapter.collapsed
+            lessons = sum(not unit.project for unit in units)
+            projects = sum(unit.project for unit in units)
+            assert f"{lessons} lesson" in chapter.title
+            if projects:
+                assert f"{projects} project" in chapter.title
         await pilot.press("escape", "c")
         assert app.screen.lesson.id == NEW_LESSONS[0]
         assert all(app.store.data["lessons"][key] == value for key, value in previous.items())

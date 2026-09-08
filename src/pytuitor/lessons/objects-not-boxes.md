@@ -21,8 +21,8 @@ A module is a Python file containing reusable code; the standard library comes w
 
 ## Assignment does not copy an object
 
-This path assumes you can already write variables, conditions, loops, and functions in some language.
-If you need an introduction to those ideas, use Edit path on the dashboard to choose Beginner or Custom; your existing drafts remain saved.
+This chapter assumes you can already write variables, conditions, loops, and functions.
+If you need an introduction to those ideas, open Foundations in the syllabus; your existing drafts remain saved.
 
 In Python, variables refer to objects.
 Assigning `b = a` makes both variables refer to the same object; it does not create a copy.

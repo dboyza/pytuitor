@@ -1,13 +1,12 @@
-"""Direct path selection and prior-knowledge checklists."""
+"""A direct start and an optional prior-knowledge checklist."""
 
-from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
-from textual.widgets import Button, Footer, Label, Select, SelectionList, Static
+from textual.widgets import Button, Footer, SelectionList, Static
 
-from pytuitor.curriculum import CONCEPTS, track_chapters, track_lessons
+from pytuitor.curriculum import CONCEPTS
 from pytuitor.ui import TutorScreen, brand
 
 
@@ -20,102 +19,85 @@ class Onboarding(TutorScreen):
     def __init__(self, editing: bool = False):
         super().__init__()
         self.editing = editing
+        self.set_class(editing, "editing")
 
     def compose(self) -> ComposeResult:
-        yield brand("EDIT YOUR PATH" if self.editing else "CHOOSE WHERE TO START")
+        yield brand("KNOWN TOPICS" if self.editing else "WELCOME")
         with VerticalScroll(id="onboarding-scroll"):
             with Vertical(id="onboarding-card"):
                 yield Static(
-                    "Your path and known topics"
+                    "Skip what you already know"
                     if self.editing
                     else "Learn Python at your own pace.",
                     classes="hero",
                 )
-                yield Static(
-                    "Progress is always saved.\nEverything stays on your machine.",
-                    classes="muted intro",
-                )
-                yield Label("CHOOSE A PATH", classes="eyebrow")
-                yield Select(
-                    [
-                        ("Beginner - learn programming from the beginning", "beginner"),
-                        ("Experienced - learn how Python works", "experienced"),
-                        ("Custom - skip Python topics I already know", "custom"),
-                    ],
-                    value=self.store.data["track"],
-                    allow_blank=False,
-                    id="path",
-                )
-                yield Static(id="path-description", classes="muted")
-                yield Static(id="path-topics", classes="topic-preview")
-                yield Label("ALREADY KNOW SOME OF THIS?", classes="eyebrow")
-                yield Static(
-                    "Check the concepts you already know. Continue skips a lesson when all its "
-                    "concepts are checked. You can still open it from the dashboard.",
-                    classes="muted",
-                )
-                yield SelectionList(
-                    *[(c, c, c in self.store.data["familiar"]) for c in CONCEPTS],
-                    id="onboarding-concepts",
-                )
+                if self.editing:
+                    yield Static(
+                        "Continue skips a lesson when all its concepts are checked. "
+                        "You can still open any lesson from the syllabus or dashboard.",
+                        classes="muted",
+                    )
+                    yield SelectionList(
+                        *[(c, c, c in self.store.data["familiar"]) for c in CONCEPTS],
+                        id="onboarding-concepts",
+                    )
+                else:
+                    yield Static(
+                        "Progress is saved locally. No account or internet needed.",
+                        classes="muted intro",
+                    )
+                    yield Static(
+                        "Start with Foundations, then learn everyday Python "
+                        "and build useful programs.\n\n"
+                        "Already programming? Browse the syllabus and open any chapter. "
+                        "Python depth and specialized topics are optional.",
+                        classes="topic-preview",
+                    )
                 with Horizontal(classes="actions"):
                     yield Button(
-                        "Save path" if self.editing else "Start learning  →",
+                        "Save topics" if self.editing else "Start learning →",
                         id="begin",
                         variant="primary",
                     )
                     if self.editing:
                         yield Button("Cancel", id="cancel-preferences")
-                yield Static(
-                    "You can change paths or update this checklist anytime.", classes="muted"
-                )
+                    else:
+                        yield Button("Browse syllabus", id="browse-syllabus")
         yield Footer(show_command_palette=False)
 
     def on_mount(self) -> None:
-        self.update_preview()
-        self.query_one("#path", Select).focus()
-
-    @on(Select.Changed, "#path")
-    def path_changed(self) -> None:
-        self.update_preview()
-
-    def update_preview(self) -> None:
-        track = self.query_one("#path", Select).value
-        descriptions = {
-            "beginner": "No programming experience needed. "
-            "Build useful command-line tools and automation, from first values to tested projects.",
-            "experienced": "For people who already program. "
-            "Explore Python's behavior, features, and tools.",
-            "custom": "Both paths in order, skipping what you know. "
-            "Start with the checklist below.",
-        }
-        self.query_one("#path-description", Static).update(descriptions[track])
-        chapters = track_chapters(track)
-        preview = (
-            "\n".join(
-                f"{index:02}  {chapter.title}\n      {chapter.outcome}"
-                for index, chapter in enumerate(chapters, 1)
-            )
-            if chapters
-            else "\n".join(
-                f"{index:02}  {lesson.title}"
-                for index, lesson in enumerate(track_lessons(track), 1)
-            )
-        )
-        self.query_one("#path-topics", Static).update(Text(preview))
+        self.query_one("#onboarding-concepts" if self.editing else "#begin").focus()
 
     @on(Button.Pressed, "#begin")
-    def action_begin(self) -> None:
-        from pytuitor.screens import Dashboard
-
-        self.store.data.update({"track": self.query_one("#path", Select).value, "onboarded": True})
-        self.store.set_familiar(self.query_one("#onboarding-concepts", SelectionList).selected)
-        if not self.tutor.persist():
-            return
+    async def action_begin(self) -> None:
         if self.editing:
+            previous = list(self.store.data["familiar"])
+            self.store.set_familiar(self.query_one("#onboarding-concepts", SelectionList).selected)
+            if not self.tutor.persist():
+                self.store.data["familiar"] = previous
+                return
             self.app.pop_screen()
         else:
-            self.app.switch_screen(Dashboard())
+            await self.start(browse=False)
+
+    @on(Button.Pressed, "#browse-syllabus")
+    async def browse_syllabus(self) -> None:
+        await self.start(browse=True)
+
+    async def start(self, *, browse: bool) -> None:
+        from pytuitor.screens import Dashboard
+        from pytuitor.syllabus import Syllabus
+
+        self.store.data["onboarded"] = True
+        if not self.tutor.persist():
+            self.store.data["onboarded"] = False
+            return
+        dashboard = Dashboard()
+        self.app.switch_screen(dashboard)
+        if browse:
+            dashboard.call_after_refresh(self.app.push_screen, Syllabus())
+        else:
+            dashboard.call_after_refresh(dashboard.action_continue)
 
     @on(Button.Pressed, "#cancel-preferences")
     def action_cancel_preferences(self) -> None:

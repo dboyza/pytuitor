@@ -8,7 +8,7 @@ from pathlib import Path
 
 from platformdirs import user_data_path
 
-from pytuitor.curriculum import CONCEPTS, Lesson, track_lessons
+from pytuitor.curriculum import BY_ID, CHAPTERS, CONCEPTS, SECTIONS, Lesson, chapter_lessons
 
 
 class ProfileError(Exception):
@@ -19,7 +19,6 @@ def fresh_profile() -> dict:
     return {
         "version": 3,
         "onboarded": False,
-        "track": "beginner",
         "familiar": [],
         "lessons": {},
         "last_lesson": None,
@@ -62,8 +61,8 @@ class Store:
     def _validate(data: object) -> None:
         if not isinstance(data, dict) or data.get("version") not in (1, 2, 3):
             raise ValueError("Unsupported profile version")
-        if data.get("track") not in ("beginner", "experienced", "custom"):
-            raise ValueError("Invalid track")
+        if "track" in data and data["track"] not in ("beginner", "experienced", "custom"):
+            raise ValueError("Invalid legacy track")
         if not isinstance(data.get("onboarded"), bool):
             raise ValueError("Invalid onboarding state")
         if data.get("background", "new") not in ("new", "cs", "python"):
@@ -163,16 +162,42 @@ class Store:
             return "in progress"
         return "new"
 
-    def next_lesson(self, track: str | None = None) -> Lesson | None:
-        lessons = track_lessons(track or self.data["track"])
-        last = self.data.get("last_lesson")
-        for lesson in lessons:
-            if lesson.id == last and self.status(lesson) not in ("completed", "familiar"):
-                return lesson
+    def chapter_next_lesson(self, chapter_id: str) -> Lesson | None:
         return next(
-            (lesson for lesson in lessons if self.status(lesson) not in ("completed", "familiar")),
+            (
+                lesson
+                for lesson in chapter_lessons(chapter_id)
+                if self.status(lesson) not in ("completed", "familiar")
+            ),
             None,
         )
+
+    def next_lesson(self) -> Lesson | None:
+        """Resume the active chapter, with optional sections entered explicitly."""
+        last = BY_ID.get(self.data.get("last_lesson"))
+        chapters = {chapter.id: chapter for chapter in CHAPTERS}
+        active = chapters.get(last.chapter_id) if last else None
+        if active:
+            if self.status(last) not in ("completed", "familiar"):
+                return last
+            pending = self.chapter_next_lesson(active.id)
+            if pending:
+                return pending
+        optional = {section.id for section in SECTIONS if section.optional}
+        if active and active.section_id in optional:
+            candidates = [
+                chapter for chapter in CHAPTERS if chapter.section_id == active.section_id
+            ]
+        else:
+            candidates = [chapter for chapter in CHAPTERS if chapter.section_id not in optional]
+        if active in candidates:
+            position = candidates.index(active)
+            candidates = candidates[position + 1 :] + candidates[: position + 1]
+        for chapter in candidates:
+            pending = self.chapter_next_lesson(chapter.id)
+            if pending:
+                return pending
+        return None
 
     def set_familiar(self, concepts: list[str]) -> None:
         self.data["familiar"] = [concept for concept in concepts if concept in CONCEPTS]

@@ -72,7 +72,7 @@ class LessonScreen(TutorScreen):
             self.stage = "build"
         entry = self.stage_entry()
         sources = self.project_files()
-        yield brand(f"{self.lesson.track.upper()}  /  {self.lesson.title.upper()}")
+        yield brand(self.lesson.title.upper())
         with Horizontal(id="lesson-toolbar"):
             yield Button("← Dashboard", id="back")
             yield Static(self.lesson.title, id="lesson-name", classes="title")
@@ -741,15 +741,17 @@ class LessonScreen(TutorScreen):
             self.notify("Pass the Repair checks to complete the lesson.")
             return
         self.save_draft()
-        track = "custom" if self.store.data["track"] == "custom" else self.lesson.track
-        following = self.store.next_lesson(track)
+        self.store.data["last_lesson"] = self.lesson.id
+        following = self.store.next_lesson()
         if following is not None and following.id != self.lesson.id:
             self.store.data["last_lesson"] = following.id
-            self.tutor.persist()
-            self.app.switch_screen(LessonScreen(following))
+            if self.tutor.persist():
+                self.app.switch_screen(LessonScreen(following))
+            else:
+                self.store.data["last_lesson"] = self.lesson.id
         else:
             self.app.pop_screen()
-            self.notify("Path complete. You can revisit any lesson from the dashboard.")
+            self.notify("Section complete. Open the syllabus to choose another chapter.")
 
     def action_next(self) -> None:
         self.next_lesson()

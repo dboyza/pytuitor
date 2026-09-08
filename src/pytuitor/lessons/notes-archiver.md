@@ -1,4 +1,4 @@
-## Your final beginner project
+## Build a careful notes archiver
 Build a tool that copies selected notes into an archive while preserving originals and existing archive files.
 A **dry run** reports what would happen without making changes.
 Make that the default so a caller must deliberately request writes.

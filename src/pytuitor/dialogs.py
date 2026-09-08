@@ -25,7 +25,7 @@ class KeyboardHelp(ModalScreen):
                 "Ctrl+Q              Save and quit\n\n"
                 "ON THE DASHBOARD\n"
                 "C                   Continue learning\n"
-                "P                   Edit path\n"
+                "P                   Known topics\n"
                 "S                   Browse syllabus\n\n"
                 "IN THE SYLLABUS\n"
                 "↑ ↓ / PageUp / PageDown   Scroll the outline\n"
@@ -68,7 +68,7 @@ class ConfirmRestart(ModalScreen[bool]):
             yield Static("Erase progress and start over?", classes="title")
             yield Static(
                 "This erases all saved lesson drafts, completions, hints, and checked topics "
-                "in this profile, then returns to path selection.\n\n"
+                "in this profile, then returns to the welcome screen.\n\n"
                 "This cannot be undone. Python files you already exported are separate and remain.",
                 classes="muted",
             )

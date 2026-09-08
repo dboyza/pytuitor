@@ -17,10 +17,10 @@ from textual.widgets.option_list import Option
 
 from pytuitor.curriculum import (
     BY_ID,
-    TRACKS,
+    CHAPTERS,
+    LESSONS,
     Lesson,
-    track_chapters,
-    track_lessons,
+    chapter_lessons,
 )
 from pytuitor.lesson_screen import LessonScreen
 from pytuitor.setup import Onboarding
@@ -41,25 +41,24 @@ class LessonList(OptionList):
 class Dashboard(TutorScreen):
     BINDINGS = [
         Binding("c", "continue", "Continue"),
-        Binding("p", "preferences", "Edit path"),
+        Binding("p", "preferences", "Known topics"),
         Binding("s", "syllabus", "Syllabus", show=False),
     ]
 
     def __init__(self):
         super().__init__()
-        self.track = "beginner"
         self.current: Lesson | None = None
         self.chapter_id: str | None = None
+        self.seen_last_lesson: str | None = None
 
     def compose(self) -> ComposeResult:
-        self.track = self.store.data["track"]
-        yield brand("YOUR LEARNING PATH")
+        yield brand("LEARNING")
         with Horizontal(id="dashboard-body"):
             with Vertical(id="dashboard-main"):
                 with Horizontal(id="path-header"):
                     yield Static(id="path-title", classes="hero")
                     yield Button("Syllabus", id="syllabus")
-                    yield Button("Edit path", id="preferences")
+                    yield Button("Known topics", id="preferences")
                 yield Static(id="dashboard-summary", classes="muted")
                 with Horizontal(id="resume-card"):
                     yield Static(id="continue-summary")
@@ -94,15 +93,15 @@ class Dashboard(TutorScreen):
             self.show_course()
 
     def refresh_dashboard(self) -> None:
-        track = self.store.data["track"]
-        if track != self.track:
-            self.chapter_id = None
-            self.current = None
-        self.track = track
-        lessons = track_lessons(self.track)
+        last_lesson = self.store.data.get("last_lesson")
+        if last_lesson != self.seen_last_lesson and last_lesson in BY_ID:
+            self.chapter_id = BY_ID[last_lesson].chapter_id
+            self.current = BY_ID[last_lesson]
+        self.seen_last_lesson = last_lesson
+        lessons = LESSONS
         completed = sum(self.store.status(lesson) == "completed" for lesson in lessons)
         familiar = sum(self.store.status(lesson) == "familiar" for lesson in lessons)
-        self.query_one("#path-title", Static).update(f"Your {TRACKS[self.track].lower()} path")
+        self.query_one("#path-title", Static).update("Learning")
         self.query_one("#dashboard-summary", Static).update(
             f"{completed} of {len(lessons)} completed"
             + (f" · {familiar} already known" if familiar else "")
@@ -111,12 +110,10 @@ class Dashboard(TutorScreen):
         self.query_one("#continue-summary", Static).update(
             Text(f"UP NEXT\n{next_lesson.title} · {next_lesson.minutes} min")
             if next_lesson
-            else Text(
-                "PATH COMPLETE\nRevisit a lesson, or use Edit path to choose what comes next."
-            )
+            else Text("CHOOSE YOUR NEXT CHAPTER\nOpen the syllabus to explore more topics.")
         )
         self.query_one("#continue", Button).disabled = next_lesson is None
-        chapters = track_chapters(self.track)
+        chapters = CHAPTERS
         if self.chapter_id not in {chapter.id for chapter in chapters}:
             self.chapter_id = next_lesson.chapter_id if next_lesson else None
             if not self.chapter_id and chapters:
@@ -143,12 +140,8 @@ class Dashboard(TutorScreen):
         self.show_course()
 
     def show_course(self) -> None:
-        lessons = [
-            lesson
-            for lesson in track_lessons(self.track)
-            if not self.chapter_id or lesson.chapter_id == self.chapter_id
-        ]
-        chapter = next((c for c in track_chapters(self.track) if c.id == self.chapter_id), None)
+        lessons = chapter_lessons(self.chapter_id) if self.chapter_id else LESSONS
+        chapter = next((c for c in CHAPTERS if c.id == self.chapter_id), None)
         self.query_one("#chapter-outcome", Static).update(chapter.outcome if chapter else "")
         listing = self.query_one("#lesson-list", OptionList)
         selected_id = self.current.id if self.current else None
@@ -187,10 +180,12 @@ class Dashboard(TutorScreen):
         self.open_lesson(BY_ID[event.option.id])
 
     def open_lesson(self, lesson: Lesson) -> None:
+        previous = self.store.data.get("last_lesson")
         self.store.data["last_lesson"] = lesson.id
-        self.chapter_id = lesson.chapter_id
         if not self.tutor.persist():
+            self.store.data["last_lesson"] = previous
             return
+        self.chapter_id = lesson.chapter_id
         self.app.push_screen(LessonScreen(lesson))
 
     @on(Button.Pressed, "#continue")
@@ -199,7 +194,7 @@ class Dashboard(TutorScreen):
         if lesson:
             self.open_lesson(lesson)
         else:
-            self.notify("Your path is complete. Revisit a lesson or choose Edit path.")
+            self.notify("Choose your next chapter in the syllabus.")
 
     @on(Button.Pressed, "#preferences")
     def action_preferences(self) -> None:

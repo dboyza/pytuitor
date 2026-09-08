@@ -13,11 +13,11 @@ Verify implementation details against code.
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
 - The v1 candidate has 75 lessons and 12 chapter projects.
-- Each path has six chapters ending in a project, with lesson counts matched to the topics; see [the curriculum map](docs/curriculum.md).
+- One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
-- Onboarding is Beginner, Experienced, or Custom with chapter previews and known concepts; no diagnostic or background questions.
-- Known topics are skipped by Continue but remain accessible; project concepts must match taught checklist concepts.
-- Dashboard browses only the selected path's chapters; Continue resumes globally within that path.
+- Welcome offers Start learning or Browse syllabus; Known topics is an optional dashboard checklist.
+- Known topics are skipped by Continue but remain accessible; project concepts describe their relevant preparation.
+- Dashboard browses all chapters; Continue resumes the active chapter, then the core sequence or explicitly selected optional section.
 - Every course unit has blank Build followed by broken Repair, with separate saved drafts and both required for new completion.
 - Prerequisites advise without blocking; reference solutions require explicit reveal and never replace drafts.
 - Learner studies are user-run; automated tests do not establish teaching effectiveness.
@@ -25,8 +25,8 @@ Verify implementation details against code.
 ## Teaching standards
 
 - Introduce terminology and syntax before requiring them, accounting for preceding lessons.
-- Beginner progression grows from values/input through collections/functions to files, modules, classes, tests, and automation.
-- Experienced learners know programming concepts but need Python-specific syntax and behavior explained.
+- Foundations grows from values/input through collections/functions; Everyday Python and Building programs add files, modules, classes, tests, and automation.
+- Depth lessons build on core concepts and explain Python-specific syntax and behavior.
 - Make blank-editor exercises solvable: specify names, signatures, input handling, output, and edge cases.
 - Prefer natural explanations and worked examples distinct from the required solution.
 - Distinguish variables/values, print/return, and user input/prompt text.
@@ -43,8 +43,8 @@ Verify implementation details against code.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
-- Retired practice and study-note profile fields remain loadable but inert.
-- Syllabus shows chapter lesson/project counts with collapsed lesson details; browsing never changes the saved path or progress.
+- Legacy track, practice, and study-note profile fields remain loadable but inert.
+- Syllabus groups chapters by section with collapsed details and advisory prerequisites; only opening a lesson changes the resume anchor.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.
 - Check reports each operation, input, expected/actual result, printed output, and running/pass/fail status.
 - Reset exercise backs up the complete current stage before restoring blank Build or broken Repair.
@@ -60,7 +60,7 @@ Verify implementation details against code.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
 - `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
-- `syllabus.py` renders the browsable outline from the curriculum catalog.
+- `course_map.py` defines section/chapter order and project preparation; `syllabus.py` renders it.
 - `state.py` owns version 3 profiles, atomic writes, migration backups and locks.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
 - `runner.py` launches `_worker.py` with isolated Python; worker must remain standard-library-only.
@@ -75,7 +75,6 @@ Verify implementation details against code.
 
 ## Working and verification
 
-- Prefer quality, simplicity, robustness, and maintainability over saving development effort.
 - Reproduce bugs through the learner UI first; retain meaningful regressions.
 - Use scratch `--data-dir` profiles; never test against the user's progress.
 - Run `uv sync --locked`, `uv run pytest`, `uv run ruff check .`, and `uv run ruff format --check .`.

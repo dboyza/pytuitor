@@ -45,7 +45,11 @@ The focus column describes what is taught across those lessons; not every API me
 ## Curriculum choices
 
 Practical collection operations and ordinary class protocols precede specialized machinery.
-Advanced topics remain in the Experienced path because descriptors, class hooks, and cooperative inheritance serve its Python-depth goal.
+One syllabus groups the curriculum into Foundations, Everyday Python, Building programs, Python depth, and Specialized topics.
+The first three sections are recommended, while depth and specialized chapters are optional.
+Descriptors, class hooks, and cooperative inheritance remain available for learners who need language machinery.
 No existing lesson was removed or repurposed, preserving its exercise contract and saved drafts.
-Each chapter still ends in a project that combines its concepts.
+The 21 chapters group related topics, with projects placed after their required preparation.
+Projects combine relevant taught concepts without requiring every chapter to end in a project.
+See the [curriculum map](curriculum.md) for chapter order and advisory prerequisites.
 The topic map is a maintenance aid; learner studies are required to assess retention and transfer to unfamiliar problems.

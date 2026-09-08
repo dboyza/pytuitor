@@ -5,11 +5,13 @@ A configured CI workflow is not evidence that its jobs passed, and a built wheel
 
 ## Product and content
 
-- Verify the course contains 75 teaching lessons and 12 chapter projects across both supported paths.
+- Verify the unified course contains 75 teaching lessons and 12 projects organized into five sections.
+- Verify Start learning opens the first lesson, Browse syllabus opens the outline, and Known topics remains editable from the dashboard.
+- Verify Continue follows the active chapter and section, with optional depth requiring an explicit choice.
 - Verify every Build reference passes, every original Repair fails meaningfully, and every corrected Repair passes.
 - Check prerequisite order, worked examples, input/output contracts, and unfamiliar syntax in each chapter.
 - Complete the [learner study](learner-study.md) and resolve observed blockers.
-- Preserve existing profiles, drafts, known topics, and completion information during upgrades.
+- Preserve existing profiles, drafts, known topics, and completion information during upgrades; legacy path preferences must not hide course content.
 - Confirm reference-solution reveal does not replace a learner's code.
 
 ## Engineering and terminals

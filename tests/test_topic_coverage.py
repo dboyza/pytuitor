@@ -116,7 +116,7 @@ async def test_new_topics_are_reachable_and_complete_both_stages(tmp_path, ident
     restored.close()
 
 
-@pytest.mark.parametrize("track", ["beginner", "experienced"])
+@pytest.mark.parametrize("track", ["beginner", "experienced", "custom"])
 def test_previous_completions_and_drafts_survive_the_topic_expansion(tmp_path, track):
     store = Store(tmp_path)
     store.data.update(onboarded=True, track=track)
@@ -128,7 +128,12 @@ def test_previous_completions_and_drafts_survive_the_topic_expansion(tmp_path, t
     store.close()
     store = Store(tmp_path)
     assert store.data["lessons"] == previous
-    assert store.next_lesson().id in NEW_TOPICS
+    next_lesson = store.next_lesson()
+    assert next_lesson is not None
+    assert store.status(next_lesson) != "completed"
+    for legacy_track in ("beginner", "experienced", "custom"):
+        store.data["track"] = legacy_track
+        assert store.next_lesson().id == next_lesson.id
     assert all(store.status(BY_ID[identifier]) == "completed" for identifier in previous)
     store.close()
 

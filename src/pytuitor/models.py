@@ -58,8 +58,18 @@ def code(source: str) -> str:
 
 
 @dataclass(frozen=True)
+class Section:
+    id: str
+    title: str
+    description: str
+    optional: bool = False
+
+
+@dataclass(frozen=True)
 class Chapter:
     id: str
     track: str
     title: str
     outcome: str
+    section_id: str = ""
+    prerequisites: tuple[str, ...] = ()

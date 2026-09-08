@@ -7,8 +7,9 @@ from pytuitor.curriculum import BY_ID
 async def test_onboarding_is_a_direct_choice(tmp_path):
     app = TutorApp(tmp_path)
     async with app.run_test(size=(120, 40)):
-        assert not app.screen.query("#background, #goal, #diagnostic")
-        assert app.screen.query("#path")
+        assert not app.screen.query("#background, #goal, #diagnostic, #path")
+        assert app.screen.query("#begin")
+        assert app.screen.query("#browse-syllabus")
 
 
 async def test_run_waits_for_keyboard_input(tmp_path):

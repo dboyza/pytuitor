@@ -1,12 +1,15 @@
 # Curriculum map
 
-The release candidate has 75 lessons and 12 chapter projects, with 40 beginner lessons and 35 experienced lessons.
-Each path has six chapter projects.
+The release candidate has one syllabus with 75 lessons and 12 projects across 21 chapters.
+The first three sections form the recommended sequence; Python depth and Specialized topics are optional.
+Start learning begins with Foundations, and learners can open any chapter directly.
+Each chapter lists useful preparation without locking access.
 Every course unit uses blank Build followed by Repair.
-Prerequisites are advisory, and familiar topics remain available from the dashboard.
 See [topic coverage](coverage.md) for the mapping to Pythonlings and the boundaries of that comparison.
 
-## Beginner
+## Foundations
+
+Start here: values, decisions, collections, and reusable functions.
 
 ### First programs
 
@@ -19,14 +22,23 @@ Read input, calculate, and choose what happens.
 - **Making decisions**: Comparisons, booleans, if, elif, and else.
 - **Project: the ticket desk**: Combine input, arithmetic, and decisions.
 
-### Working with collections
+### Lists and sets
 
-Process ordered items, unique values, and dictionaries.
+Process ordered items and compare unique values.
+
+Useful preparation: First programs.
 
 - **Lists and loops**: Work through a collection and calculate a total.
 - **Finding items in a list**: Indexes, length, and empty collections.
 - **Tuples, sets, and unpacking**: Group a fixed pair and recognize unique items.
 - **Comparing sets**: Find shared, missing, and combined values.
+
+### Loops and dictionaries
+
+Traverse, edit, and summarize collections.
+
+Useful preparation: Lists and sets.
+
 - **Numbering and pairing items**: Use range, enumerate, and zip to organize loops.
 - **Working with nested lists**: Traverse rows and columns without losing empty rows.
 - **Dictionaries and counts**: Associate keys with values.
@@ -34,61 +46,107 @@ Process ordered items, unique values, and dictionaries.
 - **Repeating until done**: While loops and stopping conditions.
 - **Project: supply report**: Summarize a collection without changing it.
 
-### Reusable programs
+### Functions and input
 
-Organize behavior into functions and handle invalid input.
+Write reusable functions and recover from invalid input.
+
+Useful preparation: Loops and dictionaries.
 
 - **Writing functions**: Parameters, return values, and debugging.
 - **Cleaning strings**: Methods, whitespace, and reusable transformations.
 - **Function options**: Default arguments, keyword calls, and local variables.
-- **Recursion and base cases**: Solve a smaller version of the same problem.
-- **Nested lists with recursion**: Traverse collections at different depths.
 - **Handling invalid input**: Exceptions and deliberate recovery.
 - **Build a text adventure**: Build a tiny branching adventure.
+
+## Everyday Python
+
+Read data and use Python's everyday library tools.
 
 ### Files and structured data
 
 Read, transform, and save text, JSON, and CSV.
 
+Useful preparation: Functions and input.
+
 - **Reading and writing files**: Use a context manager to close files reliably.
 - **Paths and folders**: Navigate paths without fragile string concatenation.
 - **Saving structured data**: JSON, dictionaries, and lists on disk.
 - **Working with CSV tables**: Read headers and quoted fields correctly.
-- **Matching text patterns**: Validate complete text with regular expressions.
-- **Extracting and replacing text**: Capture fields and substitute matching spans.
 - **Project: an expense report**: Transform CSV records into a JSON summary.
 
-### Tools you can maintain
+### Text patterns
 
-Build modules, command-line interfaces, classes, and tests.
+Validate, extract, and replace text with regular expressions.
+
+Useful preparation: Functions and input.
+
+- **Matching text patterns**: Validate complete text with regular expressions.
+- **Extracting and replacing text**: Capture fields and substitute matching spans.
+
+### Modules and library tools
+
+Organize modules, calculate summaries, and expose command-line options.
+
+Useful preparation: Files and structured data.
 
 - **Writing your own modules**: Share functions across Python files.
 - **Math and statistical summaries**: Use library calculations and distinguish mean from median.
 - **Repeatable random choices**: Generate reproducible samples without changing global random state.
 - **Command-line arguments**: Give a tool a predictable interface.
+
+### Dates and times
+
+Calculate deadlines and parse calendar and clock values.
+
+Useful preparation: Modules and library tools.
+
+- **Dates and deadlines**: Use date arithmetic instead of counting calendar days yourself.
+- **Parsing dates and times**: Combine calendar dates, clock times, and explicit formats.
+
+### Collection tools
+
+Transform, count, group, and queue data.
+
+Useful preparation: Modules and library tools.
+
+- **Readable comprehensions**: Transform and filter without hiding the intent.
+- **Counting and grouping**: Use Counter and defaultdict for collections.
+- **Queues with deque**: Process work in arrival order.
+
+## Building programs
+
+Build tested tools and automate work safely.
+
+### Classes and tested tools
+
+Model state, name choices, and verify a multi-file application.
+
+Useful preparation: Modules and library tools.
+
 - **Your first class**: Keep state and related operations together.
 - **Named states with enums**: Represent a fixed set of meaningful values.
 - **Writing automated tests**: Use assertions and unittest to catch regressions.
 - **Project: a task list workspace**: Separate a reusable model from its entry point.
 
-### Dependable automation
+### Careful automation
 
-Combine data, dates, validation, and safe file operations.
+Validate inputs and protect files while automating work.
 
-- **Readable comprehensions**: Transform and filter without hiding the intent.
-- **Counting and grouping**: Use Counter and defaultdict for collections.
-- **Queues with deque**: Process work in arrival order.
-- **Dates and deadlines**: Use date arithmetic instead of counting calendar days yourself.
-- **Parsing dates and times**: Combine calendar dates, clock times, and explicit formats.
+Useful preparation: Files and structured data, Modules and library tools, Collection tools.
+
 - **Validating a tool’s inputs**: State acceptable inputs before touching files.
 - **Copying without overwriting**: Preview work and protect existing data.
 - **Project: a careful notes archiver**: Preview a multi-file automation tool before it writes.
 
-## Experienced
+## Python depth (optional)
 
-### Think in Python
+Explore Python's behavior, composition, and object protocols.
 
-Write clear functions without aliasing or argument surprises.
+### Python semantics
+
+Understand truthiness, copying, arguments, and collection idioms.
+
+Useful preparation: Functions and input, Collection tools.
 
 - **Expressions with intent**: Python syntax & truthiness.
 - **Objects and copying**: Identity, aliasing, and mutability.
@@ -96,30 +154,64 @@ Write clear functions without aliasing or argument surprises.
 - **Group without losing order**: Dictionaries, sets & comprehensions.
 - **Project: a record index**: Record indexing project.
 
-### Compose and stream
+### Recursion and functional tools
 
-Compose decorators, lazy pipelines, and reliable resource cleanup.
+Solve recursive problems and compose function values.
 
+Useful preparation: Python semantics.
+
+- **Recursion and base cases**: Solve a smaller version of the same problem.
+- **Nested lists with recursion**: Traverse collections at different depths.
 - **Callable tools and sorting**: Callables, lambdas & partial.
 - **Map, filter, and folds**: Map, filter & reduce.
+
+### Decorators
+
+Wrap functions with predictable arguments, state, and metadata.
+
+Useful preparation: Recursion and functional tools.
+
 - **Arguments and decorators**: Scope, defaults, and decorators.
 - **Configure and stack decorators**: Decorator factories & stacking.
+
+### Iterators and streaming
+
+Compose lazy, bounded, one-pass data pipelines.
+
+Useful preparation: Python semantics.
+
 - **Iterators and generators**: Comprehensions and generator protocols.
-- **Exceptions with context**: Custom exceptions & chaining.
-- **Restore temporary state**: Exception-safe context managers.
-- **Implement the context protocol**: Class-based context managers.
 - **Consume only what you need**: Iterator composition.
 - **Combine and bound iterators**: Chain, islice, zip_longest & product.
 - **Group consecutive values**: Consecutive grouping with itertools.
 - **Project: a streaming report**: Lazy pipeline project.
 
-### Design and verify
+### Exceptions and contexts
 
-Model data, express protocols, and test behavior at boundaries.
+Preserve errors and restore resources reliably.
+
+Useful preparation: Classes and tested tools, Decorators, Iterators and streaming.
+
+- **Exceptions with context**: Custom exceptions & chaining.
+- **Restore temporary state**: Exception-safe context managers.
+- **Implement the context protocol**: Class-based context managers.
+
+### Dataclasses and types
+
+Express and test value objects and their lifecycle.
+
+Useful preparation: Classes and tested tools, Python semantics.
 
 - **Types and tests**: Types, tests, and project boundaries.
 - **Model a small value object**: Classes & dataclasses.
 - **Dataclass defaults and updates**: Dataclass factories & post-init.
+
+### Object protocols and testing
+
+Define typed interfaces and verify behavior at boundaries.
+
+Useful preparation: Dataclasses and types, Decorators.
+
 - **Unions and generic contracts**: Union types & TypeVar generics.
 - **Objects that fit Python**: Properties & special methods.
 - **Factories and abstract interfaces**: Class methods, static methods & ABCs.
@@ -127,9 +219,15 @@ Model data, express protocols, and test behavior at boundaries.
 - **Inject effects for reliable tests**: Dependency injection & mocking.
 - **Project: an inventory library**: Typed multi-file project.
 
+## Specialized topics (optional)
+
+Choose async, distribution, or language machinery when you need it.
+
 ### Coordinate async work
 
-Schedule work, preserve order, and clean up on cancellation.
+Schedule work and clean up on cancellation.
+
+Useful preparation: Exceptions and contexts, Iterators and streaming.
 
 - **Await cooperative work**: Coroutines & event loops.
 - **Context managers and async**: Resources, exceptions, and async.
@@ -139,7 +237,9 @@ Schedule work, preserve order, and clean up on cancellation.
 
 ### Build distributable tools
 
-Separate modules, validate metadata, and expose a predictable CLI.
+Organize imports, package metadata, and a predictable CLI.
+
+Useful preparation: Classes and tested tools, Files and structured data.
 
 - **Make imports boring**: Modules & import boundaries.
 - **Understand package metadata**: Virtual environments & packaging.
@@ -149,7 +249,9 @@ Separate modules, validate metadata, and expose a predictable CLI.
 
 ### Understand the machinery
 
-Use descriptors and class hooks, and inspect Python execution.
+Use descriptors, class hooks, inheritance, and introspection.
+
+Useful preparation: Object protocols and testing.
 
 - **Control attribute access**: Descriptors & attribute lookup.
 - **Register classes deliberately**: Metaclasses & class creation.
@@ -159,10 +261,17 @@ Use descriptors and class hooks, and inspect Python execution.
 
 ## Teaching and validation
 
+Chapters group related work rather than requiring a project at the end of every group.
+Projects remain where their required concepts have been introduced, including preparation from earlier chapters.
+Recursion is optional depth rather than a prerequisite for an introductory text adventure.
+Generator and class context managers follow generators, decorators, and classes.
+Packaging does not require async, and language machinery does not require packaging.
+
 Each lesson states the names, inputs, outputs, and edge cases needed to build its program from a blank editor.
 Repair uses the same contract with a deliberately defective implementation.
 Checks report expected and actual behavior; reference solutions never replace learner drafts.
-Existing lesson IDs and saved drafts remain intact when new lessons are inserted.
+All existing lesson IDs, exercise contracts, revisions, and saved drafts remain intact through this reorganization.
+Retired authoring paths remain implementation provenance, not learner navigation.
 
 Automated checks establish executable consistency.
-Use the [learner study](learner-study.md) to assess teaching effectiveness with real beginners and experienced programmers.
+Use the [learner study](learner-study.md) to assess teaching effectiveness with real learners.

@@ -4,7 +4,7 @@ import pytest
 from textual.widgets import Button, OptionList, Select, SelectionList, Static, TextArea
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import BY_ID, LESSONS, track_lessons
+from pytuitor.curriculum import BY_ID, LESSONS
 from pytuitor.dialogs import KeyboardHelp
 from pytuitor.screens import Dashboard, LessonScreen, Onboarding
 
@@ -24,9 +24,6 @@ async def test_beginner_journey_and_resume(tmp_path):
         app.screen.query_one("#begin").scroll_visible(animate=False)
         await pilot.pause()
         await pilot.click("#begin")
-        await pilot.pause()
-        assert isinstance(app.screen, Dashboard)
-        await pilot.click("#continue")
         await pilot.pause()
         screen = app.screen
         assert isinstance(screen, LessonScreen)
@@ -71,37 +68,30 @@ async def test_beginner_journey_and_resume(tmp_path):
         assert resumed.screen.query_one("#editor", TextArea).text == "# A draft I want to keep\n"
 
 
-async def test_experienced_placement_skip_and_revisit(tmp_path):
+async def test_known_topics_skip_and_revisit(tmp_path):
     app = TutorApp(tmp_path)
     async with app.run_test(size=(120, 40)) as pilot:
-        app.screen.query_one("#path", Select).value = "experienced"
+        await pilot.click("#browse-syllabus")
         await pilot.pause()
-        assert app.screen.query_one("#path", Select).value == "experienced"
-        first_lessons = track_lessons("experienced")
-        known = next(lesson for lesson in first_lessons if lesson.id == "objects-not-boxes")
-        for lesson in first_lessons[: first_lessons.index(known) + 1]:
-            for concept in lesson.concepts:
-                app.screen.query_one("#onboarding-concepts", SelectionList).select(concept)
-        expected_next = first_lessons[first_lessons.index(known) + 1]
-        app.screen.query_one("#begin").scroll_visible(animate=False)
+        await pilot.press("escape")
+        await pilot.click("#preferences")
         await pilot.pause()
-        await pilot.click("#begin")
+        known = LESSONS[0]
+        for concept in known.concepts:
+            app.screen.query_one("#onboarding-concepts", SelectionList).select(concept)
+        await pilot.press("f5")
         await pilot.pause()
+        assert isinstance(app.screen, Dashboard)
         await pilot.click("#continue")
         await pilot.pause()
-        assert app.screen.lesson.id == expected_next.id
+        assert app.screen.lesson.id == LESSONS[1].id
         await pilot.press("ctrl+b")
         await pilot.pause()
         listing = app.screen.query_one("#lesson-list", OptionList)
         listing.focus()
-        known_index = next(
-            index
-            for index in range(listing.option_count)
-            if listing.get_option_at_index(index).id == known.id
-        )
-        await pilot.press("home", *(["down"] * known_index), "enter")
+        await pilot.press("home", "enter")
         await pilot.pause()
-        assert app.screen.lesson.id == "objects-not-boxes"
+        assert app.screen.lesson.id == known.id
         assert app.store.status(app.screen.lesson) == "familiar"
 
 
@@ -115,10 +105,12 @@ async def test_small_terminal_and_visual_artifacts(tmp_path):
         await pilot.pause()
         await pilot.click("#begin")
         await pilot.pause()
+        assert app.screen.active_pane == "lesson"
+        await pilot.press("ctrl+b")
+        await pilot.pause()
         app.save_screenshot("dashboard-80.svg", str(artifacts))
         await pilot.click("#continue")
         await pilot.pause()
-        assert app.screen.active_pane == "lesson"
         app.save_screenshot("reading-80.svg", str(artifacts))
         await pilot.press("ctrl+t")
         await pilot.pause()
@@ -159,28 +151,32 @@ async def test_reset_backup_and_cancel(tmp_path):
         assert screen.query_one("#next", Button).disabled
 
 
-async def test_path_choice_and_known_topics(tmp_path):
+async def test_known_topics_preferences_preserve_selection(tmp_path):
     app = TutorApp(tmp_path)
     async with app.run_test(size=(100, 35)) as pilot:
-        app.screen.query_one("#path", Select).value = "experienced"
         await pilot.press("f5")
         await pilot.pause()
-        await pilot.click("#preferences")
+        assert isinstance(app.screen, LessonScreen)
+        await pilot.press("ctrl+b")
         await pilot.pause()
-        # Reopening setup preserves the user's explicit path.
-        assert app.screen.query_one("#path", Select).value == "experienced"
-        app.screen.query_one("#begin").scroll_visible(animate=False)
-        await pilot.pause()
-        await pilot.click("#begin")
-        await pilot.pause()
-        assert isinstance(app.screen, Dashboard)
         await pilot.click("#preferences")
         await pilot.pause()
         assert isinstance(app.screen, Onboarding)
-        app.screen.query_one("#onboarding-concepts", SelectionList).select("Identity & mutability")
+        concepts = app.screen.query_one("#onboarding-concepts", SelectionList)
+        concepts.select("Identity & mutability")
         await pilot.press("f5")
         await pilot.pause()
+        assert isinstance(app.screen, Dashboard)
         assert app.store.status(BY_ID["objects-not-boxes"]) == "familiar"
+        await pilot.click("#preferences")
+        await pilot.pause()
+        assert (
+            "Identity & mutability"
+            in app.screen.query_one("#onboarding-concepts", SelectionList).selected
+        )
+        await pilot.press("escape")
+        await pilot.pause()
+        assert isinstance(app.screen, Dashboard)
 
 
 @pytest.mark.parametrize("lesson_id", ["lantern-quest", "signal-from-noise"])

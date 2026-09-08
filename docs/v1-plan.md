@@ -2,11 +2,11 @@
 
 ## Accepted scope
 
-Deliver 75 authored lessons and 12 chapter projects across two paths.
-Each path contains six chapters ending in a project.
-Beginner has 40 lessons; Experienced has 35.
-Beginner graduates should independently build command-line tools that use files, structured data, modules, classes, and tests.
-Experienced graduates should understand idiomatic Python and its object model, including descriptors, metaclasses, protocols, asynchronous code, and implementation details.
+Deliver one curriculum containing 75 authored lessons and 12 projects, organized into five sections with focused chapters.
+Start learning opens the first lesson immediately; the syllabus provides an alternative entry for browsing.
+Core study builds from first programs to command-line tools using structured data, modules, classes, tests, and safe automation.
+Optional sections introduce deeper Python behavior, async, distribution, and language machinery without becoming the automatic next destination after core study.
+Known topics can be edited from the dashboard, and familiar lessons remain available for review.
 
 Preserve the gray interface, Python blue/yellow accents, keyboard navigation, and an 80 × 24 minimum terminal size.
 Keep learning and checks offline after installation.
@@ -18,7 +18,7 @@ No account, telemetry, automatic package installation, or mandatory daily practi
 1. Curriculum: coherent prerequisites, complete exercise contracts, blank Build then broken Repair, chapter projects, and verified reference implementations.
 2. Workspace: multiple files, saved stage drafts, local imports, isolated check fixtures, exports, environments, and explicit package installation.
 3. Learning feedback: progressive hints, useful error explanations, transparent checks, and explicitly revealed reference solutions.
-4. Navigation: chapter browsing within the selected path, advisory prerequisites, and a browsable syllabus.
+4. Navigation: one ordered curriculum, section and chapter browsing, advisory prerequisites, known topics, and a browsable syllabus.
 5. Learner validation: self-run study scripts and user-recorded observations.
 6. Release readiness: migration checks, installed-package validation, secure installation guidance, macOS/Linux CI, and release checks.
 

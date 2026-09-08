@@ -1,6 +1,6 @@
 # Expressions with intent
 
-You already know how to program; this path concentrates on Python's rules and conventions.
+This chapter builds on variables, conditions, loops, and functions to explore Python's rules and conventions.
 Python uses indentation to group statements and a colon to introduce a block.
 Use four spaces for each indentation level.
 There are no braces around a function body or an `if` branch.

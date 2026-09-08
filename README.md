@@ -13,8 +13,10 @@ uv run --locked pytuitor
 
 The first run installs Python and dependencies if needed.
 Lessons, hints, reference solutions, checks, and progress then work offline.
-Choose a path, mark topics you already know, and select **Continue**.
-Browse chapters to revisit any lesson; prerequisites are guidance, not barriers.
+Select **Start learning** to open the first lesson, or **Browse syllabus** to explore the course.
+One curriculum progresses through five sections, with optional depth clearly marked.
+Use **Known topics** on the dashboard to skip familiar material when continuing.
+Browse chapters to open any lesson; prerequisites are guidance, not barriers.
 
 Designed for macOS and Linux, Python 3.11+, and terminals at least 80 × 24.
 Press **Ctrl+T** to cycle through lesson, editor, and console, **Ctrl+R** to run, **F5** to check, and **F10** for all keybinds.

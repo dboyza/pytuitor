@@ -128,12 +128,12 @@ class TutorApp(App):
         from pytuitor.setup import Onboarding
 
         yield SystemCommand(
-            "Dashboard", "Continue your chosen path or revisit its lessons", self.action_dashboard
+            "Dashboard", "Continue your chapter or revisit lessons", self.action_dashboard
         )
         if self.store.data["onboarded"]:
             yield SystemCommand(
-                "Edit path",
-                "Change your path or update known topics",
+                "Known topics",
+                "Choose which familiar concepts Continue skips",
                 lambda: self.push_screen(Onboarding(editing=True)),
             )
         yield SystemCommand(

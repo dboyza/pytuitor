@@ -2,12 +2,12 @@ import json
 from pathlib import Path
 
 import pytest
-from textual.widgets import Input, Select, Static, TextArea
+from textual.widgets import Input, Static, TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import BY_ID, LESSONS
 from pytuitor.dialogs import ConfirmRestart, KeyboardHelp
-from pytuitor.screens import Dashboard
+from pytuitor.screens import Dashboard, LessonScreen
 from pytuitor.setup import Onboarding
 
 
@@ -40,15 +40,13 @@ async def command(pilot, name):
 async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size):
     app = TutorApp(tmp_path)
     async with app.run_test(size=size) as pilot:
-        assert app.screen.query_one("#path", Select).value == "beginner"
+        assert isinstance(app.screen, Onboarding)
         await pilot.press("f10")
         await pilot.pause()
         assert isinstance(app.screen, KeyboardHelp)
         await pilot.press("escape", "f5")
         await pilot.pause()
-        assert isinstance(app.screen, Dashboard)
-        await pilot.press("c")
-        await pilot.pause()
+        assert isinstance(app.screen, LessonScreen)
         await pilot.press(
             "ctrl+t", "ctrl+a", *'print("Hello, explorer!")', "enter", *"print(6 * 7)"
         )
@@ -98,15 +96,18 @@ async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size)
         assert isinstance(app.screen, Dashboard)
 
 
-async def test_custom_path_selection_and_revisit_are_keyboard_accessible(tmp_path):
+async def test_known_topics_and_revisit_are_keyboard_accessible(tmp_path):
     app = TutorApp(tmp_path)
     async with app.run_test(size=(100, 35)) as pilot:
-        await pilot.press("enter", "end", "enter")
+        await tab_to(pilot, app, "browse-syllabus")
+        await pilot.press("enter")
         await pilot.pause()
-        assert app.screen.query_one("#path", Select).value == "custom"
-        assert "Build distributable tools" in str(
-            app.screen.query_one("#path-topics", Static).content
-        )
+        await pilot.press("escape")
+        await pilot.pause()
+        assert isinstance(app.screen, Dashboard)
+        await tab_to(pilot, app, "preferences")
+        await pilot.press("enter")
+        await pilot.pause()
         await tab_to(pilot, app, "onboarding-concepts")
         await pilot.press("home", "space", "f5")
         await pilot.pause()

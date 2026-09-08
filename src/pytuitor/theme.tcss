@@ -44,6 +44,7 @@ Footer { background: #151719; color: #9ba3a5; }
 #onboarding-scroll { padding: 1 4; align-horizontal: center; }
 #onboarding-card { width: 76; max-width: 100%; height: auto; padding: 1 3 2 3; }
 #onboarding-concepts { height: 8; }
+Onboarding.editing #onboarding-card { padding: 0 1; }
 #dashboard-body { padding: 1 3 0 3; align-horizontal: center; }
 #dashboard-main { width: 110; max-width: 100%; height: 1fr; }
 #path-header { height: 3; align-vertical: middle; }
@@ -57,12 +58,14 @@ Syllabus .topbar { width: 100%; }
 #syllabus-header { height: 3; align-vertical: middle; }
 #syllabus-header .hero { width: 1fr; margin: 0; }
 #syllabus-back { height: 1; }
-#syllabus-path { margin: 0 0 1 0; }
 #syllabus-scroll { height: 1fr; border: solid transparent; }
 #syllabus-scroll:focus { border: solid #3776ab; }
 #syllabus-summary { margin-bottom: 1; }
 #syllabus-content { height: auto; margin-top: 1; }
-.syllabus-columns { height: 1; color: #a2aaa9; text-style: bold; }
+.syllabus-section { height: auto; margin-top: 1; }
+.syllabus-section-description { height: auto; margin-bottom: 1; }
+.syllabus-prerequisites { height: auto; margin-bottom: 1; }
+.start-chapter { height: 3; margin-bottom: 1; }
 .syllabus-chapter { height: auto; padding: 0; background: #1c1f22; border: none; border-bottom: solid #303639; }
 .syllabus-chapter CollapsibleTitle { width: 100%; padding: 0 1; border-left: solid transparent; color: #dddcd7; }
 .syllabus-chapter CollapsibleTitle:hover { background: #33393c; }

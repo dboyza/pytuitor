@@ -9,15 +9,16 @@ from pathlib import Path
 from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import CHAPTERS, LESSONS, default_input
+from pytuitor.curriculum import CHAPTERS, LESSONS, SECTIONS, default_input
 from pytuitor.runner import execute
-from pytuitor.screens import Dashboard, LessonScreen
+from pytuitor.screens import LessonScreen
 
 
 async def main():
     assert len(LESSONS) == 87
     assert sum(lesson.project for lesson in LESSONS) == 12
-    assert len(CHAPTERS) == 12
+    assert len(CHAPTERS) == 21
+    assert len(SECTIONS) == 5
     assert files("pytuitor").joinpath("theme.tcss").is_file()
     for lesson in LESSONS:
         assert lesson.body.strip()
@@ -29,9 +30,6 @@ async def main():
         app = TutorApp(Path(directory))
         async with app.run_test(size=(80, 24)) as pilot:
             await pilot.press("f5")
-            await pilot.pause()
-            assert isinstance(app.screen, Dashboard)
-            await pilot.press("c")
             await pilot.pause()
             assert isinstance(app.screen, LessonScreen)
             screen = app.screen
