@@ -52,9 +52,9 @@ Footer { background: #151719; color: #9ba3a5; }
 #preferences:focus, #preferences:hover { background: #384044; color: #eee9e0; }
 #dashboard-summary { height: 1; }
 #resume-card { height: 4; margin-top: 1; padding: 0 1; background: #222629; align-vertical: middle; }
-#continue-summary { width: 1fr; height: auto; padding: 0 1; color: #ffd343; }
-#continue { margin-left: 1; }
-#course-heading { height: 1; margin: 1 0; }
+#continue-summary { width: 1fr; height: 100%; content-align: left middle; padding: 0 1; color: #ffd343; }
+#continue { height: 100%; content-align: center middle; margin-left: 1; }
+#course-heading { height: 1; margin: 1 0 0 0; }
 #lesson-list { width: 100%; height: 1fr; min-height: 4; }
 #lesson-list-help { height: auto; margin-top: 1; }
 #dashboard-bottom { height: 2; margin-top: 1; }
@@ -65,7 +65,7 @@ Dashboard.narrow .topbar { height: 2; }
 Dashboard.narrow #dashboard-body { padding: 0 2; }
 Dashboard.narrow #path-header { height: 2; }
 Dashboard.narrow #resume-card { height: 3; }
-Dashboard.narrow #course-heading { margin: 1 0 0 0; }
+Dashboard.narrow #course-heading { margin: 0; }
 Dashboard.narrow #lesson-list-help { margin-top: 0; }
 Dashboard.narrow #dashboard-bottom { height: 1; margin-top: 0; }
 #lesson-toolbar { height: 3; margin: 1 3 0 3; align-vertical: middle; }
@@ -134,7 +134,7 @@ LessonScreen.narrow #stage-navigation Button { height: 1; padding: 0 1; }
 #chapter-picker { height: 3; margin: 0; }
 #chapter-outcome { height: auto; max-height: 2; }
 #review, #study-notes { height: 1; padding: 0 1; background: transparent; color: #86bde8; }
-#review:focus, #study-notes:focus { background: #384044; }
+#review:focus, #review:hover, #study-notes:focus, #study-notes:hover { background: #384044; }
 #run-files-dialog { height: 90%; }
 #run-file-code { height: 1fr; min-height: 6; }
 #run-files-dialog, #solution-dialog { padding: 1 2; }

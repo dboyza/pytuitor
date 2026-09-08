@@ -109,6 +109,7 @@ class Dashboard(TutorScreen):
                     [("Your lessons", "")], value="", allow_blank=False, id="chapter-picker"
                 )
                 yield Static(id="chapter-outcome", classes="muted")
+                yield Static("Lessons in this chapter", id="course-heading", classes="title")
                 yield LessonList(id="lesson-list")
                 yield Static(
                     "↑ ↓ select · Enter or double-click opens · Known lessons stay available",
@@ -165,7 +166,10 @@ class Dashboard(TutorScreen):
                 self.chapter_id = chapters[0].id
         picker = self.query_one("#chapter-picker", Select)
         picker.set_options(
-            [(f"{index}. {chapter.title}", chapter.id) for index, chapter in enumerate(chapters, 1)]
+            [
+                (f"Chapter {index}: {chapter.title}", chapter.id)
+                for index, chapter in enumerate(chapters, 1)
+            ]
             or [("Your lessons", "")]
         )
         picker.value = self.chapter_id or ""

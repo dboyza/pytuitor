@@ -43,6 +43,7 @@ Verify implementation details against code.
 - Footer order is numbered function keys, Ctrl shortcuts, then other keys.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
 - Dashboard single-click selects; double-click or Enter opens.
+- Label the dashboard chapter selector and its lesson list explicitly; vertically center resume-card content.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.
 - Check reports each operation, input, expected/actual result, printed output, and running/pass/fail status.
 - Reset exercise backs up the complete current stage before restoring blank Build or broken Repair.
