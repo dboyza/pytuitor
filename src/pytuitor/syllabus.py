@@ -5,7 +5,7 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.events import Resize
-from textual.widgets import Button, Footer, Markdown, Select, Static
+from textual.widgets import Button, Collapsible, Footer, Select, Static
 
 from pytuitor.curriculum import TRACKS, track_chapters, track_lessons
 from pytuitor.ui import TutorScreen, brand
@@ -19,7 +19,7 @@ class Syllabus(TutorScreen):
         with Horizontal(id="syllabus-container"):
             with Vertical(id="syllabus-body"):
                 with Horizontal(id="syllabus-header"):
-                    yield Static("Explore the curriculum", classes="hero")
+                    yield Static("Curriculum", classes="hero")
                     yield Button("Back", id="syllabus-back")
                 yield Select(
                     [
@@ -32,48 +32,67 @@ class Syllabus(TutorScreen):
                     id="syllabus-path",
                 )
                 with VerticalScroll(id="syllabus-scroll"):
-                    yield Markdown(id="syllabus-content")
+                    yield Static(id="syllabus-summary", classes="muted")
+                    yield Static("Expand a chapter to see its lessons.", classes="muted")
+                    yield Vertical(id="syllabus-content")
         yield Footer(show_command_palette=False)
 
-    def on_mount(self) -> None:
-        self.show_outline(self.store.data["track"])
+    async def on_mount(self) -> None:
+        await self.show_outline(self.store.data["track"])
         self.query_one("#syllabus-scroll").focus()
 
     def on_resize(self, event: Resize) -> None:
         self.set_class(event.size.width < 100, "narrow")
 
     @on(Select.Changed, "#syllabus-path")
-    def change_path(self, event: Select.Changed) -> None:
+    async def change_path(self, event: Select.Changed) -> None:
         if event.value != Select.BLANK:
-            self.show_outline(str(event.value))
+            await self.show_outline(str(event.value))
 
-    def show_outline(self, track: str) -> None:
+    async def show_outline(self, track: str) -> None:
         lessons = track_lessons(track)
         chapters = track_chapters(track)
         projects = sum(lesson.project for lesson in lessons)
-        minutes = sum(lesson.minutes for lesson in lessons)
-        title = "All chapters" if track == "custom" else f"{TRACKS[track]} path"
-        lines = [
-            f"# {title}",
-            f"{len(chapters)} chapters · {len(lessons) - projects} lessons · "
-            f"{projects} projects · about {minutes // 60} hr {minutes % 60} min",
-            "Build from scratch, then Repair a broken program to complete each unit. "
-            "Learn entirely offline.",
+        self.query_one("#syllabus-summary", Static).update(
+            f"{len(chapters)} chapters · {len(lessons) - projects} lessons · {projects} projects\n"
+            "Each unit includes Build and Repair."
+        )
+        content = self.query_one("#syllabus-content", Vertical)
+        await content.remove_children()
+        rows = [
+            Static(
+                f"    {'Chapter':38} {'Lessons':>7} {'Projects':>9}",
+                classes="syllabus-columns",
+                markup=False,
+            )
         ]
         for index, chapter in enumerate(chapters, 1):
-            lines.extend([f"## Chapter {index}: {chapter.title}", chapter.outcome])
+            units = [lesson for lesson in lessons if lesson.chapter_id == chapter.id]
+            project_count = sum(lesson.project for lesson in units)
+            details = [Static(chapter.outcome, classes="syllabus-outcome", markup=False)]
             if track == "custom":
-                lines.append(f"{TRACKS[chapter.track]} path")
-            for lesson in (item for item in lessons if item.chapter_id == chapter.id):
-                lines.extend(
-                    [
-                        f"### {lesson.title}",
-                        f"{'Project' if lesson.project else 'Lesson'} · {lesson.minutes} min · "
-                        f"{lesson.subtitle}",
-                        f"Topics: {', '.join(lesson.concepts)}.",
-                    ]
+                details.append(Static(f"{TRACKS[chapter.track]} path", classes="muted"))
+            for lesson in units:
+                details.append(
+                    Static(
+                        f"{lesson.title} · {lesson.minutes} min\n"
+                        f"{lesson.subtitle}\n"
+                        f"Topics: {', '.join(lesson.concepts)}",
+                        classes="syllabus-lesson",
+                        markup=False,
+                    )
                 )
-        self.query_one("#syllabus-content", Markdown).update("\n\n".join(lines))
+            label = f"{index:02}  {chapter.title}"
+            rows.append(
+                Collapsible(
+                    *details,
+                    title=f"{label:38} {len(units) - project_count:>7} {project_count:>9}",
+                    id=f"syllabus-{chapter.id}",
+                    collapsed=True,
+                    classes="syllabus-chapter",
+                )
+            )
+        await content.mount(*rows)
         self.query_one("#syllabus-scroll").scroll_home(animate=False)
 
     @on(Button.Pressed, "#syllabus-back")

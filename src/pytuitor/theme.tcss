@@ -60,10 +60,16 @@ Syllabus .topbar { width: 100%; }
 #syllabus-path { margin: 0 0 1 0; }
 #syllabus-scroll { height: 1fr; border: solid transparent; }
 #syllabus-scroll:focus { border: solid #3776ab; }
-#syllabus-content { padding: 0 1; }
-#syllabus-content MarkdownH1 { color: #ffd343; margin: 0 0 1 0; padding: 0; border: none; text-align: left; }
-#syllabus-content MarkdownH2 { color: #86bde8; margin: 1 0 0 0; text-style: bold; }
-#syllabus-content MarkdownH3 { color: #dddcd7; margin: 1 0 0 0; }
+#syllabus-summary { margin-bottom: 1; }
+#syllabus-content { height: auto; margin-top: 1; }
+.syllabus-columns { height: 1; color: #a2aaa9; text-style: bold; }
+.syllabus-chapter { height: auto; padding: 0; background: #1c1f22; border: none; border-bottom: solid #303639; }
+.syllabus-chapter CollapsibleTitle { width: 100%; padding: 0 1; border-left: solid transparent; color: #dddcd7; }
+.syllabus-chapter CollapsibleTitle:hover { background: #33393c; }
+.syllabus-chapter CollapsibleTitle:focus { background: #384044; color: #ffd343; border-left: solid #3776ab; }
+.syllabus-chapter Contents { padding: 1 2; }
+.syllabus-outcome { height: auto; color: #86bde8; margin-bottom: 1; }
+.syllabus-lesson { height: auto; margin-bottom: 1; }
 Syllabus.narrow .topbar { height: 2; }
 Syllabus.narrow #syllabus-body { padding: 0 2; }
 Syllabus.narrow #syllabus-header { height: 2; }

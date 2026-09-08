@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import pytest
 from textual.containers import VerticalScroll
-from textual.widgets import Markdown, Select
+from textual.widgets import Collapsible, Select, Static
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import track_chapters, track_lessons
@@ -11,7 +11,10 @@ from pytuitor.syllabus import Syllabus
 
 
 def assert_path_content(screen, track):
-    source = screen.query_one("#syllabus-content", Markdown).source
+    source = "\n".join(str(item.content) for item in screen.query("#syllabus-content Static"))
+    sections = list(screen.query(Collapsible))
+    assert len(sections) == len(track_chapters(track))
+    source += "\n".join(section.title for section in sections)
     for chapter in track_chapters(track):
         assert chapter.title in source
         assert chapter.outcome in source
@@ -40,6 +43,26 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
         await pilot.click("#syllabus")
         assert isinstance(app.screen, Syllabus)
         assert_path_content(app.screen, "beginner")
+        sections = list(app.screen.query(Collapsible))
+        assert all(section.collapsed for section in sections)
+        first = sections[0]
+        first.query_one("CollapsibleTitle").focus()
+        await pilot.press("enter")
+        await pilot.pause()
+        assert not first.collapsed
+        details = first.query_one(".syllabus-lesson", Static)
+        assert details.region.height >= 3
+        await pilot.press("enter")
+        await pilot.pause()
+        assert first.collapsed
+        await pilot.click(first.query_one("CollapsibleTitle"))
+        await pilot.pause()
+        assert not first.collapsed
+        await pilot.click(first.query_one("CollapsibleTitle"))
+        await pilot.pause()
+        assert first.collapsed
+        app.screen.query_one("#syllabus-scroll").focus()
+        await pilot.pause()
         picker = app.screen.query_one("#syllabus-path", Select)
         assert picker.value == "beginner"
         for control in ("#syllabus-path", "#syllabus-back"):
@@ -49,7 +72,6 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
             assert region.y >= 0 and region.bottom <= size[1] - 1
         scroll = app.screen.query_one("#syllabus-scroll", VerticalScroll)
         assert app.focused is scroll
-        assert scroll.max_scroll_y > 0
         assert scroll.max_scroll_x == 0
         await pilot.press("end")
         await pilot.pause()
@@ -60,6 +82,7 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
         assert picker.value == "experienced"
         assert scroll.scroll_y == 0
         assert_path_content(app.screen, "experienced")
+        assert all(section.collapsed for section in app.screen.query(Collapsible))
         await pilot.press("enter", "down", "enter")
         await pilot.pause()
         assert picker.value == "custom"

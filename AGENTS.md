@@ -44,7 +44,7 @@ Verify implementation details against code.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
 - Retired practice and study-note profile fields remain loadable but inert.
-- Syllabus browses authored paths without changing the learner's saved path or progress.
+- Syllabus shows chapter lesson/project counts with collapsed lesson details; browsing never changes the saved path or progress.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.
 - Check reports each operation, input, expected/actual result, printed output, and running/pass/fail status.
 - Reset exercise backs up the complete current stage before restoring blank Build or broken Repair.
