@@ -6,14 +6,14 @@ from pytuitor.runner import execute
 
 
 def test_experienced_course_has_six_complete_chapters():
-    assert len(LESSONS) == 30
-    assert len({lesson.id for lesson in LESSONS}) == 30
+    assert len(LESSONS) == 41
+    assert len({lesson.id for lesson in LESSONS}) == 41
     assert sum(lesson.project for lesson in LESSONS) == 6
     seen = set()
     for chapter in CHAPTERS:
         units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter.id]
-        assert len(units) == 5
-        assert [lesson.project for lesson in units] == [False] * 4 + [True]
+        assert len(units) >= 5
+        assert [lesson.project for lesson in units] == [False] * (len(units) - 1) + [True]
         for lesson in units:
             assert set(lesson.prerequisites) <= seen
             assert not lesson.starter

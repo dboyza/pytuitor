@@ -12,7 +12,7 @@ Verify implementation details against code.
 
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
-- The v1 candidate has 51 lessons and 12 chapter projects.
+- The v1 candidate has 75 lessons and 12 chapter projects.
 - Each path has six chapters ending in a project, with lesson counts matched to the topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Onboarding is Beginner, Experienced, or Custom with chapter previews and known concepts; no diagnostic or background questions.
@@ -56,7 +56,7 @@ Verify implementation details against code.
 
 ## Code map and pitfalls
 
-- `models.py` defines contracts; `beginner_course.py` and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
+- `models.py` defines contracts; `beginner_course.py`, `beginner_extensions.py`, and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
 - `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.

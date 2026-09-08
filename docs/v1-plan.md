@@ -2,9 +2,9 @@
 
 ## Accepted scope
 
-Deliver 51 authored lessons and 12 chapter projects across two paths.
+Deliver 75 authored lessons and 12 chapter projects across two paths.
 Each path contains six chapters ending in a project.
-Beginner has 27 lessons; Experienced has 24.
+Beginner has 40 lessons; Experienced has 35.
 Beginner graduates should independently build command-line tools that use files, structured data, modules, classes, and tests.
 Experienced graduates should understand idiomatic Python and its object model, including descriptors, metaclasses, protocols, asynchronous code, and implementation details.
 

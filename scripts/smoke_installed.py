@@ -15,7 +15,7 @@ from pytuitor.screens import Dashboard, LessonScreen
 
 
 async def main():
-    assert len(LESSONS) == 63
+    assert len(LESSONS) == 87
     assert sum(lesson.project for lesson in LESSONS) == 12
     assert len(CHAPTERS) == 12
     assert files("pytuitor").joinpath("theme.tcss").is_file()

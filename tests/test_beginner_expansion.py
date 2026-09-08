@@ -77,7 +77,7 @@ async def test_returning_learner_keeps_progress_and_discovers_added_lessons(tmp_
         first = app.screen.query_one("#syllabus-b-foundations", Collapsible)
         second = app.screen.query_one("#syllabus-b-collections", Collapsible)
         assert first.title.split()[-2:] == ["5", "1"]
-        assert second.title.split()[-2:] == ["6", "1"]
+        assert second.title.split()[-2:] == ["9", "1"]
         await pilot.press("escape", "c")
         assert app.screen.lesson.id == NEW_LESSONS[0]
         assert all(app.store.data["lessons"][key] == value for key, value in previous.items())

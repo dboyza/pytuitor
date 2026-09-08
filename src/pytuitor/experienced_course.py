@@ -238,8 +238,263 @@ LESSONS = (
         ],
         project=True,
     ),
+    unit(
+        "callable-tools",
+        "python-composition",
+        "Callable tools and sorting",
+        "Callables, lambdas & partial",
+        """
+        from functools import partial
+
+        def rank(records, key):
+            return sorted(records, key=key)
+
+        def make_scaler(factor):
+            return partial(lambda value, factor: value * factor, factor=factor)
+        """,
+        """
+        def rank(records, key):
+            return sorted(records)
+
+        def make_scaler(factor):
+            return lambda value: value + factor
+        """,
+        [
+            check("Custom key", "rank(['pear', 'fig', 'apple'], len)", ["fig", "pear", "apple"]),
+            check("Stable equal keys", "rank(['bb', 'aa', 'z'], len)", ["z", "bb", "aa"]),
+            check("One-pass records", "rank(iter([3, 1, 2]), lambda value: -value)", [3, 2, 1]),
+            check("Empty records", "rank([], len)", []),
+            check(
+                "Reusable bound argument",
+                "(lambda scale: [scale(2), scale(-3), scale(0)])(make_scaler(4))",
+                [8, -12, 0],
+            ),
+            check(
+                "Keep caller list",
+                (
+                    "(exec('values = [3, 1]\\nrank(values, lambda x: x)\\nresult = "
+                    "values', globals()), result)[1]"
+                ),
+                [3, 1],
+            ),
+        ],
+        [
+            (
+                "Pass the supplied key callable to sorted; sorted returns a n"
+                "ew list and preserves equal-key order."
+            ),
+            (
+                "Bind factor with a closure or functools.partial so each late"
+                "r call multiplies its own value."
+            ),
+        ],
+    ),
+    unit(
+        "functional-pipelines",
+        "python-composition",
+        "Map, filter, and folds",
+        "Map, filter & reduce",
+        """
+        from functools import reduce
+
+        def transform_selected(items, predicate, transform):
+            return list(map(transform, filter(predicate, items)))
+
+        def fold(items, combine, initial):
+            return reduce(combine, items, initial)
+        """,
+        """
+        def transform_selected(items, predicate, transform):
+            return [transform(item) for item in items]
+
+        def fold(items, combine, initial):
+            for item in items:
+                initial = combine(item, initial)
+            return initial
+        """,
+        [
+            check(
+                "Select before transform",
+                "transform_selected([-2, 0, 3], lambda x: x > 0, lambda x: x * 10)",
+                [30],
+            ),
+            check(
+                "One-pass transformation",
+                "transform_selected(iter([1, 2, 3]), lambda x: x % 2, str)",
+                ["1", "3"],
+            ),
+            check("Empty pipeline", "transform_selected([], bool, str)", []),
+            check(
+                "Transform only selected values",
+                "transform_selected([0, 2], bool, lambda value: 10 / value)",
+                [5.0],
+            ),
+            check("Left fold order", "fold([2, 3], lambda total, x: total - x, 10)", 5),
+            check(
+                "Generic accumulator",
+                "fold(iter(['a', 'b']), lambda acc, x: acc + [x.upper()], [])",
+                ["A", "B"],
+            ),
+            check("Empty fold keeps initial", "fold([], lambda a, b: None, 'seed')", "seed"),
+        ],
+        [
+            (
+                "Filter original values before applying the transform; reject"
+                "ed values must never reach it."
+            ),
+            (
+                "Start with initial and call combine(accumulator, item) in in"
+                "put order, including for nonnumeric accumulators."
+            ),
+        ],
+    ),
     legacy("functions-with-memory", "python-composition"),
+    unit(
+        "decorator-factories",
+        "python-composition",
+        "Configure and stack decorators",
+        "Decorator factories & stacking",
+        """
+        from functools import wraps
+
+        def prefixed(prefix):
+            def decorate(function):
+                @wraps(function)
+                def wrapper(*args, **kwargs):
+                    return prefix + function(*args, **kwargs)
+                return wrapper
+            return decorate
+        """,
+        """
+        def prefixed(prefix):
+            def decorate(function):
+                def wrapper(value):
+                    return function(value) + prefix
+                return wrapper
+            return decorate
+        """,
+        [
+            check("Factory configuration", "prefixed('Hi: ')(lambda name: name)('Lin')", "Hi: Lin"),
+            check(
+                "Forward keyword arguments",
+                "prefixed('>')(lambda *, name: name)(name='Ada')",
+                ">Ada",
+            ),
+            check("Stack order", "prefixed('A')(prefixed('B')(lambda: 'C'))()", "ABC"),
+            check(
+                "Preserve function identity metadata",
+                (
+                    "(exec(\"def greet():\\n    'Greeting documentation.'\\n    retu"
+                    "rn 'hello'\\nwrapped = prefixed('!')(greet)\\nresult = [wrappe"
+                    'd.__name__, wrapped.__doc__, wrapped.__wrapped__ is greet]",'
+                    " globals()), result)[1]"
+                ),
+                ["greet", "Greeting documentation.", True],
+            ),
+            check(
+                "Evaluate each call",
+                (
+                    '(exec("calls = []\\ndef greet(value):\\n    calls.append(value'
+                    ")\\n    return str(value)\\nf = prefixed('!')(greet)\\nresult ="
+                    ' [f(1), f(2), calls]", globals()), result)[1]'
+                ),
+                ["!1", "!2", [1, 2]],
+            ),
+        ],
+        [
+            "Use three nested layers: configuration, original function, then invocation arguments.",
+            (
+                "Forward *args and **kwargs, prepend after calling, and use w"
+                "raps to preserve metadata and __wrapped__."
+            ),
+        ],
+    ),
     legacy("lazy-by-design", "python-composition"),
+    unit(
+        "exception-boundaries",
+        "python-composition",
+        "Exceptions with context",
+        "Custom exceptions & chaining",
+        """
+        class RecordError(ValueError):
+            pass
+
+        def parse_record(text):
+            try:
+                return int(text)
+            except ValueError as error:
+                raise RecordError("Invalid integer record") from error
+
+        def read_record(stream):
+            try:
+                return parse_record(stream.read())
+            finally:
+                stream.close()
+        """,
+        """
+        class RecordError(ValueError):
+            pass
+
+        def parse_record(text):
+            return int(text)
+
+        def read_record(stream):
+            result = parse_record(stream.read())
+            stream.close()
+            return result
+        """,
+        [
+            check("Parse signed integer", "parse_record(' -12 ')", -12),
+            check(
+                "Custom error retains cause",
+                (
+                    "(exec(\"try:\\n    parse_record('bad')\\nexcept RecordError as "
+                    'error:\\n    result = type(error.__cause__) is ValueError", g'
+                    "lobals()), result)[1]"
+                ),
+                True,
+            ),
+            check(
+                "Close on success",
+                (
+                    "(exec(\"from io import StringIO\\ns = StringIO('5')\\nvalue = r"
+                    'ead_record(s)\\nresult = [value, s.closed]", globals()), resu'
+                    "lt)[1]"
+                ),
+                [5, True],
+            ),
+            check(
+                "Close on invalid record",
+                (
+                    "(exec(\"from io import StringIO\\ns = StringIO('x')\\ntry:\\n   "
+                    ' read_record(s)\\nexcept RecordError:\\n    result = s.closed"'
+                    ", globals()), result)[1]"
+                ),
+                True,
+            ),
+            check(
+                "Preserve read errors and close",
+                (
+                    '(exec("class Broken:\\n    closed = False\\n    def read(self)'
+                    ":\\n        raise OSError('disk')\\n    def close(self):\\n    "
+                    "    self.closed = True\\ns = Broken()\\ntry:\\n    read_record("
+                    "s)\\nexcept OSError as error:\\n    result = [str(error), s.cl"
+                    'osed]", globals()), result)[1]'
+                ),
+                ["disk", True],
+            ),
+        ],
+        [
+            (
+                "Catch ValueError around int conversion and raise RecordError"
+                " from the caught exception."
+            ),
+            (
+                "Read once in try and close once in finally so conversion and"
+                " reading failures both clean up."
+            ),
+        ],
+    ),
     unit(
         "context-practice",
         "python-composition",
@@ -304,6 +559,95 @@ LESSONS = (
         ],
     ),
     unit(
+        "managed-contexts",
+        "python-composition",
+        "Implement the context protocol",
+        "Class-based context managers",
+        """
+        class Closing:
+            def __init__(self, resource):
+                self.resource = resource
+            def __enter__(self):
+                return self.resource
+            def __exit__(self, exc_type, exc_value, traceback):
+                self.resource.close()
+                return False
+
+        class IgnoreValueError:
+            def __enter__(self):
+                return self
+            def __exit__(self, exc_type, exc_value, traceback):
+                return exc_type is not None and issubclass(exc_type, ValueError)
+        """,
+        """
+        class Closing:
+            def __init__(self, resource):
+                self.resource = resource
+            def __enter__(self):
+                return self
+            def __exit__(self, exc_type, exc_value, traceback):
+                return True
+
+        class IgnoreValueError:
+            def __enter__(self):
+                return self
+            def __exit__(self, exc_type, exc_value, traceback):
+                return True
+        """,
+        [
+            check(
+                "Return and close resource",
+                (
+                    "(exec(\"from io import StringIO\\ns = StringIO('hello')\\nwith "
+                    "Closing(s) as value:\\n    same = value is s\\n    text = valu"
+                    'e.read()\\nresult = [same, text, s.closed]", globals()), resu'
+                    "lt)[1]"
+                ),
+                [True, "hello", True],
+            ),
+            check(
+                "Close and propagate failure",
+                (
+                    "(exec(\"from io import StringIO\\ns = StringIO('')\\ntry:\\n    "
+                    "with Closing(s):\\n        raise RuntimeError('boom')\\nexcept"
+                    " RuntimeError as error:\\n    result = [str(error), s.closed]"
+                    '", globals()), result)[1]'
+                ),
+                ["boom", True],
+            ),
+            check(
+                "Suppress value subclasses",
+                (
+                    '(exec("class Specific(ValueError):\\n    pass\\nwith IgnoreVal'
+                    "ueError():\\n    raise Specific('bad')\\nresult = True\", globa"
+                    "ls()), result)[1]"
+                ),
+                True,
+            ),
+            check(
+                "Propagate unrelated failures",
+                (
+                    '(exec("result = False\\ntry:\\n    with IgnoreValueError():\\n '
+                    "       raise TypeError('wrong')\\nexcept TypeError:\\n    resu"
+                    'lt = True", globals()), result)[1]'
+                ),
+                True,
+            ),
+            check(
+                "Normal context exit",
+                "(exec('with IgnoreValueError():\\n    result = 3', globals()), result)[1]",
+                3,
+            ),
+        ],
+        [
+            "Store resource in __init__, return it from __enter__, and close it once in __exit__.",
+            (
+                "Only suppress when exc_type is not None and is a subclass of"
+                " ValueError; Closing suppresses nothing."
+            ),
+        ],
+    ),
+    unit(
         "iterator-tools",
         "python-composition",
         "Consume only what you need",
@@ -350,6 +694,135 @@ LESSONS = (
         [
             "Yield a new list for each batch; do not clear a list already yielded.",
             "After the loop, yield a nonempty partial batch. Validate the size first.",
+        ],
+    ),
+    unit(
+        "iterator-recipes",
+        "python-composition",
+        "Combine and bound iterators",
+        "Chain, islice, zip_longest & product",
+        """
+        from itertools import chain, islice, zip_longest, product
+
+        def preview(groups, limit):
+            if limit < 0:
+                raise ValueError("Negative limit")
+            return list(islice(chain.from_iterable(groups), limit))
+
+        def align(left, right):
+            return list(zip_longest(left, right, fillvalue=None))
+
+        def combinations(left, right):
+            return list(product(left, right))
+        """,
+        """
+        def preview(groups, limit):
+            return [value for group in groups for value in group][:limit]
+
+        def align(left, right):
+            return list(zip(left, right))
+
+        def combinations(left, right):
+            return list(zip(left, right))
+        """,
+        [
+            check("Flatten bounded preview", "preview([[1, 2], [], [3, 4]], 3)", [1, 2, 3]),
+            check(
+                "Do not overconsume",
+                (
+                    "(exec('source = iter([1, 2, 3])\\nvalues = preview([source], "
+                    "2)\\nresult = [values, next(source)]', globals()), result)[1]"
+                ),
+                [[1, 2], 3],
+            ),
+            check(
+                "Zero consumes nothing",
+                (
+                    "(exec('source = iter([7])\\nvalues = preview([source], 0)\\nre"
+                    "sult = [values, next(source)]', globals()), result)[1]"
+                ),
+                [[], 7],
+            ),
+            check("Negative limit", "__raises_value_error__(lambda n: preview([], n), -1)", True),
+            check(
+                "Pad either side",
+                "(align([1], [2, 3]), align([1, 2], []))",
+                [[[1, 2], [None, 3]], [[1, None], [2, None]]],
+            ),
+            check(
+                "All pairs",
+                "combinations(iter('ab'), iter([1, 2]))",
+                [["a", 1], ["a", 2], ["b", 1], ["b", 2]],
+            ),
+            check("Empty combinations", "combinations([], [1])", []),
+        ],
+        [
+            (
+                "Combine chain.from_iterable with islice to avoid exhausting "
+                "input during a bounded preview."
+            ),
+            (
+                "Use zip_longest for padded alignment and product for every p"
+                "air; ordinary zip does neither."
+            ),
+        ],
+    ),
+    unit(
+        "adjacent-groups",
+        "python-composition",
+        "Group consecutive values",
+        "Consecutive grouping with itertools",
+        """
+        from itertools import groupby
+
+        def runs(items, key):
+            for label, group in groupby(items, key=key):
+                yield label, list(group)
+        """,
+        """
+        def runs(items, key):
+            groups = {}
+            for item in items:
+                groups.setdefault(key(item), []).append(item)
+            return iter(groups.items())
+        """,
+        [
+            check(
+                "Keep separate runs",
+                "list(runs('aabba', lambda x: x))",
+                [["a", ["a", "a"]], ["b", ["b", "b"]], ["a", ["a"]]],
+            ),
+            check(
+                "Apply key",
+                "list(runs(iter(['Ada', 'Al', 'Bo']), lambda name: name[0]))",
+                [["A", ["Ada", "Al"]], ["B", ["Bo"]]],
+            ),
+            check("Empty runs", "list(runs([], str))", []),
+            check(
+                "Return an iterator",
+                "(lambda grouped: iter(grouped) is grouped)(runs('a', str))",
+                True,
+            ),
+            check(
+                "Unhashable labels",
+                "list(runs([1, 1, 2], lambda x: [x]))",
+                [[[1], [1, 1]], [[2], [2]]],
+            ),
+            check(
+                "Groups remain usable",
+                (
+                    "(exec(\"groups = list(runs('aba', str))\\nresult = [list(group"
+                    ') for label, group in groups]", globals()), result)[1]'
+                ),
+                [["a"], ["b"], ["a"]],
+            ),
+        ],
+        [
+            "groupby compares adjacent keys without sorting or requiring dictionary keys.",
+            (
+                "Copy each group into its own list before advancing the outer"
+                " iterator, and yield the label and list."
+            ),
         ],
     ),
     unit(
@@ -452,6 +925,312 @@ LESSONS = (
         [
             "A dataclass can generate initialization and equality from annotated fields.",
             "Construct a new Item in restock rather than updating self.",
+        ],
+    ),
+    unit(
+        "dataclass-lifecycle",
+        "python-design",
+        "Dataclass defaults and updates",
+        "Dataclass factories & post-init",
+        """
+        from dataclasses import dataclass, field, replace
+
+        @dataclass
+        class Batch:
+            name: str
+            tags: list[str] = field(default_factory=list)
+            def __post_init__(self):
+                self.name = self.name.strip()
+                if not self.name:
+                    raise ValueError("Empty name")
+            def renamed(self, name):
+                return replace(self, name=name, tags=self.tags.copy())
+        """,
+        """
+        from dataclasses import dataclass, field
+
+        @dataclass
+        class Batch:
+            name: str
+            tags: list[str] = field(default_factory=list)
+            def renamed(self, name):
+                self.name = name
+                return self
+        """,
+        [
+            check("Normalize name", "Batch('  parts ').name", "parts"),
+            check("Reject blank", "__raises_value_error__(Batch, '  ')", True),
+            check(
+                "Separate defaults",
+                (
+                    "(exec(\"a = Batch('a')\\nb = Batch('b')\\na.tags.append('hot')\\"
+                    'nresult = b.tags", globals()), result)[1]'
+                ),
+                [],
+            ),
+            check(
+                "Copy on rename",
+                (
+                    "(exec(\"a = Batch('old', ['x'])\\nb = a.renamed(' new ')\\nb.ta"
+                    "gs.append('y')\\nresult = [a.name, a.tags, b.name, b.tags, a "
+                    'is b]", globals()), result)[1]'
+                ),
+                ["old", ["x"], "new", ["x", "y"], False],
+            ),
+            check("Validate rename", "__raises_value_error__(Batch('old').renamed, '')", True),
+            check("Dataclass values", "Batch('x', ['a']) == Batch('x', ['a'])", True),
+        ],
+        [
+            (
+                "Use field(default_factory=list) for independent defaults and"
+                " __post_init__ to normalize and validate."
+            ),
+            "replace is shallow: provide a copy of tags when constructing the renamed batch.",
+        ],
+    ),
+    unit(
+        "typed-contracts",
+        "python-design",
+        "Unions and generic contracts",
+        "Union types & TypeVar generics",
+        """
+        from collections.abc import Iterable
+        from typing import TypeVar
+
+        T = TypeVar("T")
+
+        def first_or(items: Iterable[T], default: T) -> T:
+            return next(iter(items), default)
+
+        def parse_optional(text: str | None) -> int | None:
+            if text is None or not text.strip():
+                return None
+            return int(text)
+        """,
+        """
+        def first_or(items, default):
+            return next(iter(items)) or default
+
+        def parse_optional(text):
+            return int(text or 0)
+        """,
+        [
+            check("Keep falsey item", "first_or(iter([0, 2]), 9)", 0),
+            check("Keep generic value", "first_or([{'a': 1}], {})", {"a": 1}),
+            check("Empty uses default", "first_or(iter([]), 'fallback')", "fallback"),
+            check(
+                "Consume one only",
+                (
+                    "(exec('source = iter([1, 2])\\nfirst_or(source, 0)\\nresult = "
+                    "next(source)', globals()), result)[1]"
+                ),
+                2,
+            ),
+            check(
+                "Missing optional values",
+                "[parse_optional(None), parse_optional('  ')]",
+                [None, None],
+            ),
+            check("Signed integer", "parse_optional(' -4 ')", -4),
+            check("Reject invalid input", "__raises_value_error__(parse_optional, '1.5')", True),
+        ],
+        [
+            (
+                "next(iter(items), default) distinguishes exhaustion from a f"
+                "alsey first value without overconsuming."
+            ),
+            (
+                "Handle None and blank text before int conversion; TypeVar re"
+                "lates the iterable element and return types."
+            ),
+        ],
+    ),
+    unit(
+        "practical-object-protocols",
+        "python-design",
+        "Objects that fit Python",
+        "Properties & special methods",
+        """
+        class Score:
+            def __init__(self, points):
+                self.points = points
+            @property
+            def points(self):
+                return self._points
+            @points.setter
+            def points(self, value):
+                if value < 0:
+                    raise ValueError("Negative points")
+                self._points = value
+            def __repr__(self):
+                return f"Score({self.points})"
+            def __len__(self):
+                return self.points
+            def __eq__(self, other):
+                if not isinstance(other, Score):
+                    return NotImplemented
+                return self.points == other.points
+            def __add__(self, other):
+                if not isinstance(other, Score):
+                    return NotImplemented
+                return Score(self.points + other.points)
+        """,
+        """
+        class Score:
+            def __init__(self, points):
+                self.points = points
+            def __repr__(self):
+                return str(self.points)
+            def __len__(self):
+                return self.points
+            def __eq__(self, other):
+                return True
+            def __add__(self, other):
+                self.points += other.points
+                return self
+        """,
+        [
+            check("Readable representation", "repr(Score(3))", "Score(3)"),
+            check(
+                "Length and equality",
+                "[len(Score(0)), Score(2) == Score(2), Score(2) == Score(3), Score(2) == 2]",
+                [0, True, False, False],
+            ),
+            check(
+                "Independent sum",
+                (
+                    "(exec('a = Score(2)\\nb = Score(3)\\nc = a + b\\nresult = [a.po"
+                    "ints, b.points, c.points, c is a, c is b]', globals()), resu"
+                    "lt)[1]"
+                ),
+                [2, 3, 5, False, False],
+            ),
+            check("Reject negative creation", "__raises_value_error__(Score, -1)", True),
+            check(
+                "Reject assignment without mutation",
+                (
+                    "(exec('s = Score(4)\\ntry:\\n    s.points = -1\\nexcept ValueEr"
+                    "ror:\\n    result = s.points', globals()), result)[1]"
+                ),
+                4,
+            ),
+            check(
+                "Accept assignment",
+                "(exec('s = Score(1)\\ns.points = 0\\nresult = s.points', globals()), result)[1]",
+                0,
+            ),
+            check(
+                "Unsupported addition",
+                (
+                    "(exec('try:\\n    Score(2) + 2\\nexcept TypeError:\\n    result"
+                    " = True', globals()), result)[1]"
+                ),
+                True,
+            ),
+        ],
+        [
+            (
+                "Validate before updating the backing attribute in the proper"
+                "ty setter to preserve rejected updates."
+            ),
+            (
+                "Return a new Score when adding and NotImplemented for unsupp"
+                "orted operand types; compare point values."
+            ),
+        ],
+    ),
+    unit(
+        "class-construction",
+        "python-design",
+        "Factories and abstract interfaces",
+        "Class methods, static methods & ABCs",
+        """
+        from abc import ABC, abstractmethod
+
+        class Renderer(ABC):
+            @abstractmethod
+            def render(self, text):
+                pass
+
+        class PrefixRenderer(Renderer):
+            def __init__(self, prefix):
+                self.prefix = prefix
+            @staticmethod
+            def valid_prefix(value):
+                return bool(value.strip())
+            @classmethod
+            def from_text(cls, text):
+                prefix = text.strip()
+                if not cls.valid_prefix(prefix):
+                    raise ValueError("Empty prefix")
+                return cls(prefix)
+            def render(self, text):
+                return self.prefix + text
+        """,
+        """
+        class Renderer:
+            def render(self, text):
+                pass
+
+        class PrefixRenderer(Renderer):
+            def __init__(self, prefix):
+                self.prefix = prefix
+            @staticmethod
+            def valid_prefix(value):
+                return bool(value)
+            @classmethod
+            def from_text(cls, text):
+                return PrefixRenderer(text)
+            def render(self, text):
+                return text + self.prefix
+        """,
+        [
+            check(
+                "Factory normalization", "PrefixRenderer.from_text(' > ').render('hello')", ">hello"
+            ),
+            check(
+                "Validation helper",
+                '[PrefixRenderer.valid_prefix(" "), PrefixRenderer.valid_prefix("!")]',
+                [False, True],
+            ),
+            check(
+                "Reject blank factory",
+                "__raises_value_error__(PrefixRenderer.from_text, ' ')",
+                True,
+            ),
+            check(
+                "Subclass factory",
+                (
+                    '(exec("class Special(PrefixRenderer):\\n    pass\\nobj = Speci'
+                    "al.from_text(' ! ')\\nresult = [type(obj) is Special, obj.ren"
+                    "der('ok')]\", globals()), result)[1]"
+                ),
+                [True, "!ok"],
+            ),
+            check(
+                "Abstract base cannot instantiate",
+                (
+                    "(exec('try:\\n    Renderer()\\nexcept TypeError:\\n    result ="
+                    " True', globals()), result)[1]"
+                ),
+                True,
+            ),
+            check(
+                "Incomplete subclass cannot instantiate",
+                (
+                    "(exec('class Incomplete(Renderer):\\n    pass\\ntry:\\n    Inco"
+                    "mplete()\\nexcept TypeError:\\n    result = True', globals()),"
+                    " result)[1]"
+                ),
+                True,
+            ),
+        ],
+        [
+            "Inherit from ABC and mark render with abstractmethod to prevent incomplete instances.",
+            (
+                "The classmethod factory must construct cls, not a hardcoded "
+                "class, after trimming and validating text."
+            ),
         ],
     ),
     unit(
@@ -1427,6 +2206,75 @@ def probe(label, source, expected, description, nudge):
 
 
 EXTRA_CHECKS = {
+    "exception-boundaries": (
+        probe(
+            "Read and close exactly once on every exit",
+            """
+            class CountingStream:
+                def __init__(self, text, error=None):
+                    self.text = text
+                    self.error = error
+                    self.reads = self.closes = 0
+                def read(self):
+                    self.reads += 1
+                    if self.error is not None:
+                        raise self.error
+                    return self.text
+                def close(self):
+                    self.closes += 1
+            results = []
+            for text in ["7", "invalid"]:
+                stream = CountingStream(text)
+                try:
+                    value = read_record(stream)
+                except RecordError:
+                    value = "invalid"
+                results.append([value, stream.reads, stream.closes])
+            original = OSError("disk")
+            stream = CountingStream("", original)
+            try:
+                read_record(stream)
+            except OSError as error:
+                results.append([error is original, stream.reads, stream.closes])
+            else:
+                raise AssertionError("Reading failure was hidden")
+            __probe_result__ = results
+            """,
+            [[7, 1, 1], ["invalid", 1, 1], [True, 1, 1]],
+            "Count read and close calls on success, parsing failure, and reading failure; "
+            "the original reading exception must propagate unchanged.",
+            "Read once inside try, close once in finally, and preserve unrelated exceptions.",
+        ),
+    ),
+    "managed-contexts": (
+        probe(
+            "Close exactly once on normal and exceptional exits",
+            """
+            class CountingResource:
+                def __init__(self):
+                    self.closes = 0
+                def close(self):
+                    self.closes += 1
+            normal = CountingResource()
+            with Closing(normal) as value:
+                inside = [value is normal, normal.closes]
+            failed = CountingResource()
+            original = RuntimeError("body failed")
+            try:
+                with Closing(failed):
+                    raise original
+            except RuntimeError as error:
+                unchanged = error is original
+            else:
+                raise AssertionError("Body failure was hidden")
+            __probe_result__ = [inside, normal.closes, failed.closes, unchanged]
+            """,
+            [[True, 0], 1, 1, True],
+            "The resource stays open inside the body and closes once afterward, "
+            "including when the original body exception propagates.",
+            "Close in __exit__ once; return a false value to preserve the body exception.",
+        ),
+    ),
     "metaclasses": (
         probe(
             "Duplicate registration preserves the original",

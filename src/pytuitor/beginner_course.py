@@ -2,6 +2,8 @@
 
 from dataclasses import replace
 
+from pytuitor.beginner_extensions import INSERT_AFTER
+from pytuitor.beginner_extensions import LESSONS as EXTRA_LESSONS
 from pytuitor.legacy import LESSONS as LEGACY
 from pytuitor.models import Chapter, Check, Lesson, code, lesson_text
 
@@ -622,6 +624,88 @@ add(
 )
 
 add(
+    "recursion-basics",
+    "Recursion and base cases",
+    "Solve a smaller version of the same problem",
+    "b-functions",
+    code(
+        """
+        def digit_sum(number):
+            if number < 10:
+                return number
+            return number % 10 + digit_sum(number // 10)
+        """
+    ),
+    code(
+        """
+        def digit_sum(number):
+            if number < 10:
+                return 0
+            return number % 10 + digit_sum(number // 10)
+        """
+    ),
+    (
+        case("Digits of 0", "digit_sum(0)", 0),
+        case("Digits of 7", "digit_sum(7)", 7),
+        case("Digits of 10", "digit_sum(10)", 1),
+        case("Digits of 204", "digit_sum(204)", 6),
+        case("Digits of 9999", "digit_sum(9999)", 36),
+        case("Digits of 100000", "digit_sum(100000)", 1),
+    ),
+    (
+        "Return the last remaining digit in the base case.",
+        "number // 10 removes the last digit; number % 10 reads it.",
+    ),
+)
+
+add(
+    "recursive-collections",
+    "Nested lists with recursion",
+    "Traverse collections at different depths",
+    "b-functions",
+    code(
+        """
+        def sum_nested(items):
+            total = 0
+            for item in items:
+                if isinstance(item, list):
+                    total += sum_nested(item)
+                else:
+                    total += item
+            return total
+        """
+    ),
+    code(
+        """
+        def sum_nested(items):
+            total = 0
+            for item in items:
+                if isinstance(item, list):
+                    total += len(item)
+                else:
+                    total += item
+            return total
+        """
+    ),
+    (
+        case("Nested total 1", "sum_nested([])", 0),
+        case("Nested total 2", "sum_nested([3, -2])", 1),
+        case("Nested total 3", "sum_nested([1, [2, [3]], 4])", 10),
+        case("Nested total 4", "sum_nested([[[], []]])", 0),
+        case("Nested total 5", "sum_nested([[-8], [2, [0, 5]]])", -1),
+        case(
+            "Input stays unchanged",
+            "(lambda items: (sum_nested(items), items))([1, [2, [3]]])",
+            (6, [1, [2, [3]]]),
+        ),
+    ),
+    (
+        "isinstance(item, list) distinguishes nested lists from integers.",
+        "The empty list naturally totals zero; add a recursive subtotal for each inner list.",
+    ),
+)
+
+add(
     "handle-invalid-input",
     "Handling invalid input",
     "Exceptions and deliberate recovery",
@@ -882,6 +966,92 @@ add(
 )
 
 add(
+    "regex-validation",
+    "Matching text patterns",
+    "Validate complete text with regular expressions",
+    "b-data",
+    code(
+        """
+        import re
+
+        def valid_code(text):
+            return re.fullmatch(r"[A-Z]{2}-[0-9]{3}", text) is not None
+        """
+    ),
+    code(
+        """
+        import re
+
+        def valid_code(text):
+            return re.search(r"[A-Z]{2}-[0-9]{3}", text) is not None
+        """
+    ),
+    (
+        case("Validate 'AB-123'", "valid_code('AB-123')", True),
+        case("Validate 'ZZ-000'", "valid_code('ZZ-000')", True),
+        case("Validate 'ab-123'", "valid_code('ab-123')", False),
+        case("Validate 'XAB-123Y'", "valid_code('XAB-123Y')", False),
+        case("Validate 'AB-123\\n'", "valid_code('AB-123\\n')", False),
+        case("Validate 'AB-１２３'", "valid_code('AB-１２３')", False),
+        case("Validate ''", "valid_code('')", False),
+        case("Validate 'A-123'", "valid_code('A-123')", False),
+        case("Validate 'AB-12'", "valid_code('AB-12')", False),
+    ),
+    (
+        "fullmatch requires the entire string to match.",
+        "Use [0-9] when the contract requires ASCII digits; \\d also includ"
+        "es other digit characters.",
+    ),
+)
+
+add(
+    "regex-transformations",
+    "Extracting and replacing text",
+    "Capture fields and substitute matching spans",
+    "b-data",
+    code(
+        """
+        import re
+
+        def redact_tags(text):
+            pattern = r"\\[user:([a-z]+)\\]"
+            names = re.findall(pattern, text)
+            return names, re.sub(pattern, "[user:hidden]", text)
+        """
+    ),
+    code(
+        """
+        import re
+
+        def redact_tags(text):
+            pattern = r"\\[user:([a-z]+)\\]"
+            names = re.findall(pattern, text)
+            return names, re.sub(pattern, "[user:hidden]", text, count=1)
+        """
+    ),
+    (
+        case("Redact sample 1", "redact_tags('')", ([], "")),
+        case("Redact sample 2", "redact_tags('hello')", ([], "hello")),
+        case("Redact sample 3", "redact_tags('[user:ada]')", (["ada"], "[user:hidden]")),
+        case(
+            "Redact sample 4",
+            "redact_tags('[user:ada] met [user:bob] [user:ada]')",
+            (["ada", "bob", "ada"], "[user:hidden] met [user:hidden] [user:hidden]"),
+        ),
+        case(
+            "Redact sample 5",
+            "redact_tags('[user:Ada] [user:] [user:ab2]')",
+            ([], "[user:Ada] [user:] [user:ab2]"),
+        ),
+        case("Redact sample 6", "redact_tags('x[user:zoe]\\ny')", (["zoe"], "x[user:hidden]\ny")),
+    ),
+    (
+        "A single capture group makes findall return just the captured names.",
+        "sub replaces every match by default; count=1 limits it to the first.",
+    ),
+)
+
+add(
     "expense-report",
     "Project: an expense report",
     "Transform CSV records into a JSON summary",
@@ -1092,6 +1262,59 @@ add(
     (
         "Store balance in __init__ using self.balance.",
         "Check amount > self.balance before subtracting anything.",
+    ),
+)
+
+add(
+    "named-states",
+    "Named states with enums",
+    "Represent a fixed set of meaningful values",
+    "b-tools",
+    code(
+        """
+        from enum import Enum
+
+        class Status(Enum):
+            TODO = "todo"
+            DOING = "doing"
+            DONE = "done"
+
+        def next_status(status):
+            if status is Status.TODO:
+                return Status.DOING
+            return Status.DONE
+        """
+    ),
+    code(
+        """
+        from enum import Enum
+
+        class Status(Enum):
+            TODO = "todo"
+            DOING = "doing"
+            DONE = "done"
+
+        def next_status(status):
+            if status is Status.TODO:
+                return Status.DOING
+            return Status.TODO
+        """
+    ),
+    (
+        case(
+            "Defined members",
+            "[(s.name, s.value) for s in Status]",
+            [("TODO", "todo"), ("DOING", "doing"), ("DONE", "done")],
+        ),
+        case("Start work", "next_status(Status.TODO) is Status.DOING", True),
+        case("Finish work", "next_status(Status.DOING) is Status.DONE", True),
+        case("Finished stays finished", "next_status(Status.DONE) is Status.DONE", True),
+        case("Look up by stored value", "Status('doing') is Status.DOING", True),
+        case("Real Enum type", "issubclass(Status, __import__('enum').Enum)", True),
+    ),
+    (
+        "Subclass Enum and assign the three string values inside the class.",
+        "Treat DONE as a final state that cannot move backward.",
     ),
 )
 
@@ -1326,6 +1549,114 @@ add(
     (
         "Filter with number > 0, not >= 0.",
         "Use a list rather than a set so repeated inputs remain repeated outputs.",
+    ),
+)
+
+add(
+    "counting-and-grouping",
+    "Counting and grouping",
+    "Use Counter and defaultdict for collections",
+    "b-automation",
+    code(
+        """
+        from collections import Counter, defaultdict
+
+        def summarize_visits(visits):
+            counts = Counter()
+            pages = defaultdict(list)
+            for user, page in visits:
+                counts[user] += 1
+                pages[user].append(page)
+            return dict(counts), dict(pages)
+        """
+    ),
+    code(
+        """
+        from collections import Counter, defaultdict
+
+        def summarize_visits(visits):
+            counts = Counter()
+            pages = defaultdict(list)
+            for user, page in visits:
+                counts[user] += 1
+                pages[user] = [page]
+            return dict(counts), dict(pages)
+        """
+    ),
+    (
+        case("Visit summary 1", "summarize_visits([])", ({}, {})),
+        case(
+            "Visit summary 2",
+            "summarize_visits([('ada', 'home')])",
+            ({"ada": 1}, {"ada": ["home"]}),
+        ),
+        case(
+            "Visit summary 3",
+            "summarize_visits([('ada', 'home'), ('bob', 'help'), ('ada', 'home"
+            "'), ('ada', 'about')])",
+            ({"ada": 3, "bob": 1}, {"ada": ["home", "home", "about"], "bob": ["help"]}),
+        ),
+        case("Visit summary 4", "summarize_visits([('', '')])", ({"": 1}, {"": [""]})),
+        case(
+            "Input stays unchanged",
+            "(lambda visits: (summarize_visits(visits), visits))([('a', 'x'), ('a', 'y')])",
+            (({"a": 2}, {"a": ["x", "y"]}), [("a", "x"), ("a", "y")]),
+        ),
+    ),
+    (
+        "Counter starts an unseen key at zero; defaultdict(list) creates a"
+        "n independent list for each new key.",
+        "Append each page instead of replacing earlier pages.",
+    ),
+)
+
+add(
+    "queues-with-deque",
+    "Queues with deque",
+    "Process work in arrival order",
+    "b-automation",
+    code(
+        """
+        from collections import deque
+
+        def process_queue(waiting, arrivals, limit):
+            queue = deque(waiting)
+            queue.extend(arrivals)
+            served = []
+            while queue and len(served) < limit:
+                served.append(queue.popleft())
+            return served, list(queue)
+        """
+    ),
+    code(
+        """
+        from collections import deque
+
+        def process_queue(waiting, arrivals, limit):
+            queue = deque(waiting)
+            queue.extend(arrivals)
+            served = []
+            while queue and len(served) < limit:
+                served.append(queue.pop())
+            return served, list(queue)
+        """
+    ),
+    (
+        case("Arrival order", "process_queue(['a', 'b'], ['c'], 2)", (["a", "b"], ["c"])),
+        case("No capacity", "process_queue(['a'], ['b'], 0)", ([], ["a", "b"])),
+        case("More capacity than work", "process_queue([], ['a', 'b'], 8)", (["a", "b"], [])),
+        case("Empty queues", "process_queue([], [], 2)", ([], [])),
+        case("Repeated names", "process_queue(['x', 'x'], ['x'], 2)", (["x", "x"], ["x"])),
+        case(
+            "Inputs stay unchanged",
+            "(lambda waiting, arrivals: (process_queue(waiting, arrivals, 1), "
+            "waiting, arrivals))(['a'], ['b'])",
+            ((["a"], ["b"]), ["a"], ["b"]),
+        ),
+    ),
+    (
+        "Append arrivals at the right and remove waiting work from the left.",
+        "popleft serves the oldest item; pop serves the newest item.",
     ),
 )
 
@@ -1661,6 +1992,12 @@ add(
         },
     ),
 )
+
+_extra_by_id = {lesson.id: lesson for lesson in EXTRA_LESSONS}
+for _anchor, _identifier in INSERT_AFTER.items():
+    _position = next(index for index, lesson in enumerate(_units) if lesson.id == _anchor)
+    _units.insert(_position + 1, _extra_by_id[_identifier])
+
 
 LESSONS = tuple(
     replace(
