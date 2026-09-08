@@ -1,7 +1,7 @@
 # pytuitor
 
 An offline Python tutor for complete beginners and programmers who want to understand Python deeply.
-The v1 release candidate contains 48 lessons and 12 chapter projects, with a blank Build exercise followed by a broken program to Repair.
+The v1 release candidate contains 51 lessons and 12 chapter projects, with a blank Build exercise followed by a broken program to Repair.
 
 ## Start learning
 

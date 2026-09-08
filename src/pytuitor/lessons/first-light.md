@@ -41,6 +41,30 @@ Use `+` for addition, `-` for subtraction, and `*` for multiplication.
 `"2" + "3"` joins two strings and gives `"23"`.
 Even if a string contains digits, Python still treats it as text.
 
+## Read, fix, and run again
+
+Finding and fixing mistakes is called **debugging**.
+For example, this instruction has an opening quote but no closing quote:
+
+```text
+print("Hello)
+```
+
+Python reports a `SyntaxError`, meaning it cannot read the instruction as written.
+The message may say `unterminated string literal`: Python reached the end of the line before finding the quote that ends the string.
+Look for the file and line number in the error output, then read the error type and message.
+An arrow or caret can help point to the problem, but check the surrounding instruction too.
+
+Add the missing quote before the closing parenthesis:
+
+```python
+print("Hello")
+```
+
+Run the corrected program again: it should display `Hello`.
+Make one correction at a time, then check whether the output matches what you expected.
+Errors are clues you can use, not a sign that you cannot program.
+
 ## Exercise
 
 Write a complete program that displays `Hello, explorer!` on the first line and the result of `6 * 7` on the second line.
@@ -51,6 +75,3 @@ Press **Ctrl+R** to run the program and see its output in the console.
 Press **F5** to check the exercise requirements.
 After Build passes, open Repair and fix a separate program that should produce the same output.
 The short question below is optional practice.
-
-If you accidentally remove a quote, Python reports a `SyntaxError`, meaning it cannot read the instruction as written.
-Restore the missing quote and run again.

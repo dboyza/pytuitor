@@ -1,6 +1,7 @@
 # Curriculum map
 
-The release candidate has 48 lessons and 12 chapter projects, split evenly between Beginner and Experienced.
+The release candidate has 51 lessons and 12 chapter projects, with 27 beginner lessons and 24 experienced lessons.
+Each path has six chapter projects.
 Every course unit uses blank Build followed by Repair.
 Prerequisites are advisory, and familiar topics remain available from the dashboard.
 
@@ -10,18 +11,21 @@ Prerequisites are advisory, and familiar topics remain available from the dashbo
 
 Read input, calculate, and choose what happens.
 
-- **Your first program**: Strings, integers, and output.
+- **Your first program**: Strings, integers, output, and reading a first error message.
 - **Variables and input**: Store values and ask the user a question.
 - **Numbers from input**: Convert text and calculate whole-number results.
+- **Decimal measurements**: Read decimal input and format a calculated measurement.
 - **Making decisions**: Comparisons, booleans, if, elif, and else.
 - **Project: the ticket desk**: Combine input, arithmetic, and decisions.
 
 ### Working with collections
 
-Process lists and dictionaries without losing track of state.
+Process ordered items, unique values, and dictionaries.
 
 - **Lists and loops**: Work through a collection and calculate a total.
 - **Finding items in a list**: Indexes, length, and empty collections.
+- **Tuples, sets, and unpacking**: Group a fixed pair and recognize unique items.
+- **Numbering and pairing items**: Use range, enumerate, and zip to organize loops.
 - **Dictionaries and counts**: Associate keys with values.
 - **Repeating until done**: While loops and stopping conditions.
 - **Project: supply report**: Summarize a collection without changing it.

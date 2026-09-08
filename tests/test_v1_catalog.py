@@ -4,9 +4,9 @@ from pytuitor.curriculum import CHAPTERS, CONCEPTS, LESSONS
 
 
 def test_catalog_has_complete_chapters_and_ordered_prerequisites():
-    assert len(LESSONS) == len({lesson.id for lesson in LESSONS}) == 60
+    assert len(LESSONS) == len({lesson.id for lesson in LESSONS}) == 63
     assert sum(lesson.project for lesson in LESSONS) == 12
-    assert Counter(lesson.track for lesson in LESSONS) == {"beginner": 30, "experienced": 30}
+    assert Counter(lesson.track for lesson in LESSONS) == {"beginner": 33, "experienced": 30}
     assert len(CHAPTERS) == 12
     seen = set()
     for lesson in LESSONS:
@@ -17,6 +17,6 @@ def test_catalog_has_complete_chapters_and_ordered_prerequisites():
         seen.add(lesson.id)
     for chapter in CHAPTERS:
         units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter.id]
-        assert len(units) == 5
+        assert len(units) == {"b-foundations": 6, "b-collections": 7}.get(chapter.id, 5)
         assert sum(lesson.project for lesson in units) == 1
         assert units[-1].project

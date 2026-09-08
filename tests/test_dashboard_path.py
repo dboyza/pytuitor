@@ -27,7 +27,7 @@ async def test_path_settings_are_explicit_and_progress_is_path_specific(tmp_path
     for lesson in track_lessons("experienced"):
         app.store.entry(lesson)["completed"] = True
     async with app.run_test(size=(80, 24)) as pilot:
-        assert "0 of 30" in str(app.screen.query_one("#dashboard-summary", Static).content)
+        assert "0 of 33" in str(app.screen.query_one("#dashboard-summary", Static).content)
         await pilot.click("#preferences")
         app.screen.query_one("#path", Select).value = "experienced"
         await pilot.press("escape")
@@ -37,8 +37,8 @@ async def test_path_settings_are_explicit_and_progress_is_path_specific(tmp_path
         app.screen.query_one("#onboarding-concepts", SelectionList).select("Values & output")
         await pilot.press("f5")
         assert app.store.data["track"] == "custom"
-        assert app.screen.query_one("#lesson-list", OptionList).option_count == 5
-        assert "30 of 60" in str(app.screen.query_one("#dashboard-summary", Static).content)
+        assert app.screen.query_one("#lesson-list", OptionList).option_count == 6
+        assert "30 of 63" in str(app.screen.query_one("#dashboard-summary", Static).content)
         await pilot.press("c")
         assert app.screen.lesson.id == "names-and-voices"
 

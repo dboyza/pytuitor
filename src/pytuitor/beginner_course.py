@@ -16,7 +16,7 @@ CHAPTERS = (
         "b-collections",
         "beginner",
         "Working with collections",
-        "Process lists and dictionaries without losing track of state.",
+        "Process ordered items, unique values, and dictionaries.",
     ),
     Chapter(
         "b-functions",
@@ -150,6 +150,44 @@ add(
     stdin="125\n",
 )
 
+add(
+    "decimal-measurements",
+    "Decimal measurements",
+    "Read decimal input and format a calculated measurement",
+    "b-foundations",
+    code("""
+        centimeters = float(input("Centimeters: "))
+        meters = centimeters / 100
+        print(f"{meters:.2f} m")
+    """),
+    code("""
+        centimeters = float(input("Centimeters: "))
+        meters = centimeters // 100
+        print(f"{meters} m")
+    """),
+    tuple(
+        case(
+            label,
+            f"abs(meters - {expected!r}) < 0.000000001",
+            True,
+            stdin=text + "\n",
+            output=output,
+        )
+        for label, text, expected, output in (
+            ("Fractional centimeters", "172.4", 1.724, "1.72 m"),
+            ("Zero length", "0", 0.0, "0.00 m"),
+            ("Small length", "1.2", 0.012, "0.01 m"),
+            ("Exact meter", "100", 1.0, "1.00 m"),
+            ("Preserve precision before display", "234.56", 2.3456, "2.35 m"),
+        )
+    ),
+    (
+        "Read with float(input(...)) so fractional centimeters survive.",
+        'Divide by 100 with /; use f"{meters:.2f} m" only when printing.',
+    ),
+    stdin="172.4\n",
+)
+
 reuse("choose-a-door", "b-foundations", stdin="gold\n")
 
 add(
@@ -254,6 +292,122 @@ add(
         )
     ),
     ("Check len(items) before indexing.", "The first index is 0; -1 asks for the last item."),
+)
+
+add(
+    "tuples-and-sets",
+    "Tuples, sets, and unpacking",
+    "Group a fixed pair and recognize unique items",
+    "b-collections",
+    code("""
+        pair = tuple(input("Two names: ").split())
+        first, second = pair
+        seen = set(input("Visitors: ").split())
+        print(first in seen)
+        print(second in seen)
+        print(len(seen))
+    """),
+    code("""
+        pair = tuple(input("Two names: ").split())
+        second, first = pair
+        seen = input("Visitors: ").split()
+        print(first in seen)
+        print(second in seen)
+        print(len(seen))
+    """),
+    tuple(
+        case(
+            label,
+            (
+                "[list(pair), isinstance(pair, tuple), first, second, "
+                "sorted(seen), isinstance(seen, set)]"
+            ),
+            [names.split(), True, *names.split(), sorted(set(visitors.split())), True],
+            stdin=names + "\n" + visitors + "\n",
+            output=output,
+        )
+        for label, names, visitors, output in (
+            ("Repeated visitors", "Ada Lin", "Ada Ada Bo", "True\nFalse\n2"),
+            ("Second name only", "Ada Lin", "Lin", "False\nTrue\n1"),
+            ("No visitors", "Ada Lin", "", "False\nFalse\n0"),
+            ("Case matters", "Ada ada", "ada Bo", "False\nTrue\n2"),
+            ("Both names present", "Ada Lin", "Lin Ada", "True\nTrue\n2"),
+        )
+    ),
+    (
+        "Convert the first split input with tuple(), then unpack in the original order.",
+        "Use set() for the visitors, in for membership, and len() for the distinct count.",
+    ),
+    stdin="Ada Lin\nAda Ada Bo\n",
+)
+
+add(
+    "loop-helpers",
+    "Numbering and pairing items",
+    "Use range, enumerate, and zip to organize loops",
+    "b-collections",
+    code("""
+        count = int(input("Number of slots: "))
+        names = input("Names: ").split()
+        colors = input("Colors: ").split()
+        slots = []
+        for number in range(1, count + 1):
+            slots.append(number)
+        numbered = []
+        for number, name in enumerate(names, start=1):
+            numbered.append((number, name))
+        pairs = []
+        for name, color in zip(names, colors):
+            pairs.append((name, color))
+        print(slots)
+        print(numbered)
+        print(pairs)
+    """),
+    code("""
+        count = int(input("Number of slots: "))
+        names = input("Names: ").split()
+        colors = input("Colors: ").split()
+        slots = []
+        for number in range(1, count):
+            slots.append(number)
+        numbered = []
+        for number, name in enumerate(names):
+            numbered.append((number, name))
+        pairs = []
+        for name, color in zip(colors, names):
+            pairs.append((name, color))
+        print(slots)
+        print(numbered)
+        print(pairs)
+    """),
+    tuple(
+        case(
+            label,
+            "[slots, numbered, pairs, all(isinstance(item, tuple) for item in numbered + pairs)]",
+            [
+                list(range(1, count + 1)),
+                list(enumerate(names.split(), 1)),
+                list(zip(names.split(), colors.split(), strict=False)),
+                True,
+            ],
+            stdin=f"{count}\n{names}\n{colors}\n",
+        )
+        for label, count, names, colors in (
+            ("Matching lists", 3, "Ada Lin", "blue gold"),
+            ("Preserve repeated entries", 2, "Ada Ada Bo", "blue gold blue"),
+            ("More names than colors", 1, "Ada Lin Bo", "blue"),
+            ("More colors than names", 2, "Ada", "blue gold green"),
+            ("Empty lists and zero slots", 0, "", ""),
+            ("Empty names", 0, "", "blue"),
+            ("Empty colors", 2, "Ada", ""),
+        )
+    ),
+    (
+        "range stops before its end; range(1, count + 1) includes count.",
+        "Use enumerate(names, start=1) for numbering and zip(names, colors) for matched pairs.",
+        "Start each result as [] and append a tuple such as (number, name) inside its loop.",
+    ),
+    stdin="3\nAda Lin\nblue gold\n",
 )
 
 add(
@@ -1515,7 +1669,8 @@ LESSONS = tuple(
         concepts=tuple(
             dict.fromkeys(
                 concept
-                for prerequisite in _units[index - 4 : index]
+                for prerequisite in _units[:index]
+                if prerequisite.chapter_id == lesson.chapter_id and not prerequisite.project
                 for concept in prerequisite.concepts
             )
         )

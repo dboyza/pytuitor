@@ -12,8 +12,8 @@ Verify implementation details against code.
 
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
-- The v1 candidate has 48 lessons and 12 chapter projects.
-- Each path has six chapters of four lessons plus a project; see [the curriculum map](docs/curriculum.md).
+- The v1 candidate has 51 lessons and 12 chapter projects.
+- Each path has six chapters ending in a project, with lesson counts matched to the topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Onboarding is Beginner, Experienced, or Custom with chapter previews and known concepts; no diagnostic or background questions.
 - Known topics are skipped by Continue but remain accessible; project concepts must match taught checklist concepts.

@@ -15,7 +15,7 @@ from pytuitor.screens import Dashboard, LessonScreen
 
 
 async def main():
-    assert len(LESSONS) == 60
+    assert len(LESSONS) == 63
     assert sum(lesson.project for lesson in LESSONS) == 12
     assert len(CHAPTERS) == 12
     assert files("pytuitor").joinpath("theme.tcss").is_file()
@@ -46,7 +46,8 @@ async def main():
                     await pilot.pause()
             assert app.store.status(screen.lesson) == "completed"
     print(
-        f"Pytuitor {version('pytuitor')}: installed content and all 60 reference programs passed."
+        f"Pytuitor {version('pytuitor')}: installed content and all "
+        f"{len(LESSONS)} reference programs passed."
     )
 
 

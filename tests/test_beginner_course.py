@@ -10,7 +10,7 @@ from pytuitor.runner import execute
 
 
 def test_beginner_course_has_six_coherent_chapters():
-    assert len(LESSONS) == 30
+    assert len(LESSONS) == 33
     assert sum(lesson.project for lesson in LESSONS) == 6
     seen = set()
     for lesson in LESSONS:
@@ -21,7 +21,7 @@ def test_beginner_course_has_six_coherent_chapters():
         assert len(lesson.hints) >= 2
     for chapter in CHAPTERS:
         units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter.id]
-        assert len(units) == 5
+        assert len(units) == {"b-foundations": 6, "b-collections": 7}.get(chapter.id, 5)
         assert units[-1].project
         assert set(units[-1].concepts) == {
             concept for lesson in units[:-1] for concept in lesson.concepts
