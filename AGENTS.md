@@ -44,6 +44,7 @@ Verify implementation details against code.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; vertically center resume-card content.
+- Syllabus browses authored paths without changing the learner's saved path or progress.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.
 - Check reports each operation, input, expected/actual result, printed output, and running/pass/fail status.
 - Reset exercise backs up the complete current stage before restoring blank Build or broken Repair.
@@ -60,6 +61,7 @@ Verify implementation details against code.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
 - `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation/practice; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, environment, and feedback dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
+- `syllabus.py` renders the browsable outline from the curriculum catalog.
 - `state.py` owns version 3 profiles, atomic writes, migration backups, locks, and review schedules.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
 - `runner.py` launches `_worker.py` with isolated Python; worker must remain standard-library-only.

@@ -85,7 +85,11 @@ class ReviewDialog(ModalScreen[Lesson | None]):
 
 
 class Dashboard(TutorScreen):
-    BINDINGS = [Binding("c", "continue", "Continue"), Binding("p", "preferences", "Edit path")]
+    BINDINGS = [
+        Binding("c", "continue", "Continue"),
+        Binding("p", "preferences", "Edit path"),
+        Binding("s", "syllabus", "Syllabus", show=False),
+    ]
 
     def __init__(self):
         super().__init__()
@@ -100,6 +104,7 @@ class Dashboard(TutorScreen):
             with Vertical(id="dashboard-main"):
                 with Horizontal(id="path-header"):
                     yield Static(id="path-title", classes="hero")
+                    yield Button("Syllabus", id="syllabus")
                     yield Button("Edit path", id="preferences")
                 yield Static(id="dashboard-summary", classes="muted")
                 with Horizontal(id="resume-card"):
@@ -252,6 +257,12 @@ class Dashboard(TutorScreen):
     @on(Button.Pressed, "#preferences")
     def action_preferences(self) -> None:
         self.app.push_screen(Onboarding(editing=True))
+
+    @on(Button.Pressed, "#syllabus")
+    def action_syllabus(self) -> None:
+        from pytuitor.syllabus import Syllabus
+
+        self.app.push_screen(Syllabus())
 
     @on(Button.Pressed, "#review")
     def review(self) -> None:
