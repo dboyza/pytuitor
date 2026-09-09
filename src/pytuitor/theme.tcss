@@ -44,7 +44,9 @@ Footer { background: #151719; color: #9ba3a5; }
 #onboarding-scroll { padding: 1 4; align-horizontal: center; }
 #onboarding-card { width: 76; max-width: 100%; height: auto; padding: 1 3 2 3; }
 #onboarding-concepts { height: 8; }
-Onboarding.editing #onboarding-card { padding: 0 1; }
+Onboarding.editing #onboarding-scroll { height: 1fr; padding: 0 2; }
+Onboarding.editing #onboarding-card { width: 110; height: 1fr; padding: 0 1; }
+Onboarding.editing #onboarding-concepts { height: 1fr; min-height: 8; }
 #dashboard-body { padding: 1 3 0 3; align-horizontal: center; }
 #dashboard-main { width: 110; max-width: 100%; height: 1fr; }
 #path-header { height: 3; align-vertical: middle; }

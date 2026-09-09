@@ -15,7 +15,7 @@ Verify implementation details against code.
 - The v1 candidate has 75 lessons and 12 chapter projects.
 - One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
-- Welcome offers Start learning or Browse syllabus; Known topics is an optional dashboard checklist.
+- Welcome offers Start learning or Browse syllabus; Known topics is a category-grouped checklist.
 - Known topics are skipped by Continue but remain accessible; project concepts describe their relevant preparation.
 - Dashboard browses all chapters; Continue resumes the active chapter, then the core sequence or explicitly selected optional section.
 - Every course unit has blank Build followed by broken Repair, with separate saved drafts and both required for new completion.

@@ -1,12 +1,13 @@
 """A direct start and an optional prior-knowledge checklist."""
 
+from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, Footer, SelectionList, Static
 
-from pytuitor.curriculum import CONCEPTS
+from pytuitor.curriculum import CHAPTERS, LESSONS, SECTIONS
 from pytuitor.ui import TutorScreen, brand
 
 
@@ -20,6 +21,17 @@ class Onboarding(TutorScreen):
         super().__init__()
         self.editing = editing
         self.set_class(editing, "editing")
+        self.category_topics = {}
+        for section in SECTIONS:
+            chapters = {c.id for c in CHAPTERS if c.section_id == section.id}
+            self.category_topics[f"category:{section.id}"] = tuple(
+                dict.fromkeys(
+                    concept
+                    for lesson in LESSONS
+                    if lesson.chapter_id in chapters and not lesson.project
+                    for concept in lesson.concepts
+                )
+            )
 
     def compose(self) -> ComposeResult:
         yield brand("KNOWN TOPICS" if self.editing else "WELCOME")
@@ -34,13 +46,19 @@ class Onboarding(TutorScreen):
                 if self.editing:
                     yield Static(
                         "Continue skips a lesson when all its concepts are checked. "
-                        "You can still open any lesson from the syllabus or dashboard.",
+                        "Toggle a category to check or clear all its topics. "
+                        "All lessons stay available.",
                         classes="muted",
                     )
-                    yield SelectionList(
-                        *[(c, c, c in self.store.data["familiar"]) for c in CONCEPTS],
-                        id="onboarding-concepts",
-                    )
+                    options = []
+                    for section in SECTIONS:
+                        category = f"category:{section.id}"
+                        options.append((section.title, category, False))
+                        options.extend(
+                            (f"  {concept}", concept, concept in self.store.data["familiar"])
+                            for concept in self.category_topics[category]
+                        )
+                    yield SelectionList(*options, id="onboarding-concepts")
                 else:
                     yield Static(
                         "Progress is saved locally. No account or internet needed.",
@@ -66,7 +84,37 @@ class Onboarding(TutorScreen):
         yield Footer(show_command_palette=False)
 
     def on_mount(self) -> None:
+        if self.editing:
+            self.update_categories()
         self.query_one("#onboarding-concepts" if self.editing else "#begin").focus()
+
+    @on(SelectionList.SelectionToggled, "#onboarding-concepts")
+    def toggle_category(self, event: SelectionList.SelectionToggled) -> None:
+        topics = self.category_topics.get(event.selection.value)
+        if topics is None:
+            return
+        listing = event.selection_list
+        clear = all(topic in listing.selected for topic in topics)
+        with listing.prevent(SelectionList.SelectedChanged):
+            for topic in topics:
+                listing.deselect(topic) if clear else listing.select(topic)
+        self.update_categories()
+
+    @on(SelectionList.SelectedChanged, "#onboarding-concepts")
+    def update_categories(self) -> None:
+        listing = self.query_one("#onboarding-concepts", SelectionList)
+        selected = set(listing.selected)
+        index = 0
+        with listing.prevent(SelectionList.SelectedChanged):
+            for section in SECTIONS:
+                category = f"category:{section.id}"
+                topics = self.category_topics[category]
+                count = sum(topic in selected for topic in topics)
+                listing.select(category) if count == len(topics) else listing.deselect(category)
+                listing.replace_option_prompt_at_index(
+                    index, Text(f"{section.title} · {count}/{len(topics)} known", style="bold")
+                )
+                index += len(topics) + 1
 
     @on(Button.Pressed, "#begin")
     async def action_begin(self) -> None:

@@ -109,7 +109,7 @@ async def test_known_topics_and_revisit_are_keyboard_accessible(tmp_path):
         await pilot.press("enter")
         await pilot.pause()
         await tab_to(pilot, app, "onboarding-concepts")
-        await pilot.press("home", "space", "f5")
+        await pilot.press("home", "down", "space", "f5")
         await pilot.pause()
         assert app.store.status(LESSONS[0]) == "familiar"
         await pilot.press("c")
