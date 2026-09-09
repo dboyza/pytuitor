@@ -19,8 +19,8 @@ map: 1
 ```
 
 Preserve capitalization and do not alphabetize the report.
-No functions are required yet.
-Think through where to initialize each collection and which changes happen inside the loop.
+You do not need to define your own functions yet.
+Create the empty list and dictionary before the loop, then decide which changes happen inside it.
 
 ## Repair
 The supplied program adds duplicate entries to the reporting order.

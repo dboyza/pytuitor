@@ -1,7 +1,11 @@
 # Consume an async stream
 
-Some producers must await I/O before the next item is ready.
-An async iterator exposes that waiting through `__anext__`; `async for` handles the protocol for you.
+A **stream** supplies items over time rather than returning a complete collection at once.
+The function or object supplying them is the producer.
+Some producers must await input/output before their next item is ready.
+An **async iterable** is an object usable in `async for`.
+Its `__aiter__` method supplies an async iterator, whose `__anext__` method supplies an awaitable for the next item.
+You can use `async for` without calling these methods yourself.
 An async function containing `yield` is an async generator.
 It can both await and yield during iteration.
 
@@ -39,5 +43,5 @@ Do not print, modify the source, or run a new event loop inside the function.
 
 ## Repair
 
-Repair already iterates asynchronously but does not fulfill the normalization contract.
+Repair already uses `async for`, but does not remove surrounding whitespace or discard empty results.
 Fix that behavior while keeping the async interface.

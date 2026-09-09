@@ -1,5 +1,6 @@
 ## Build a small data pipeline
-A data pipeline reads one representation, transforms it, and writes another.
+A data pipeline is a sequence of steps that reads data, changes it, and saves the result.
+Here, the input format is CSV and the output format is JSON.
 You have already practiced all three operations separately.
 This project connects them in one function.
 
@@ -24,7 +25,7 @@ travel,150
 
 Return and save `{"travel": 400, "food": 600}`.
 JSON whitespace and key order do not matter.
-Use `csv.DictReader`, dictionary counting patterns, and `json.dump`.
+The tools you have practiced fit together here: `csv.DictReader` reads rows, a dictionary keeps each category's running total, and `json.dump` saves the result.
 The function receives paths from its caller, so it does not need input prompts.
 
 ## Repair

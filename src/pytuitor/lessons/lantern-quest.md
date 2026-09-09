@@ -31,7 +31,8 @@ For example, `place == "cave" and move == "west"` checks both the location and t
 
 First, loop over the moves and implement east and west.
 Then add treasure collection using your boolean variable.
-Keep all three state variables outside the loop so they retain their values between moves.
+The location, coin count, and collected flag describe the game's **state**, its current situation.
+Give these variables their starting values before the loop so they keep their values between moves.
 Return the final pair after the loop has finished.
 
 To try the game interactively, you may add `moves = input("Moves: ").split()` followed by `print(play(moves))` below the function.

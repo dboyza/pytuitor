@@ -203,7 +203,7 @@ LESSONS = (
         ("0", "None", "An error"),
         1,
         (
-            "Python implicitly returns None. That often explains a failing "
+            "Python returns None automatically. That often explains a failing "
             "check after a print statement."
         ),
         (
@@ -258,7 +258,8 @@ LESSONS = (
         ),
         (
             "Loop over moves and combine place and move in each condition.",
-            "Initialize collected = False. On a valid take, add 5 and set collected = True.",
+            "Set collected = False before the loop. "
+            "On a valid take, add 5 and set collected = True.",
         ),
         "Where should collected = False go?",
         ("Before the loop", "Inside every loop iteration", "After return"),
@@ -592,7 +593,7 @@ LESSONS = (
         "Types and tests",
         "Types, tests, and project boundaries",
         15,
-        ("Typing & testing", "Environments & packaging"),
+        ("Typing & testing",),
         lesson_text("ready-to-ship"),
         (
             "def parse_count(text: str) -> int:\n"
@@ -652,10 +653,10 @@ LESSONS = (
             ),
         ),
         "Does a str annotation prevent passing an integer at runtime?",
-        ("Yes", "No", "Only inside a venv"),
+        ("Yes", "No", "Only inside a function"),
         1,
         (
-            "Annotations are metadata. Static analysis can flag misuse, but "
+            "Annotations describe expected types. A type checker can flag mismatches, but "
             "runtime validation is still your responsibility."
         ),
         code("""
@@ -717,7 +718,7 @@ LESSONS = (
                 "Empty stream",
                 "summarize(iter([]))",
                 {"INFO": 0, "WARNING": 0, "ERROR": 0},
-                "Initialize all three counters before reading.",
+                "Set all three counters to zero before reading.",
             ),
             Check(
                 "Whitespace",

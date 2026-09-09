@@ -3,7 +3,8 @@
 An **iterable** is something you can loop over, such as a list.
 `iter(values)` gets an **iterator**, which keeps track of the current position.
 `next(iterator)` returns the next item or raises `StopIteration` when no items remain.
-A `for` loop handles this protocol for you.
+A `for` loop requests each next item and stops automatically at `StopIteration`.
+These agreed operations form the iterator **protocol**, the behavior an object must provide to act as an iterator.
 
 ## Build a list with a comprehension
 
@@ -17,7 +18,7 @@ print(squares)
 
 This displays `[9, 4]`.
 Python visits each `n`, keeps it if `n > 0`, and puts `n * n` in a new list.
-The loop variable does not escape the comprehension's scope in Python 3.
+The comprehension's loop variable is local to that comprehension; it does not replace a variable of the same name outside it.
 
 ## Produce values only when requested
 

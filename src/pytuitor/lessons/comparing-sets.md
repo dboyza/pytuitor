@@ -12,15 +12,16 @@ print(morning - evening)
 
 `&` is intersection: the values in both groups, here `Sol`.
 `-` is difference: values in the left group that are absent from the right, here `Mira`.
-Reversing the operands changes a difference.
+Swapping the left and right sets changes which group you subtract from.
 `|` is union, containing everyone from either group.
 `^` is symmetric difference, containing only people in exactly one group.
 
 `morning <= evening` asks whether every morning value is also in evening.
-This is a subset test, and equal sets satisfy it.
+A **subset** contains only values that are also in the other set.
+Equal sets count as subsets of each other.
 `<` means a proper subset: equality is excluded.
 An empty set is a subset of every set.
-For predictable display, `sorted(values)` returns a new sorted list; set display order itself is unspecified.
+For predictable display, `sorted(values)` returns a new sorted list; a set itself has no guaranteed display order.
 
 ## Build
 

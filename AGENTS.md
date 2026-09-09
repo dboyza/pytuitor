@@ -24,7 +24,7 @@ Verify implementation details against code.
 
 ## Teaching standards
 
-- Introduce terminology and syntax before requiring them, accounting for preceding lessons.
+- Explain new terms and syntax before requiring their use; use plain English and standard programming names.
 - Foundations grows from values/input through collections/functions; Everyday Python and Building programs add files, modules, classes, tests, and automation.
 - Depth lessons build on core concepts and explain Python-specific syntax and behavior.
 - Make blank-editor exercises solvable: specify names, signatures, input handling, output, and edge cases.
@@ -33,7 +33,6 @@ Verify implementation details against code.
 - Verify correct reference programs pass and broken Repair programs fail meaningfully.
 - Accept valid alternative implementations; test observable behavior rather than source spelling.
 - Keep prose, hints, checks, repair code, and references synchronized.
-- Omit generic repeated quizzes; optional questions should teach something specific.
 
 ## Interaction contracts
 

@@ -15,11 +15,13 @@ def greeting(person):
 `def` defines a function, parentheses declare its parameters, and `return` supplies its result to the caller.
 A function returns `None` if it reaches the end without a return statement.
 Strings use single or double quotes; `None` represents the absence of a value.
-Use `is None` for that singleton, and `==` when comparing values.
+Python has one `None` object, so use `is None` to check for it.
+Use `==` when comparing ordinary values.
 
 `text.strip()` returns a string without surrounding whitespace.
 Strings are immutable: methods produce a new string rather than changing the original.
 An empty string is false in a condition, while every nonempty string is true, including `"0"` and `"False"`.
+A value is **truthy** when Python treats it as true in a condition and **falsy** when Python treats it as false.
 `a or b` evaluates to `a` when `a` is truthy; otherwise it evaluates to `b`.
 It does not necessarily return a Boolean.
 

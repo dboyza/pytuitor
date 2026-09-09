@@ -96,7 +96,7 @@ def case(
     *,
     stdin=None,
     output=None,
-    nudge="Compare the result with the stated contract, including the edge cases.",
+    nudge="Compare the actual and expected results for this input.",
 ):
     return Check(label, expression, expected, nudge, stdin=stdin, expected_output=output)
 
@@ -180,11 +180,11 @@ add(
             ("Zero length", "0", 0.0, "0.00 m"),
             ("Small length", "1.2", 0.012, "0.01 m"),
             ("Exact meter", "100", 1.0, "1.00 m"),
-            ("Preserve precision before display", "234.56", 2.3456, "2.35 m"),
+            ("Keep the unrounded value before printing", "234.56", 2.3456, "2.35 m"),
         )
     ),
     (
-        "Read with float(input(...)) so fractional centimeters survive.",
+        "Read with float(input(...)) to keep the fractional part of the measurement.",
         'Divide by 100 with /; use f"{meters:.2f} m" only when printing.',
     ),
     stdin="172.4\n",
@@ -752,7 +752,7 @@ reuse(
 add(
     "text-files",
     "Reading and writing files",
-    "Use a context manager to close files reliably",
+    "Open files and close them reliably",
     "b-data",
     (
         code("""
@@ -805,7 +805,7 @@ add(
 add(
     "paths-and-folders",
     "Paths and folders",
-    "Navigate paths without fragile string concatenation",
+    "Build file paths without joining strings by hand",
     "b-data",
     (
         code("""
@@ -961,7 +961,7 @@ add(
     ),
     (
         "DictReader gives strings; convert both numeric columns with int().",
-        "Accumulate quantity multiplied by price, once per row.",
+        "Add quantity multiplied by price to the total for each row.",
     ),
 )
 
@@ -999,15 +999,14 @@ add(
     ),
     (
         "fullmatch requires the entire string to match.",
-        "Use [0-9] when the contract requires ASCII digits; \\d also includ"
-        "es other digit characters.",
+        "Use [0-9] for the required digits 0 through 9; \\d also includes other digit characters.",
     ),
 )
 
 add(
     "regex-transformations",
     "Extracting and replacing text",
-    "Capture fields and substitute matching spans",
+    "Find values and replace matching text",
     "b-data",
     code(
         """
@@ -1122,7 +1121,7 @@ add(
         )
     ),
     (
-        "Read and aggregate every CSV row before writing the JSON file.",
+        "Read every CSV row and add its amount to the category total before saving JSON.",
         'Use totals.get(category, 0) + int(row["amount"]) so earlier rows are retained.',
     ),
     project=True,
@@ -1138,7 +1137,11 @@ add(
     (
         case("One minute", "minutes_to_seconds(1)", 60),
         case("No minutes", "minutes_to_seconds(0)", 0),
-        case("Imported module contract", "__import__('conversions').minutes_to_seconds(7)", 420),
+        case(
+            "Call the function from the imported module",
+            "__import__('conversions').minutes_to_seconds(7)",
+            420,
+        ),
         case("Imports produce no output", "__stdout__", ""),
     ),
     (
@@ -1321,7 +1324,7 @@ add(
 add(
     "tests-for-your-code",
     "Writing automated tests",
-    "Use assertions and unittest to catch regressions",
+    "Use unittest to check expected results",
     "b-tools",
     (
         code("""
@@ -1370,7 +1373,7 @@ add(
     (
         case("Lower boundary", "clamp(-2, 0, 10)", 0),
         case("Upper boundary", "clamp(12, 0, 10)", 10),
-        case("Interior", "clamp(5, 0, 10)", 5),
+        case("Inside the range", "clamp(5, 0, 10)", 5),
         case("Equal boundaries", "clamp(9, 4, 4)", 4),
         case(
             "Your test suite passes",
@@ -1383,7 +1386,7 @@ add(
         ),
         *tuple(
             case(
-                "Your tests reject a stub returning " + stub,
+                "Your tests reject a function always returning " + stub,
                 "(ClampTests.test_below.__globals__.__setitem__('clamp', "
                 f"lambda value, low, high: {stub}), "
                 "__import__('unittest').defaultTestLoader.loadTestsFromTestCase(ClampTests)"
@@ -1394,7 +1397,7 @@ add(
             for stub in ("low", "value", "high")
         ),
         case(
-            "Tests cover all three regions",
+            "Tests cover all three cases",
             "set(['test_below', 'test_inside', 'test_above']).issubset(dir(ClampTests))",
             True,
         ),
@@ -1408,7 +1411,7 @@ add(
 add(
     "task-workspace",
     "Project: a task list workspace",
-    "Separate a reusable model from its entry point",
+    "Keep task rules in a reusable Python module",
     "b-tools",
     (
         code("""
@@ -1434,7 +1437,7 @@ add(
     ),
     (
         case(
-            "Clean and deduplicate",
+            "Clean titles and remove repeats",
             "build_report([' Read ', '', 'Read', 'Walk'])",
             ["Read", "Walk"],
         ),
@@ -1455,7 +1458,7 @@ add(
         ),
     ),
     (
-        "Put all normalization and duplicate rules in TaskList.add so every caller gets them.",
+        "Put whitespace cleanup and duplicate checks in TaskList.add for every caller.",
         "pending() should return self.items.copy(), not the internal list itself.",
     ),
     project=True,

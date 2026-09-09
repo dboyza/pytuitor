@@ -1,7 +1,7 @@
 ## Calendar dates and clock times
 
 A `date` identifies a calendar day, a `time` identifies a clock reading, and a `datetime` combines both.
-`datetime.strptime(text, format)` parses text with an explicit format.
+`datetime.strptime(text, format)` reads text using a format string that describes where the date and time parts appear.
 `strftime(format)` formats an existing value as text.
 
 ```python
@@ -17,16 +17,17 @@ The output is `08/07/2024 15:15`.
 Uppercase and lowercase format letters have different meanings.
 Invalid dates or incompatible text raise `ValueError`.
 
-A datetime's `.date()` and `.time()` methods extract those components.
+A datetime's `.date()` and `.time()` methods return just its date or time part.
 `datetime.combine(day, clock)` joins a date and time into one datetime.
 Do arithmetic on the combined datetime so crossing midnight preserves the new day.
-These examples use local calendar times without timezone information.
-They do not account for daylight-saving transitions or elapsed time across different timezones.
+These examples use calendar dates and clock readings without time-zone information.
+They do not account for clocks changing for daylight saving or compare times in different time zones.
 
 ## Build
 
 Define `appointment(day, clock, minutes)`.
-`day` uses `DD/MM/YYYY`, `clock` uses `HH:MM` on a 24-hour clock, and `minutes` is an integer offset, which may be negative or zero.
+`day` uses `DD/MM/YYYY` and `clock` uses `HH:MM` on a 24-hour clock.
+`minutes` is the integer number of minutes to add; a negative value moves backward and zero leaves the date and time unchanged.
 Return the resulting date and time as `YYYY-MM-DD HH:MM`.
 Reject invalid dates and clock values with `ValueError`; you may let parsing raise it.
 Inputs otherwise follow the stated formats, and results remain in Python's supported year range.

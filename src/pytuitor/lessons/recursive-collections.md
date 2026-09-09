@@ -29,7 +29,8 @@ Define `sum_nested(items)`.
 Return the sum of all integers at every depth.
 `sum_nested([1, [2, [3]], 4])` returns `10`.
 Empty lists contribute zero, negative integers are allowed, and nesting is at most 20 levels deep.
-The input never contains cycles or other types.
+The input never contains cycles: a list cannot contain itself, directly or through other lists.
+No types other than lists and integers occur.
 Do not change any input list and do not print.
 Try recursion, but any implementation with the required behavior is accepted.
 

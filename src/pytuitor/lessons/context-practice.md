@@ -1,6 +1,6 @@
 # Restore temporary state
 
-A context manager brackets a block with setup and cleanup.
+A context manager performs setup before a `with` block and cleanup afterward.
 The `with` statement runs its exit behavior even if the block raises an exception.
 A generator decorated with `contextlib.contextmanager` expresses this using one `yield`.
 
@@ -26,7 +26,8 @@ The value yielded becomes the value after `as`.
 When the block ends normally, execution resumes after `yield`.
 If it raises, that exception is raised at the suspended `yield`.
 A `finally` clause runs in both cases.
-Do not catch and suppress exceptions unless your contract explicitly calls for it.
+Suppressing an exception means handling it without passing it back to the caller.
+Do this only when the required behavior explicitly calls for it.
 
 ## Build
 

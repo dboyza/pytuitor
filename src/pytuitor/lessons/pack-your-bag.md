@@ -14,6 +14,7 @@ A list can also contain strings, such as `["map", "rope"]`.
 ## Repeat an instruction with for
 
 A **loop** runs instructions repeatedly.
+Each repetition is called an **iteration**.
 A `for` loop works through a collection, one item at a time:
 
 ```python
@@ -53,6 +54,7 @@ for amount in input("Coins in each pouch: ").split():
     pouches.append(int(amount))
 ```
 
+A **method** is a function that belongs to a value and is called with a dot, such as `text.split()`.
 `.split()` turns a string like `"2 5 1"` into the list `["2", "5", "1"]`.
 `int(amount)` converts each string to an integer.
 `pouches.append(...)` adds that integer to the end of the list.

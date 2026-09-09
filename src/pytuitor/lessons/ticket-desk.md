@@ -19,6 +19,7 @@ There are two separate decisions: first select a price by age, then decide wheth
 Use a fresh `if` for the second decision because it applies after every age branch.
 
 ## Repair and explore
-Repair has incorrect boundary conditions and a return-ticket calculation to investigate.
+A **boundary** is a value where the rule changes, such as age 12 or 65.
+Repair has incorrect comparisons at those boundaries and an incorrect return-ticket calculation.
 After it passes, try the ages immediately before and after each price boundary.
 Those inputs reveal mistakes that testing only an ordinary adult can miss.

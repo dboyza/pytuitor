@@ -1,6 +1,6 @@
 # Understand package metadata
 
-A virtual environment gives a project its own interpreter entry point and installed packages.
+A **virtual environment** is a directory containing a Python command and installed packages kept separate from those of other projects.
 It does not sandbox code or make an untrusted dependency safe.
 The tutor can guide workspace environment setup; keep dependency installation deliberate and review the requested package and version first.
 All exercises in this course work with the standard library after the tutor is installed.
@@ -8,12 +8,17 @@ All exercises in this course work with the standard library after the tutor is i
 In an external terminal, a typical project begins with `python3 -m venv .venv`.
 On macOS and Linux, use `.venv/bin/python -m pip ...` to target that environment explicitly.
 Avoid `sudo pip`, unknown install scripts, and copying commands you have not read.
-Reproducible installations record exact versions and, when using pip requirements, verified artifact hashes with `--require-hashes`.
-Dependency pins and hashes identify what you install; they are not a guarantee that its code is trustworthy.
+A **dependency** is another package your program needs.
+Recording exact dependency versions helps repeat an installation later.
+Pip can also check a downloaded file against a recorded **hash**, a value calculated from its contents, using `--require-hashes`.
+Matching a recorded version and hash identifies the file; it does not establish that the code is trustworthy.
 
-`pyproject.toml` stores build configuration and project metadata.
+**Metadata** describes a project, such as its name and version.
+`pyproject.toml` stores metadata and settings for building an installable package.
+**TOML** is a text format for settings: `[project]` starts a named table, and `name = "small-report"` assigns a field inside it.
 The `[project]` table contains fields such as name, version, requires-python, dependencies, and scripts.
-The build backend creates a wheel, an installable distribution, from source.
+The **build backend** is the tool that turns source files into a **wheel**, the `.whl` file used to install a Python distribution.
+A distribution is the collection of code and metadata delivered for installation.
 A package name used for installation is not always the same as its import name.
 
 ```toml
@@ -24,7 +29,10 @@ requires-python = ">=3.11"
 dependencies = []
 ```
 
-Python 3.11's `tomllib.loads(text)` parses TOML text to dictionaries and lists.
+Use `import tomllib` to load Python's standard-library TOML reader, available since Python 3.11.
+`tomllib.loads(text)` parses TOML text to dictionaries and lists.
+For the example above, `tomllib.loads(text)["project"]["name"]` is `"small-report"`.
+`project.get("dependencies", [])` supplies an empty list when that field is absent.
 It does not install packages or evaluate arbitrary Python code.
 
 ## Build
@@ -32,7 +40,7 @@ It does not install packages or evaluate arbitrary Python code.
 Write `package_summary(text)`.
 Input is valid TOML with a project table containing string name and version fields and an optional list of dependency strings.
 Return a dictionary with exactly `name`, `version`, and `dependencies`.
-Copy the name and version, and return dependencies sorted lexicographically; if absent, use an empty list.
+Copy the name and version, and return dependencies sorted using Python's normal string ordering; if absent, use an empty list.
 Do not install anything or print.
 The checks teach metadata inspection; an actual packaging release also requires building and installing its wheel in a clean environment.
 

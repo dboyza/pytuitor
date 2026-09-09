@@ -68,8 +68,8 @@ Read, transform, and save text, JSON, and CSV.
 
 Useful preparation: Functions and input.
 
-- **Reading and writing files**: Use a context manager to close files reliably.
-- **Paths and folders**: Navigate paths without fragile string concatenation.
+- **Reading and writing files**: Open files and close them reliably.
+- **Paths and folders**: Build file paths without joining strings by hand.
 - **Saving structured data**: JSON, dictionaries, and lists on disk.
 - **Working with CSV tables**: Read headers and quoted fields correctly.
 - **Project: an expense report**: Transform CSV records into a JSON summary.
@@ -81,7 +81,7 @@ Validate, extract, and replace text with regular expressions.
 Useful preparation: Functions and input.
 
 - **Matching text patterns**: Validate complete text with regular expressions.
-- **Extracting and replacing text**: Capture fields and substitute matching spans.
+- **Extracting and replacing text**: Find values and replace matching text.
 
 ### Modules and library tools
 
@@ -91,7 +91,7 @@ Useful preparation: Files and structured data.
 
 - **Writing your own modules**: Share functions across Python files.
 - **Math and statistical summaries**: Use library calculations and distinguish mean from median.
-- **Repeatable random choices**: Generate reproducible samples without changing global random state.
+- **Repeatable random choices**: Repeat random choices without affecting other code.
 - **Command-line arguments**: Give a tool a predictable interface.
 
 ### Dates and times
@@ -125,8 +125,8 @@ Useful preparation: Modules and library tools.
 
 - **Your first class**: Keep state and related operations together.
 - **Named states with enums**: Represent a fixed set of meaningful values.
-- **Writing automated tests**: Use assertions and unittest to catch regressions.
-- **Project: a task list workspace**: Separate a reusable model from its entry point.
+- **Writing automated tests**: Use unittest to check expected results.
+- **Project: a task list workspace**: Keep task rules in a reusable Python module.
 
 ### Careful automation
 
@@ -241,7 +241,7 @@ Organize imports, package metadata, and a predictable CLI.
 
 Useful preparation: Classes and tested tools, Files and structured data.
 
-- **Make imports boring**: Modules & import boundaries.
+- **Keep imports predictable**: Modules & import boundaries.
 - **Understand package metadata**: Virtual environments & packaging.
 - **Define a predictable CLI**: Argument parsing & exit behavior.
 - **Read data with explicit paths**: Pathlib & structured files.
@@ -255,8 +255,8 @@ Useful preparation: Object protocols and testing.
 
 - **Control attribute access**: Descriptors & attribute lookup.
 - **Register classes deliberately**: Metaclasses & class creation.
-- **Cooperate through the MRO**: Inheritance & super.
-- **Inspect without executing**: Python internals & introspection.
+- **Method lookup and inheritance**: Inheritance & super.
+- **Inspect without executing**: Inspect function parameters.
 - **Project: an extensible formatter**: Plugin architecture project.
 
 ## Teaching and validation
@@ -273,5 +273,6 @@ Checks report expected and actual behavior; reference solutions never replace le
 All existing lesson IDs, exercise contracts, revisions, and saved drafts remain intact through this reorganization.
 Retired authoring paths remain implementation provenance, not learner navigation.
 
+See the [language review](language-review.md) for terminology and prerequisite review coverage.
 Automated checks establish executable consistency.
 Use the [learner study](learner-study.md) to assess teaching effectiveness with real learners.

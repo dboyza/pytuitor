@@ -19,8 +19,9 @@ For this lesson, inputs are valid nonnegative measurements, so you do not need t
 
 An **f-string** starts with `f` before its opening quote.
 Put an expression inside braces to insert its value into the text.
-The format specifier `:.2f` inside the braces displays a number rounded to two digits after the decimal point.
-It includes trailing zeros when necessary.
+A **format specifier** controls how a value looks in text.
+The specifier `:.2f` inside the braces displays a number rounded to two digits after the decimal point.
+It adds zeros at the end when needed to show two decimal places.
 
 ```python
 liters = 2.5
@@ -31,7 +32,8 @@ This prints `Water: 2.50 L`.
 Formatting creates display text; it does not change the number stored in `liters`.
 Keep the calculated value in a variable and format it when printing.
 
-Floats store binary approximations of many decimal fractions.
+Computers store floats using binary (base-two) numbers.
+Many decimal fractions cannot be stored exactly this way, so Python stores a nearby value.
 For example, `0.1 + 0.2` may display as `0.30000000000000004`.
 Formatting helps present a measurement, but does not make the underlying arithmetic exact.
 For money, use whole-number cents when exact cent arithmetic is needed.
@@ -49,5 +51,5 @@ Checks allow tiny floating-point differences in the calculated value and require
 
 ## Repair
 
-The supplied program discards the fractional part during conversion and does not format the display.
-Fix both problems using the same input and output contract.
+The supplied program uses `//` to round the converted measurement down to whole meters and does not format the display.
+Use division that keeps the fractional part, then match the required output format.

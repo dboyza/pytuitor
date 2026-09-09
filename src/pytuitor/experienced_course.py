@@ -49,7 +49,7 @@ def check(
     label,
     expression,
     expected,
-    nudge="Compare the result with every requirement, including the edge cases.",
+    nudge="Compare the actual and expected results for this input.",
 ):
     return Check(label, expression, expected, nudge)
 
@@ -728,7 +728,7 @@ LESSONS = (
         [
             check("Flatten bounded preview", "preview([[1, 2], [], [3, 4]], 3)", [1, 2, 3]),
             check(
-                "Do not overconsume",
+                "Do not read extra input items",
                 (
                     "(exec('source = iter([1, 2, 3])\\nvalues = preview([source], "
                     "2)\\nresult = [values, next(source)]', globals()), result)[1]"
@@ -849,7 +849,7 @@ LESSONS = (
         """,
         [
             check(
-                "Ignore annotations and blanks",
+                "Ignore comments and blanks",
                 "list(running_totals([' 3 ', '# adjustment', '', '-1', '5']))",
                 [3, 2, 7],
             ),
@@ -1015,7 +1015,7 @@ LESSONS = (
             return int(text or 0)
         """,
         [
-            check("Keep falsey item", "first_or(iter([0, 2]), 9)", 0),
+            check("Keep an item that tests as false", "first_or(iter([0, 2]), 9)", 0),
             check("Keep generic value", "first_or([{'a': 1}], {})", {"a": 1}),
             check("Empty uses default", "first_or(iter([]), 'fallback')", "fallback"),
             check(
@@ -1036,8 +1036,8 @@ LESSONS = (
         ],
         [
             (
-                "next(iter(items), default) distinguishes exhaustion from a f"
-                "alsey first value without overconsuming."
+                "next(iter(items), default) returns the first item even if it tests as false, "
+                "or default if there are no items. It reads at most one item."
             ),
             (
                 "Handle None and blank text before int conversion; TypeVar re"
@@ -1228,7 +1228,7 @@ LESSONS = (
         [
             "Inherit from ABC and mark render with abstractmethod to prevent incomplete instances.",
             (
-                "The classmethod factory must construct cls, not a hardcoded "
+                "The classmethod factory must construct cls, not a fixed "
                 "class, after trimming and validating text."
             ),
         ],
@@ -1622,7 +1622,7 @@ LESSONS = (
     unit(
         "module-boundaries",
         "python-delivery",
-        "Make imports boring",
+        "Keep imports predictable",
         "Modules & import boundaries",
         "from tools import normalize\n",
         "from tools import normalize\n",
@@ -1925,7 +1925,7 @@ LESSONS = (
                 True,
             ),
             check(
-                "Ignore abstract bases",
+                "Ignore classes without a kind",
                 "(RegistryMeta('Base', (), {}), RegistryMeta.registry)[1]",
                 {},
             ),
@@ -1960,7 +1960,7 @@ LESSONS = (
     unit(
         "method-resolution",
         "python-internals",
-        "Cooperate through the MRO",
+        "Method lookup and inheritance",
         "Inheritance & super",
         """
         class Root:
@@ -2017,7 +2017,7 @@ LESSONS = (
         "runtime-inspection",
         "python-internals",
         "Inspect without executing",
-        "Python internals & introspection",
+        "Inspect function parameters",
         """
         import inspect
 
@@ -2449,7 +2449,7 @@ EXTRA_CHECKS = {
     ),
     "concurrent-batch": (
         probe(
-            "Failure cleans up sibling work",
+            "Failure cleans up other tasks",
             """
             import asyncio
             async def probe_cleanup():
@@ -2476,7 +2476,7 @@ EXTRA_CHECKS = {
                 "One worker waits while another raises ValueError; expect sibling cleanup"
                 " before the grouped error returns."
             ),
-            "Use a TaskGroup to cancel and await unfinished siblings on failure.",
+            "Use a TaskGroup to cancel and await other unfinished tasks on failure.",
         ),
     ),
     "descriptors": (

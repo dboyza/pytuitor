@@ -1,8 +1,9 @@
 # Program to a small protocol
 
 Python often works best when a function asks an object to perform an operation rather than checking its concrete class.
-This is duck typing.
-A `typing.Protocol` describes that expected shape for static type checkers without requiring inheritance by users of your API.
+This is **duck typing**: the object's supported operations matter more than its class name.
+A `typing.Protocol` lists the attributes and methods an object should provide for static type checking.
+An object can satisfy that protocol without inheriting from it.
 
 ```python
 from typing import Protocol
@@ -34,7 +35,7 @@ Return the number of input lines written.
 Accept any object with the required method, including unrelated classes; do not require `isinstance` or inheritance.
 Empty input returns zero without writes.
 For `['one', 'two']`, a StringIO should contain `'one\ntwo\n'` and the return value should be two.
-Do not write to global stdout.
+Do not print or write to the terminal; send text only through the supplied writer.
 
 ## Repair
 

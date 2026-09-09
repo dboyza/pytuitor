@@ -1,7 +1,8 @@
 # Assemble iterator recipes
 
 `itertools` contains small tools for combining streams.
-`chain.from_iterable(groups)` flattens one level lazily.
+`chain.from_iterable(groups)` yields each group's items in order as they are requested.
+This flattens one level: `[["a"], ["b", "c"]]` supplies `"a"`, `"b"`, then `"c"`.
 `islice(source, count)` requests at most that many items without exhausting the source.
 Together they support previews even when a group is infinite.
 
@@ -14,7 +15,7 @@ preview = list(islice(chain.from_iterable([["a"], ["b", "c"]]), 2))
 Ordinary `zip` stops at the shortest input.
 `zip_longest(left, right, fillvalue=None)` continues to the longest and pads missing values.
 `product(left, right)` produces every pair, with the left item changing slowest.
-Unlike chain, product stores its input pools and requires finite inputs.
+Unlike `chain`, `product` stores the items from each input before producing pairs, so both inputs must end.
 
 ```python
 rows = list(zip_longest(["name", "age"], ["Lin"], fillvalue=None))
@@ -34,5 +35,5 @@ Equivalent implementations are welcome.
 
 ## Repair
 
-The preview eagerly exhausts its inputs, alignment truncates, and combinations omit pairs.
+The preview reads all input before returning, alignment drops unmatched values, and combinations omit pairs.
 Restore each tool's distinct contract.

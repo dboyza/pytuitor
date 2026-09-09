@@ -1,10 +1,13 @@
-# Context management is a protocol
+# Define the context-manager methods
 
-`with manager as value:` calls `manager.__enter__()` and binds its result to `value`.
+A **protocol** is a set of operations an object supplies so Python can use it in a particular way.
+The context-manager protocol uses the two methods below.
+`with manager as value:` calls `manager.__enter__()` and assigns its result to `value`.
 When the body finishes, Python calls `__exit__(exc_type, exc_value, traceback)`.
 All three arguments are `None` for a normal exit.
-On failure they describe the exception; returning a truthy value suppresses it.
-Return `False` or `None` to let it propagate.
+On failure they hold the exception's class, the exception object, and a traceback recording where the error passed through the code.
+Returning a truthy value suppresses the exception, so the caller does not receive it.
+Return `False` or `None` to let the exception propagate, meaning continue back to the caller.
 Cleanup normally should preserve failures.
 
 A class defines a new kind of object, and calling the class constructs an instance.

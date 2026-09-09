@@ -2,8 +2,11 @@
 
 Special methods let user-defined objects participate in ordinary syntax.
 `__repr__` supplies a debugging representation, `__len__` supports `len`, `__eq__` supports equality, and `__add__` supports `+`.
-Return `NotImplemented` from a binary special method for unsupported operand types so Python can try the other operand or report an error.
+An operand is a value an operator works on, such as either value in `left + right`.
+For an unsupported operand type, return `NotImplemented` from a two-operand method such as `__add__` or `__eq__`, allowing Python to try the other object's operation or its fallback behavior.
 This is a special value, not an exception to raise.
+
+`!r` in an f-string uses a value's representation, including quotes for strings.
 
 ```python
 class Label:
@@ -19,8 +22,9 @@ class Label:
         return self.text == other.text
 ```
 
-`!r` in an f-string uses a value's representation, including quotes for strings.
-A property keeps attribute syntax while running controlled access code.
+A property runs methods when an attribute is read or assigned.
+`@property` marks the method that runs when reading `object.celsius`.
+`@celsius.setter` marks the method that runs for assignment such as `object.celsius = 20`.
 
 ```python
 class Temperature:

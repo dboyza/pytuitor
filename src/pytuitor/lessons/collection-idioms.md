@@ -19,7 +19,10 @@ They work well for a direct transformation or filter; ordinary loops are clearer
 `mapping.setdefault(key, default)` inserts the default only if the key is absent, then returns the stored value.
 `item in collection` tests membership.
 `for key, value in pairs` unpacks each two-item pair into two variables.
-A function accepting an iterable should not assume it has indexing or can be traversed twice.
+An **iterable** supplies items to a loop, as lists and tuples do.
+An **iterator** supplies items one at a time and remembers how far it has advanced.
+A one-pass iterator cannot start over after its items have been read.
+A function accepting any iterable therefore cannot assume indexing or a second traversal will work.
 
 ## Build
 
@@ -27,7 +30,7 @@ Write `group_names(pairs)`.
 Each pair contains a group string and a name string.
 Return a dictionary mapping each group to its distinct names in first-seen order.
 Keep groups in their first-seen order too.
-Names are case-sensitive and already normalized.
+Names are case-sensitive and already cleaned; preserve each supplied string exactly.
 For example, `[('team', 'Mina'), ('team', 'Sol'), ('team', 'Mina')]` becomes `{'team': ['Mina', 'Sol']}`.
 Accept an empty iterable and a one-pass iterator.
 Do not mutate the input or print.

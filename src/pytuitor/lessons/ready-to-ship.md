@@ -1,7 +1,10 @@
 ## State a function's expected types
 
-In `def parse_count(text: str) -> int:`, the annotations say that `text` should be a string and the result should be an integer.
-They help readers, editors, and static type checkers understand your code.
+A **type hint** describes the type a value is expected to have.
+Python writes these hints as **annotations**, extra information attached to parameters, return values, or variables.
+In `def parse_count(text: str) -> int:`, `text: str` says the parameter should be a string, and `-> int` says the return value should be an integer.
+A static type checker is a tool that inspects code for inconsistent types without running it.
+Annotations help these tools, editors, and readers understand your code.
 Python does not enforce them at runtime, so validation still belongs in your code when needed.
 
 ## Test behavior with assertions
@@ -18,7 +21,10 @@ The tutor can call your test directly, so you do not need to install pytest to c
 Do not use `assert` to validate user input in production code: assertions can be disabled.
 
 Use `raise ValueError("message")` when an input has an unacceptable value.
-To test that an error occurs without a testing library:
+To test that an error occurs without a testing library, combine `try`, `except`, and `else`.
+The `except` block handles the expected error.
+`pass` means "do nothing".
+The `else` block runs only when the `try` block raised no error.
 
 ```python
 try:
@@ -29,9 +35,6 @@ else:
     raise AssertionError("Negative input was accepted")
 ```
 
-The `except` block handles the expected error.
-`pass` means "do nothing".
-The `else` block runs only when the `try` block raised no error.
 
 ## Exercise
 
@@ -43,14 +46,8 @@ Raise `ValueError` for negative values and non-integer text such as `"2.5"` or `
 Write assertions and exception checks in `test_parse_count()` for zero, whitespace, and invalid input.
 Check runs your test against your implementation and deliberately broken versions to see whether it detects mistakes.
 
-## Use the code in a project
+## Use the idea in a project
 
-A virtual environment gives a project its own installed packages.
-Create one with `python -m venv .venv` in your project folder and activate it before installing tools.
-On macOS and Linux, activation is `source .venv/bin/activate`.
-Then `python -m pip install pytest` installs pytest into that environment and `python -m pytest` runs its tests.
-These setup commands require your regular terminal, outside this lesson's Python console.
-
-A `pyproject.toml` file records package metadata, dependencies, supported Python versions, and build configuration.
-A console entry point maps a command name to a callable such as `package.cli:main`.
-In later projects, keep calculation separate from command-line input and output so it can be tested independently.
+Keep calculation separate from command-line input and output so it can be tested independently.
+The tutor runs this exercise and its tests offline without any package installation.
+For setting up test tools outside the tutor and sharing a program with others, continue later to Build distributable tools in the syllabus.

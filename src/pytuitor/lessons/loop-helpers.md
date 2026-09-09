@@ -12,12 +12,13 @@ for floor in range(2, 5):
 ```
 
 This prints `2`, `3`, and `4` on separate lines.
-To include a positive final number, use one more than that number as the stopping value.
+When counting upward one at a time, use one more than the final number as the stopping value.
 
 ## Number items while visiting them
 
 `enumerate()` supplies a pair containing a counter and the current item.
 It starts counting at zero unless you provide `start=1` or another starting value.
+`start=1` is a **keyword argument**: it names the setting whose value you are passing.
 Unpack each pair into two loop variables:
 
 ```python

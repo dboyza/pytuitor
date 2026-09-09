@@ -5,7 +5,7 @@ For example, `stock = {"apple": 3, "pear": 8}` stores two fruit counts.
 `stock["apple"]` returns `3`.
 `stock["apple"] = 4` changes that count.
 `{}` creates an empty dictionary.
-Looking up a missing key with brackets raises `KeyError`.
+Looking up a missing key with brackets raises `KeyError`, meaning that the dictionary has no entry for that key.
 
 `stock.get("plum", 0)` returns the value for `"plum"` if present, otherwise `0`.
 The method does not insert a missing key.
@@ -22,7 +22,7 @@ The result is `{'blue': 2, 'red': 1}`.
 
 ## Build
 Read space-separated words from one input line.
-Create a dictionary called `counts` whose keys are the words and whose values are their occurrence counts.
+Create a dictionary called `counts` whose keys are the words and whose values are the number of times each word appears.
 Treat `Cat` and `cat` as different words.
 An empty input produces `{}`.
 You may print `counts` so Run shows your result.

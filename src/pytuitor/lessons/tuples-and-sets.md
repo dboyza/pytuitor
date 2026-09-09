@@ -17,11 +17,12 @@ print(y)
 
 This prints `3` and then `8`.
 The number of names must match the number of items; otherwise Python raises `ValueError`.
-Unpacking also works with lists and with the pairs produced by loop helpers in the next lesson.
+Unpacking also works with lists and with the pairs produced by loop helpers later in this section.
 
 ## Keep unique values in a set
 
-A **set** holds distinct values, with no guaranteed display or iteration order.
+A **set** holds distinct values: each value appears once.
+Its display order and the order in which a loop visits its items are not guaranteed.
 Create one from a list with `set(...)`.
 Repeated values appear only once.
 An empty set is `set()`, not `{}`.

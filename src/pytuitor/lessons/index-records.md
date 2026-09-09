@@ -24,7 +24,7 @@ A dictionary comprehension alone would silently overwrite duplicate identifiers,
 ## Repair
 
 Repair has the correct broad shape but loses information and shares mutable objects.
-Use Check's duplicate and aliasing cases to distinguish these failures.
+Use Check's duplicate-identifier and shared-object cases to distinguish these failures.
 
 ## Take it further
 

@@ -15,19 +15,24 @@ async def pair():
     return [first.result(), second.result()]
 ```
 
-The async context manager waits for its tasks before exiting.
+`async with` is the form of `with` whose setup or cleanup may need to wait using async operations.
+Here, exiting the block waits for every task in the group.
+After a successful exit, `task.result()` returns that task's completed value.
+An **exception group** is an exception containing multiple errors from related operations.
 If a task fails with an ordinary exception, the group cancels remaining tasks, waits for their cleanup, and raises an `ExceptionGroup` containing failures.
 `try` with `except* ValueError` can handle matching parts of an exception group; do not combine ordinary `except` and `except*` clauses in the same try statement.
-Cancellation is a control signal: use `finally` for cleanup and normally let `asyncio.CancelledError` propagate.
+**Cancellation** requests that a task stop; Python raises `asyncio.CancelledError` inside it at an opportunity to stop.
+Use `finally` for cleanup and normally allow that exception to reach the caller.
 
 ## Build
 
 Define `async def collect_jobs(jobs)`.
-`jobs` is a finite iterable of no-argument callables; each call returns a fresh coroutine.
+`jobs` is a finite iterable of functions or other callable objects that accept no arguments.
+Calling each one creates a new coroutine object; such a function is sometimes called a **factory** because it creates another object.
 Call each factory once and schedule all jobs in a TaskGroup.
 Return their results in input order, regardless of completion order.
 Empty input returns `[]`.
-On failure, let the TaskGroup's exception group propagate after sibling cleanup.
+On failure, allow the TaskGroup's exception group to reach the caller after the other tasks in that group finish cleanup.
 Do not suppress errors or create a nested event loop.
 For factories returning 8 then 3, return `[8, 3]`.
 No printing is required.
@@ -35,6 +40,6 @@ No printing is required.
 ## Repair
 
 The broken function processes jobs sequentially and reverses the result order.
-Repair the task lifetime and ordering contract.
+Schedule the jobs together and preserve their input order in the returned list.
 
 See the [TaskGroup reference](https://docs.python.org/3.11/library/asyncio-task.html#task-groups) for additional detail.

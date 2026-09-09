@@ -34,9 +34,13 @@ An exception is an error that interrupts normal execution; a `try`/`finally` ens
 Calling it creates a coroutine object; `await` executes it and waits for its result within an event loop.
 Use `asyncio.run(coroutine)` to run an async entry point from ordinary synchronous code.
 
-`asyncio.gather(task1, task2)` runs awaitables concurrently and returns their results in input order.
-`*(double(v) for v in values)` expands generated coroutine objects into separate arguments to `gather`.
-Async is useful when operations spend time waiting for I/O; blocking synchronous work still blocks the event loop.
+`asyncio.gather(first, second)` schedules the supplied coroutine objects so they can make progress together.
+Awaiting the result waits for their values and returns a list in argument order, even if the second operation finishes first.
+The expression `(double(v) for v in values)` creates a generator of coroutine objects.
+Putting `*` before it in a function call passes those objects as separate arguments, equivalent to `gather(double(a), double(b))` for two values.
+Calling `gather` with no arguments produces an empty result list when awaited.
+**I/O** means input/output, such as reading from a network connection.
+Async helps when operations can let other work run while waiting for I/O; ordinary blocking calls still prevent the event loop from progressing.
 
 ## Exercise
 

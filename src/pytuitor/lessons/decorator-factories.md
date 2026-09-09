@@ -32,9 +32,10 @@ Stacked decorators apply bottom-up: `@outer` above `@inner` means `outer(inner(f
 ## Build
 
 Write the decorator factory `prefixed(prefix)` for functions returning strings.
-The resulting decorated function must call the original once per invocation with unchanged positional and keyword arguments, then prepend the string prefix to its result.
+The resulting decorated function must call the original once per call with unchanged positional and keyword arguments, then prepend the string prefix to its result.
 Preserve `__name__`, `__doc__`, and `__wrapped__` metadata.
-Factories must compose: `prefixed('A')(prefixed('B')(lambda: 'C'))()` returns `'ABC'`.
+Applying both prefixes must work together: `prefixed('A')(prefixed('B')(lambda: 'C'))()` returns `'ABC'`.
+Here `lambda: 'C'` is a function with no parameters that returns `'C'`, and the final `()` calls the fully wrapped function.
 Empty prefixes are allowed.
 Do not print or read input.
 

@@ -1,6 +1,8 @@
 ## Build a log analyzer
 
-Write a program that counts log messages by severity and displays a JSON report.
+A **log** is a sequence of messages recording what a program did.
+A message's **severity** identifies how serious it is, such as informational, warning, or error.
+Write a program that counts messages in each category and displays a JSON report.
 Use only Python's standard library, so the exported program can run without extra packages.
 
 `import sys` makes standard input available as `sys.stdin`.
@@ -45,4 +47,5 @@ Use **Ctrl+P**, search for **Export code**, and press Enter.
 In your regular terminal, run the exported file with `python your_export.py < app.log`.
 The shell's `<` supplies the contents of `app.log` as standard input.
 
-Next, add a pytest suite for `summarize` and package the program with a console entry point.
+As an optional follow-up outside this exercise, add automated tests for `summarize`.
+Packaging can also provide a **console entry point**, an installed terminal command that calls a chosen Python function.

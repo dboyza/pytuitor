@@ -5,7 +5,11 @@ from pytuitor.models import Check, Lesson, code, lesson_text
 
 def _check(label, expression, expected, stdin=None):
     return Check(
-        label, expression, expected, "Compare the result with the stated edge cases.", stdin=stdin
+        label,
+        expression,
+        expected,
+        "Compare the actual and expected results for this input.",
+        stdin=stdin,
     )
 
 
@@ -222,7 +226,7 @@ LESSONS = (
             ),
         ],
         [
-            "list.remove deletes one occurrence; guard an absent target with membership.",
+            "list.remove deletes the first match; check if target in items before removing it.",
             "sort changes the list; dict.pop(key, 0) removes a key with a safe default.",
         ],
         "pear apple pear\npear\npear\n",
@@ -326,7 +330,7 @@ LESSONS = (
         "repeatable-randomness",
         "Repeatable random choices",
         "b-tools",
-        "Generate reproducible samples without changing global random state",
+        "Repeat random choices without affecting other code",
         """
         import random
         def draw(items, count, seed):
@@ -379,7 +383,7 @@ LESSONS = (
                 True,
             ),
             _check(
-                "Global generator is untouched",
+                "Shared random generator is unchanged",
                 "(lambda before: (draw(['a', 'b'], 5, 9), "
                 "__import__('random').getstate() == before)[1])(__import__('random').getstate())",
                 True,

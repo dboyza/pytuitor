@@ -1,5 +1,8 @@
 ## An exception reports a failed operation
+An **exception** reports an error while a program runs.
+**Raising** an exception means reporting that error; **catching** or **handling** it means running code that responds to it.
 `int("twelve")` raises `ValueError` because the text is not a valid integer.
+A **block** is a group of indented instructions.
 A `try` block lets you attempt an operation, and an `except` block handles a particular exception.
 
 ```python
@@ -19,6 +22,7 @@ It is different from the string `"None"` and the number `0`.
 `result is None` is the conventional way to test for it.
 
 ## Build
+To **parse** text is to read it as a value or structure your program can use.
 Define `parse_quantity(text)`.
 Convert a string to an integer and return it if it is nonnegative.
 Return `None` if conversion fails or the integer is negative.

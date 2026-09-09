@@ -22,6 +22,7 @@ Ordinary `/` division gives a decimal number, called a `float`, even when the di
 
 ## Build
 Read one line of input containing a nonnegative whole number of minutes.
+**Nonnegative** means zero or greater.
 Convert it to an integer called `minutes`.
 Store the number of complete hours in `hours` and the leftover minutes in `remaining`.
 Print `hours` on the first line and `remaining` on the second line.

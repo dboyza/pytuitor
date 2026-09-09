@@ -4,7 +4,8 @@ A Python program is a set of instructions that the computer runs in order, from 
 We will start with two kinds of values: text and whole numbers.
 
 **A string** is a value containing text, such as a word or a sentence.
-Python calls this type `str`.
+A **type** describes what kind of value something is and which operations it supports.
+Python calls the string type `str`.
 Write a string inside matching quotes: `"Hello"` or `'Hello'`.
 The quotes tell Python where the text begins and ends; they are not part of the text itself.
 
@@ -16,6 +17,7 @@ Write integers without quotes so Python can use them in calculations.
 
 `print()` is a built-in function: an operation Python already knows how to perform.
 Put the value you want to display between its parentheses.
+Using a function this way is called **calling** it; a value you pass to it is an **argument**.
 By default, `print()` moves to a new line after displaying its value.
 
 ```python
@@ -32,7 +34,9 @@ Hello
 5
 ```
 
-Python calculates `2 + 3` before printing the result.
+An **expression** is code that produces a value, such as `2 + 3`.
+Python calculates this expression before printing the result.
+These calculation symbols are called **operators**.
 Use `+` for addition, `-` for subtraction, and `*` for multiplication.
 
 ## Why the quotes matter
@@ -53,7 +57,7 @@ print("Hello)
 Python reports a `SyntaxError`, meaning it cannot read the instruction as written.
 The message may say `unterminated string literal`: Python reached the end of the line before finding the quote that ends the string.
 Look for the file and line number in the error output, then read the error type and message.
-An arrow or caret can help point to the problem, but check the surrounding instruction too.
+An arrow or caret (`^`) can help point to the problem, but check the surrounding instruction too.
 
 Add the missing quote before the closing parenthesis:
 
@@ -70,6 +74,7 @@ Errors are clues you can use, not a sign that you cannot program.
 Write a complete program that displays `Hello, explorer!` on the first line and the result of `6 * 7` on the second line.
 Keep the greeting in quotes and write the calculation without quotes.
 
+The **editor** is the area where you write code; the **console** shows output and accepts answers when a program asks for input.
 Press **Ctrl+T** to move from the lesson to the editor, then type your changes.
 Press **Ctrl+R** to run the program and see its output in the console.
 Press **F5** to check the exercise requirements.

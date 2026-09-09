@@ -11,7 +11,8 @@ while remaining > 0:
 ```
 
 This prints `3`, `2`, `1`, then stops when `remaining` becomes zero.
-`break` stops the nearest enclosing loop immediately.
+`break` immediately stops the loop that contains it.
+If loops are nested, it stops only the innermost one.
 `while True:` creates a loop that keeps going until something such as `break` stops it.
 This is useful when the user decides when they are finished.
 
@@ -27,4 +28,4 @@ When using Run, remember to type it yourself.
 
 ## Repair
 Investigate why the loop stops before processing all the numbers.
-A stopping condition and an accumulating total serve different purposes.
+The input value decides when to stop; the running total records how much has been added.

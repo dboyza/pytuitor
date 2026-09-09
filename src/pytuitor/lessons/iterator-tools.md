@@ -14,7 +14,8 @@ next_two = list(islice(source, 2))
 ```
 
 `islice` requests only the selected part of a stream.
-Materializing an infinite stream into a list would never finish, so a lazy interface must not eagerly exhaust its input.
+Collecting an infinite stream into a list would never finish.
+A lazy operation must read only enough input to produce the next requested result.
 Once you yield a mutable object, callers may keep it.
 Reusing and clearing that same list for the next batch would change the caller's previous result too.
 

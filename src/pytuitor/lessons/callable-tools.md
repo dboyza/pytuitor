@@ -5,15 +5,16 @@ Pass a function without parentheses when another function should call it later.
 `sorted(items, key=function)` calls the key function for each item and sorts by those keys, returning a new list.
 Sorting is stable: items with equal keys retain their original order.
 
+`lambda name: expression` creates a small function without a declared name that returns the expression.
+Use `def` when a function needs several statements or a descriptive name.
+
 ```python
 names = ["Ada", "Christopher", "Lin"]
 by_length = sorted(names, key=len)
 by_last_letter = sorted(names, key=lambda name: name[-1])
 ```
 
-`lambda name: expression` creates a small anonymous function that returns the expression.
-Use `def` when a function needs several statements or a descriptive name.
-A closure can remember values from its enclosing function.
+A **closure** is a function that uses variables from the function where it was defined, retaining access after that outer call returns.
 `functools.partial` is another way to make a callable with arguments already supplied.
 
 ```python
@@ -35,7 +36,7 @@ Accept finite one-pass iterables, preserve equal-key order, and leave a caller's
 Empty input returns `[]`.
 Write `make_scaler(factor)` to return a reusable callable accepting one numeric value and multiplying it by the numeric factor.
 Negative values and zero are allowed.
-For example, `make_scaler(3)(4)` returns `12`.
+For example, `make_scaler(3)(4)` returns `12`: the first pair of parentheses creates the callable, and the second calls it with `4`.
 A closure, partial application, or another equivalent callable is valid.
 Do not print or read input.
 

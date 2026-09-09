@@ -3,7 +3,11 @@
 Python callers can usually pass arguments by position or by parameter name.
 Defaults apply when an argument is omitted.
 A bare `*` in a parameter list makes all following parameters keyword-only.
-A `/` marks preceding parameters positional-only, useful when names should not become part of your public API.
+A `/` marks preceding parameters positional-only: callers must supply those arguments without parameter names.
+These calling rules form part of a function's public interface, often called its API.
+
+The conditional expression is `value_if_true if condition else value_if_false`.
+Ordinary `if` statements are equally appropriate when they are clearer.
 
 ```python
 def label(text, /, prefix="item", *, upper=False):
@@ -14,9 +18,7 @@ def label(text, /, prefix="item", *, upper=False):
 label("report", prefix="file", upper=True)
 ```
 
-The conditional expression is `value_if_true if condition else value_if_false`.
-Ordinary `if` statements are equally appropriate when they are clearer.
-Defaults are evaluated when `def` executes, a rule we will examine with mutable objects in the next chapter.
+Defaults are evaluated when `def` executes, a rule explored with mutable objects in the Decorators chapter.
 
 Use `raise ValueError("explanation")` when an argument has an unacceptable value.
 Python supports chained comparisons: `0 <= rate <= 1` tests both boundaries.

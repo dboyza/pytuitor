@@ -28,7 +28,7 @@ Variable names are case-sensitive: `student` and `Student` are different names.
 
 `input()` pauses the program so the user can type an answer and press Enter.
 The text inside its parentheses is the question, called a **prompt**.
-The function returns the typed answer as a string.
+The function **returns** the typed answer as a string: it gives that value back to the code that called it.
 Use `=` to store that answer in a variable:
 
 ```python
@@ -73,4 +73,5 @@ Create a variable called `greeting` containing `Welcome, `, their name, and `!`.
 Print the greeting.
 
 Use Run to try your own name in the console.
-Then use Check: it tests several names automatically, so a hard-coded greeting will not pass.
+Then use Check: it tests several names automatically.
+A **hard-coded** greeting uses one fixed name instead of the answer from `input()`, so it will not pass.
