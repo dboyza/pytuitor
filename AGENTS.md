@@ -76,6 +76,7 @@ Verify implementation details against code.
 
 - Reproduce bugs through the learner UI first; retain meaningful regressions.
 - Use scratch `--data-dir` profiles; never test against the user's progress.
+- Keep the checkout's Python interpreter in a persistent installation, never a temporary directory; virtual environments depend on that base interpreter remaining intact.
 - Run `uv sync --locked`, `uv run pytest`, `uv run ruff check .`, and `uv run ruff format --check .`.
 - Use Textual Pilot for journeys and real PTY input for terminal shortcut compatibility.
 - Inspect 80 × 24 and 140 × 44 screenshots; fix clipping, wrapping, focus ambiguity, lint failures, and flakiness.

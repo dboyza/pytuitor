@@ -31,6 +31,26 @@ No administrator privileges or downloaded shell installer is required for Pytuit
 Before installing a downloaded release, compare its SHA-256 checksum against the manifest obtained from the trusted release page.
 A checksum detects changed bytes; it does not establish the identity of an untrusted publisher.
 
+## Recover a broken checkout environment
+
+If `uv run --locked pytuitor` fails while querying Python or reports `No module named 'encodings'`, the checkout's `.venv` may point to a removed or incomplete Python installation.
+Check `.venv/pyvenv.cfg` for the base interpreter location.
+Keep that interpreter in a persistent location, not `/tmp` or `/private/tmp`.
+
+Close Pytuitor, then run these commands from the checkout with no virtual environment activated:
+
+```sh
+uv python install 3.12
+mv .venv .venv-backup
+uv sync --locked --managed-python --python 3.12
+uv run --locked pytuitor
+```
+
+Choose a different backup name if `.venv-backup` already exists.
+Leave `UV_PYTHON_INSTALL_DIR` unset so uv uses its persistent default installation directory.
+This rebuilds dependencies without changing your saved learner profile.
+The old environment is retained as a backup, but should not be run from its moved location.
+
 ## Upgrade deliberately
 
 Close Pytuitor before replacing its installed version.
