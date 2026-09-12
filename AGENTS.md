@@ -68,6 +68,7 @@ Verify implementation details against code.
 - Input-wait time must not consume execution timeout; kill descendant processes during cancellation.
 - Process isolation, venvs, and resource limits are not an OS security sandbox.
 - Guard async UI callbacks against cancellation, changed drafts, and unmounted screens.
+- Keep pane selection and focus synchronous; ignore bubbled focus notifications for widgets that no longer hold focus.
 - `workspace.py` validates paths and limits, exports without overwrite, and manages explicit environment commands.
 - Create venvs at their final path; moving them breaks interpreter paths and shebangs.
 - OptionList custom click handlers need `prevent_default()` to suppress inherited activation.

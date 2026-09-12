@@ -371,12 +371,16 @@ class LessonScreen(TutorScreen):
         ]
         if pane == "console" and self.console and self.console.waiting:
             target = "#console-input"
-        self.query_one(target).focus()
+        # Keep the active pane and focus in sync before accepting another key.
+        self.set_focus(self.query_one(target))
 
     def action_focus_lesson(self) -> None:
         self.select_pane("lesson")
 
     def on_descendant_focus(self, event: DescendantFocus) -> None:
+        # Focus notifications bubble asynchronously and may already be stale.
+        if event.widget is not self.focused:
+            return
         ids = {event.widget.id, *(parent.id for parent in event.widget.ancestors)}
         for widget_id, pane in (
             ("reading-panel", "lesson"),
