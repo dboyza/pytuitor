@@ -2,9 +2,9 @@
   <img src="docs/assets/logo.svg" width="96" height="96" alt="Pytuitor logo: an open book with a terminal prompt">
 </p>
 <h1 align="center">Pytuitor</h1>
-<p align="center"><strong>Learn Python.
-Build it.
-Repair it.</strong><br>An offline Python tutor, right in your terminal.</p>
+<p align="center"><strong>Learn Python by building it and fixing it.</strong><br>
+Guided lessons, real projects, and immediate feedback in your terminal.<br>
+Offline, with no account required.</p>
 <p align="center">
   <a href="#start-learning">Start learning</a> ·
   <a href="#preview">Preview</a> ·
@@ -12,11 +12,12 @@ Repair it.</strong><br>An offline Python tutor, right in your terminal.</p>
   <a href="#development">Development</a> ·
   <a href="https://github.com/dboyza/pytuitor/issues">Report an issue</a>
 </p>
-<p align="center"><strong>75 lessons</strong> &nbsp; / &nbsp; <strong>12 projects</strong> &nbsp; / &nbsp; <strong>No account required</strong></p>
+<p align="center"><strong>75 lessons</strong> &nbsp; / &nbsp; <strong>12 projects</strong> &nbsp; / &nbsp; <strong>21 chapters</strong></p>
 
 ## Start learning
 
-For macOS and Linux, with [uv](https://docs.astral.sh/uv/getting-started/installation/) installed and a terminal at least **80 × 24**:
+For macOS and Linux, with [uv](https://docs.astral.sh/uv/getting-started/installation/) installed and a terminal at least **80 × 24**.
+Initial setup may download Python 3.11+ and dependencies; learning works offline afterward.
 
 ```sh
 git clone https://github.com/dboyza/pytuitor.git
@@ -26,9 +27,7 @@ uv run --locked pytuitor
 
 Already have the checkout?
 Run the last command from its root.
-The first launch installs Python 3.11+ and dependencies if needed, then opens the welcome screen.
-Select **Start learning** for your first lesson or **Browse syllabus** to explore.
-After setup, lessons, hints, reference solutions, and checks work offline, with progress saved locally.
+On the welcome screen, select **Start learning** for your first lesson or **Browse syllabus** to explore.
 
 **Release candidate:** Pytuitor is not yet published to PyPI.
 See [installation and upgrades](docs/install.md) for a standalone wheel installation or help recovering a broken environment.
@@ -38,21 +37,20 @@ See [installation and upgrades](docs/install.md) for a standalone wheel installa
 <a href="docs/assets/learning.svg"><img src="docs/assets/learning.svg" width="100%" alt="Pytuitor at 140 by 44 terminal cells, with a Python lesson on the left and a blank Build editor and console on the right"></a>
 
 *Read the lesson, write your code, and check the result in one workspace.*
-At smaller terminal sizes, **Ctrl+T** switches between the lesson, editor, and console.
 
 ## Learn by doing
 
 Start as a complete beginner or deepen your existing Python knowledge.
 
-- **Build, then repair.** Start each unit with a blank editor, then debug a broken program.
-  Both stages count toward completion, with separate saved drafts.
-- **Understand the result.** Run code with interactive input, then check observable behavior against expected results.
-  Hints and explicitly revealed reference solutions help when you get stuck.
-- **Follow your own path.** Start from the basics or mark known topics to skip them when continuing.
-  Prerequisites guide you without locking lessons.
-- **Grow into real projects.** Work across files, export your code, and optionally create project environments.
-  Package installation is an explicit network action.
-- **Pick up where you left off.** Your progress and drafts stay on your machine, without an account.
+- **Build, then repair.**
+  Write a program from scratch, then debug a broken one; complete both stages to finish the unit.
+- **Get useful feedback.**
+  Run code with interactive input and compare checked results with expected behavior.
+  Use hints or explicitly reveal a reference solution when you get stuck.
+- **Choose your path.**
+  Follow the course or skip known topics when continuing; prerequisites guide you without locking lessons.
+- **Keep your progress.**
+  Separate Build and Repair drafts are saved locally so you can pick up where you left off.
 
 ### A course that grows with you
 
@@ -69,27 +67,22 @@ The first three form the core sequence; the last two offer optional depth.
 
 See the [curriculum map](docs/curriculum.md) for chapters, projects, and preparation.
 
-## Make yourself at home
+<details>
+<summary><strong>Keyboard shortcuts</strong></summary>
 
 | Key | Action |
 | --- | --- |
-| **Ctrl+T** | Cycle through lesson, editor, and console |
+| **Ctrl+T** | Cycle through lesson, editor, and console, including in small terminals |
 | **Ctrl+R** | Run your program |
 | **F5** | Check your work |
 | **F10** | Open all keybinds |
 | **Ctrl+P** | Open commands, including export, reset, and project tools |
 
 When your program asks a question, type in the console and press **Enter**.
-Use the file menu for multi-file projects.
 
-For a separate learning profile, run:
+</details>
 
-```sh
-uv run --locked pytuitor --data-dir ./practice-profile
-```
-
-**Start over** resets the active profile after confirmation; exported work is kept.
-See [workspace behavior](docs/workspaces.md) for drafts, files, exports, and environments.
+For separate profiles, multi-file projects, exports, resets, and optional environments, see [workspace behavior](docs/workspaces.md) and [installation](docs/install.md).
 Learner code runs locally with resource limits; subprocesses and virtual environments are not an operating-system security sandbox.
 
 ## Development
@@ -98,23 +91,15 @@ Learner code runs locally with resource limits; subprocesses and virtual environ
 
 ```text
 pytuitor/
-├── src/pytuitor/
-│   ├── app.py              Textual application shell
-│   ├── setup.py            Welcome and onboarding
-│   ├── screens.py          Dashboard and chapter navigation
-│   ├── lesson_screen.py    Build/Repair editor, console, and execution UI
-│   ├── curriculum.py       Assembled lesson catalog
-│   ├── course_map.py       Sections, chapters, and project preparation
+├── src/pytuitor/           Textual application and learning engine
+│   ├── app.py              Application shell
+│   ├── lesson_screen.py    Build/Repair workspace and console
+│   ├── curriculum.py       Assembled course catalog
 │   ├── lessons/            Authored lesson explanations
-│   ├── runner.py           Learner program execution
-│   ├── _worker.py          Isolated Python worker
-│   ├── state.py            Local profiles, progress, and drafts
-│   ├── workspace.py        Project files, exports, and environments
 │   └── theme.tcss          Terminal layout and styling
 ├── tests/                  Curriculum, execution, state, and UI journeys
-├── scripts/                Installed-wheel smoke checks and release tooling
-├── docs/                   Curriculum, installation, and contributor guides
-│   └── assets/             README logo and application preview
+├── scripts/                Installed-wheel checks and release tooling
+├── docs/                   Curriculum, guides, and README assets
 ├── pyproject.toml          Package metadata and development tools
 └── uv.lock                 Locked dependencies
 ```
@@ -132,5 +117,9 @@ uv build
 ```
 
 See the [release checklist](docs/release-checklist.md) for installed-wheel validation and the [learner study guide](docs/learner-study.md) for evaluating the teaching experience.
-Found a problem?
-[Open an issue](https://github.com/dboyza/pytuitor/issues) with your launch command, terminal, and the error or lesson involved.
+
+## Next steps
+
+- **Keep learning:** explore the [curriculum](docs/curriculum.md) and choose your next chapter.
+- **Contribute:** start with [development](#development), then use the [release checklist](docs/release-checklist.md) to validate a change.
+- **Get help:** [open an issue](https://github.com/dboyza/pytuitor/issues) with your launch command, terminal, and the error or lesson involved.
