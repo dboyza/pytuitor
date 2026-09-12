@@ -74,6 +74,7 @@ Verify implementation details against code.
 
 ## Working and verification
 
+- Keep the README's centered branding, authentic app preview, and curated directory layout; store its visual assets in `docs/assets/`.
 - Reproduce bugs through the learner UI first; retain meaningful regressions.
 - Use scratch `--data-dir` profiles; never test against the user's progress.
 - Keep the checkout's Python interpreter in a persistent installation, never a temporary directory; virtual environments depend on that base interpreter remaining intact.
