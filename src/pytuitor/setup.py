@@ -141,11 +141,13 @@ class Onboarding(TutorScreen):
             self.store.data["onboarded"] = False
             return
         dashboard = Dashboard()
-        self.app.switch_screen(dashboard)
-        if browse:
-            dashboard.call_after_refresh(self.app.push_screen, Syllabus())
-        else:
-            dashboard.call_after_refresh(dashboard.action_continue)
+        # Keep Home behind the destination without painting it during onboarding.
+        with self.app.batch_update():
+            self.app.switch_screen(dashboard)
+            if browse:
+                self.app.push_screen(Syllabus())
+            else:
+                dashboard.action_continue()
 
     @on(Button.Pressed, "#cancel-preferences")
     def action_cancel_preferences(self) -> None:

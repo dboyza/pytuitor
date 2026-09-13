@@ -16,6 +16,7 @@ Verify implementation details against code.
 - One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Welcome offers Start learning or Browse syllabus; Known topics is a category-grouped checklist.
+- Batch onboarding screen changes so the dashboard stays behind the destination without flashing.
 - Known topics are skipped by Continue but remain accessible; project concepts describe their relevant preparation.
 - Dashboard browses all chapters; Continue resumes the active chapter, then the core sequence or explicitly selected optional section.
 - Every course unit has blank Build followed by broken Repair, with separate saved drafts and both required for new completion.
@@ -87,6 +88,6 @@ Verify implementation details against code.
 - See [release checks](docs/release-checklist.md) and [learner study](docs/learner-study.md); report only validation actually performed.
 - Never use em dashes, add agent co-authors, or manually edit changelogs/generated files.
 - Put each full sentence on its own physical line in long Markdown.
-- Use scoped subagents when independent implementation or review materially helps.
+- Use subagents only when explicitly requested for the current task.
 - Make local commits when Git metadata exists; only push or publish when instructed.
 - Suggest a concrete next step after major work.
