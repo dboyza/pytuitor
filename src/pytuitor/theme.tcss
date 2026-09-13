@@ -100,8 +100,8 @@ Dashboard.narrow #dashboard-bottom { height: 1; margin-top: 0; }
 #lesson-name { width: 1fr; padding: 1 2 0 2; }
 #save-status { width: 15; padding-top: 1; }
 #lesson-body { height: 1fr; padding: 1 3; }
-#reading-panel { width: 2fr; padding: 0 2 1 0; }
-#lesson-markdown { padding: 0; background: transparent; }
+#reading-panel { width: 2fr; padding: 0 2 1 2; }
+#lesson-markdown { padding: 0 2 0 0; background: transparent; }
 #lesson-markdown MarkdownH2 { color: #ffd343; margin: 1 0; }
 #lesson-markdown MarkdownFence { background: #222629; }
 #prediction { height: auto; margin: 1 0; }
@@ -125,7 +125,7 @@ LessonScreen.narrow #lesson-body { padding: 0 1; }
 LessonScreen.narrow #lesson-toolbar { margin: 0 1; }
 LessonScreen.narrow #lesson-name { display: none; }
 LessonScreen.narrow #save-status { width: 1fr; padding-left: 2; }
-LessonScreen.narrow #reading-panel { display: none; width: 100%; padding: 0 1; }
+LessonScreen.narrow #reading-panel { display: none; width: 100%; padding: 0 2; }
 LessonScreen.narrow #workbench { display: none; width: 100%; }
 LessonScreen.narrow.show-lesson #reading-panel { display: block; }
 LessonScreen.narrow.show-editor #workbench,
