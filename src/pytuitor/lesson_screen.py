@@ -91,47 +91,50 @@ class LessonScreen(TutorScreen):
             )
         with Horizontal(id="lesson-body"):
             with VerticalScroll(id="reading-panel"):
-                yield Static(
-                    f"{self.lesson.minutes} MIN  /  "
-                    f"{'PROJECT' if self.lesson.project else 'LESSON'}",
-                    classes="eyebrow",
-                )
-                if "code" in entry and entry.get("revision", 1) != self.lesson.revision:
+                with Vertical(id="lesson-content"):
                     yield Static(
-                        "This exercise has been updated. Your previous draft is kept below. "
-                        "Reset this stage if you want to begin with a blank Build editor.",
-                        id="updated-notice",
-                        classes="muted",
+                        f"{self.lesson.minutes} MIN  /  "
+                        f"{'PROJECT' if self.lesson.project else 'LESSON'}",
+                        classes="eyebrow",
                     )
-                    yield Button("Reset this stage", id="update-starter")
-                missing = [
-                    BY_ID[key].title
-                    for key in self.lesson.prerequisites
-                    if key in BY_ID
-                    and self.store.status(BY_ID[key]) not in ("completed", "familiar")
-                ]
-                if missing:
+                    if "code" in entry and entry.get("revision", 1) != self.lesson.revision:
+                        yield Static(
+                            "This exercise has been updated. Your previous draft is kept below. "
+                            "Reset this stage if you want to begin with a blank Build editor.",
+                            id="updated-notice",
+                            classes="muted",
+                        )
+                        yield Button("Reset this stage", id="update-starter")
+                    missing = [
+                        BY_ID[key].title
+                        for key in self.lesson.prerequisites
+                        if key in BY_ID
+                        and self.store.status(BY_ID[key]) not in ("completed", "familiar")
+                    ]
+                    if missing:
+                        yield Static(
+                            "Useful preparation: "
+                            + ", ".join(missing)
+                            + ". You can continue now or revisit these from the dashboard.",
+                            classes="topic-preview",
+                        )
+                    yield Markdown(self.lesson.body, id="lesson-markdown")
+                    yield Static(id="stage-instructions", classes="stage-instructions")
                     yield Static(
-                        "Useful preparation: "
-                        + ", ".join(missing)
-                        + ". You can continue now or revisit these from the dashboard.",
-                        classes="topic-preview",
+                        "OPTIONAL: CHECK YOUR UNDERSTANDING",
+                        classes="eyebrow",
+                        id="prediction-heading",
                     )
-                yield Markdown(self.lesson.body, id="lesson-markdown")
-                yield Static(id="stage-instructions", classes="stage-instructions")
-                yield Static(
-                    "OPTIONAL: CHECK YOUR UNDERSTANDING", classes="eyebrow", id="prediction-heading"
-                )
-                yield Static(Text(self.lesson.prediction), id="prediction")
-                yield OptionList(
-                    *[Option(Text(c), id=str(i)) for i, c in enumerate(self.lesson.choices)],
-                    id="prediction-choices",
-                )
-                yield Static(id="prediction-feedback", classes="muted")
-                yield Static("HINTS", classes="eyebrow")
-                yield Static(id="hint-copy", classes="muted")
-                yield Button("Next hint  ·  F1", id="hint")
-                yield Button("Reveal reference solution", id="solution")
+                    yield Static(Text(self.lesson.prediction), id="prediction")
+                    yield OptionList(
+                        *[Option(Text(c), id=str(i)) for i, c in enumerate(self.lesson.choices)],
+                        id="prediction-choices",
+                    )
+                    yield Static(id="prediction-feedback", classes="muted")
+                    yield Static("HINTS", classes="eyebrow")
+                    yield Static(id="hint-copy", classes="muted")
+                    yield Button("Next hint  ·  F1", id="hint")
+                    yield Button("Reveal reference solution", id="solution")
             with Vertical(id="workbench"):
                 with Horizontal(id="file-toolbar", classes="file-label"):
                     yield Select(
