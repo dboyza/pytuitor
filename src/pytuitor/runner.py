@@ -13,7 +13,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from pytuitor.models import Lesson
+from pytuitor.models import Lesson, StageContract
 
 MAX_OUTPUT = 64 * 1024
 
@@ -146,7 +146,7 @@ def _collect_run_files(directory: Path) -> tuple[dict[str, str], str]:
 async def execute(
     lesson: Lesson,
     source: str,
-    stdin: str = "",
+    stdin: str | None = None,
     *,
     check: bool = True,
     timeout: float = 5.0,
@@ -154,9 +154,13 @@ async def execute(
     on_check: Callable[[dict], None] | None = None,
     files: dict[str, str] | None = None,
     python: Path | None = None,
+    stage: StageContract | None = None,
 ) -> RunResult:
     from pytuitor.workspace import validate_files
 
+    contract = stage or lesson.stage_contract("build")
+    if stdin is None:
+        stdin = contract.stdin
     sources = validate_files(files if files is not None else {lesson.entrypoint: source})
     if lesson.entrypoint not in sources:
         return RunResult(error=f"Missing entry point: {lesson.entrypoint}")
@@ -166,7 +170,7 @@ async def execute(
         (root / "request.json").write_text(
             json.dumps(
                 {
-                    "checks": [asdict(c) for c in lesson.checks] if check else [],
+                    "checks": [asdict(c) for c in contract.checks] if check else [],
                     "stdin": stdin,
                     "interactive": console is not None,
                     "files": sources,

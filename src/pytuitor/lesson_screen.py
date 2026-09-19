@@ -21,6 +21,7 @@ from pytuitor.learning_tools import (
     SolutionDialog,
     error_guidance,
 )
+from pytuitor.models import StageContract
 from pytuitor.runner import ConsoleSession, execute
 from pytuitor.ui import CodeEditor, TutorScreen, brand
 from pytuitor.workspace import WorkspaceError, environment_python, export_workspace, validate_files
@@ -201,20 +202,17 @@ class LessonScreen(TutorScreen):
 
     def project_files(self) -> dict[str, str]:
         entry = self.stage_entry()
+        contract = self.stage_contract()
         if "files" not in entry:
-            defaults = (
-                {name: "" for name in self.lesson.files}
-                if self.stage == "build"
-                else dict(self.lesson.repair_files or {self.lesson.entrypoint: self.lesson.repair})
-            )
+            defaults = dict(contract.starter_files or {name: "" for name in contract.files})
             defaults[self.lesson.entrypoint] = entry.get(
                 "code", defaults.get(self.lesson.entrypoint, "")
             )
             entry["files"] = defaults
         # A curriculum update may add or rename required files. Keep every old draft.
         entry["files"].setdefault(self.lesson.entrypoint, entry.get("code", ""))
-        for name in self.lesson.files:
-            entry["files"].setdefault(name, "")
+        for name in contract.files:
+            entry["files"].setdefault(name, (contract.starter_files or {}).get(name, ""))
         return entry["files"]
 
     def capture_editor(self) -> dict[str, str]:
@@ -264,7 +262,7 @@ class LessonScreen(TutorScreen):
         self.tutor.persist()
 
     def action_remove_file(self) -> None:
-        if self.active_file in self.lesson.files:
+        if self.active_file in self.stage_contract().files:
             self.notify(
                 "This file is required by the exercise. You can clear its contents in the editor."
             )
@@ -283,7 +281,7 @@ class LessonScreen(TutorScreen):
     def action_solution(self) -> None:
         self.stage_entry()["solution_seen"] = True
         self.tutor.persist()
-        self.app.push_screen(SolutionDialog(self.lesson))
+        self.app.push_screen(SolutionDialog(self.lesson, self.stage_contract()))
 
     @property
     def environment_path(self):
@@ -296,6 +294,9 @@ class LessonScreen(TutorScreen):
     def stage_entry(self) -> dict:
         root = self.store.entry(self.lesson)
         return root if self.stage == "build" else root.setdefault("repair", {})
+
+    def stage_contract(self) -> StageContract:
+        return self.lesson.stage_contract(self.stage)
 
     def stage_passed(self, stage: str) -> bool:
         root = self.store.entry(self.lesson)
@@ -315,13 +316,16 @@ class LessonScreen(TutorScreen):
             "primary" if self.stage == "repair" else "default"
         )
         self.query_one("#stage-repair", Button).disabled = not self.stage_passed("build")
-        self.query_one("#stage-instructions", Static).update(
-            "STAGE 1 OF 2 · BUILD\nWrite the whole program in the blank editor "
-            "using the Exercise requirements above. Run it, then Check. Passing unlocks Repair."
+        default_instructions = (
+            "Write the whole program in the blank editor using the Exercise requirements above. "
+            "Run it, then Check. Passing unlocks Repair."
             if self.stage == "build"
-            else "STAGE 2 OF 2 · REPAIR\nThis separate program contains a mistake. "
-            "Run and Check to investigate, then fix it to meet the same requirements. "
-            "Your Build draft is saved separately."
+            else "This separate program contains a mistake. Run and Check to investigate, then "
+            "fix it to meet the requirements. Your Build draft is saved separately."
+        )
+        self.query_one("#stage-instructions", Static).update(
+            f"STAGE {1 if self.stage == 'build' else 2} OF 2 · {self.stage.upper()}\n"
+            + (self.stage_contract().instructions or default_instructions)
         )
         self.query_one("#next", Button).label = "Repair →" if self.stage == "build" else "Next →"
         self.query_one("#next", Button).disabled = not self.stage_passed(self.stage)
@@ -465,17 +469,18 @@ class LessonScreen(TutorScreen):
         return complete
 
     def show_hints(self) -> None:
-        count = min(self.stage_entry().get("hints", 0), len(self.lesson.hints))
-        text = "\n\n".join(f"{i + 1}. {hint}" for i, hint in enumerate(self.lesson.hints[:count]))
+        hints = self.stage_contract().hints
+        count = min(self.stage_entry().get("hints", 0), len(hints))
+        text = "\n\n".join(f"{i + 1}. {hint}" for i, hint in enumerate(hints[:count]))
         self.query_one("#hint-copy", Static).update(
             Text(text or "Press F1 for a hint if you get stuck.")
         )
-        self.query_one("#hint", Button).disabled = count == len(self.lesson.hints)
+        self.query_one("#hint", Button).disabled = count == len(hints)
 
     @on(Button.Pressed, "#hint")
     def action_hint(self) -> None:
         entry = self.stage_entry()
-        entry["hints"] = min(entry.get("hints", 0) + 1, len(self.lesson.hints))
+        entry["hints"] = min(entry.get("hints", 0) + 1, len(self.stage_contract().hints))
         self.show_hints()
         self.tutor.persist()
         self.select_pane("lesson")
@@ -562,7 +567,10 @@ class LessonScreen(TutorScreen):
 
     def render_checks(self) -> None:
         passed = sum(case.get("passed", False) for case in self.check_results.values())
-        lines = [f"{self.stage.upper()} · {passed}/{len(self.lesson.checks)} checks passed", ""]
+        lines = [
+            f"{self.stage.upper()} · {passed}/{len(self.stage_contract().checks)} checks passed",
+            "",
+        ]
         for case in self.check_results.values():
             status = (
                 "RUNNING" if case["status"] == "running" else "PASS" if case["passed"] else "FAIL"
@@ -602,12 +610,14 @@ class LessonScreen(TutorScreen):
     @work(exclusive=True, group="execution")
     async def run_code(self, check: bool, serial: int, source: dict[str, str]) -> None:
         try:
+            contract = self.stage_contract()
             result = await execute(
                 self.lesson,
                 source[self.lesson.entrypoint],
-                default_input(self.lesson),
+                default_input(self.lesson, self.stage),
                 check=check,
                 files=source,
+                stage=contract,
                 python=environment_python(self.environment_path)
                 if self.environment_path.exists()
                 else None,

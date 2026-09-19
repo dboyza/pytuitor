@@ -55,3 +55,7 @@ That last print should have no indentation because it runs whichever branch was 
 
 Run the program once with `gold`, once with `green`, and once with `blue`.
 Check tries those cases for you as well.
+
+After Build passes, Repair classifies a parcel by its integer item count.
+It must distinguish zero, the inclusive small range from 1 through 3, and counts above 3.
+The equality boundaries are part of the practice.

@@ -106,7 +106,10 @@ async def test_failed_next_save_keeps_completed_lesson_as_resume_anchor(tmp_path
         await pilot.pause()
         screen = app.screen
         for stage in ("build", "repair"):
-            screen.query_one("#editor", TextArea).load_text(screen.lesson.solution)
+            contract = screen.lesson.stage_contract(stage)
+            screen.query_one("#editor", TextArea).load_text(
+                contract.reference_files[screen.lesson.entrypoint]
+            )
             await pilot.press("f5")
             await app.workers.wait_for_complete()
             assert screen.stage_passed(stage)

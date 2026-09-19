@@ -32,7 +32,8 @@ async def test_new_lesson_build_repair_and_saved_drafts(tmp_path, identifier):
         screen = app.screen
         editor = screen.query_one("#editor", TextArea)
         assert editor.text == ""
-        editor.load_text(lesson.solution)
+        build = lesson.stage_contract("build")
+        editor.load_text(build.reference_files[lesson.entrypoint])
         await pilot.pause()
         await pilot.press("f5")
         await app.workers.wait_for_complete()
@@ -45,7 +46,8 @@ async def test_new_lesson_build_repair_and_saved_drafts(tmp_path, identifier):
         await pilot.press("f5")
         await app.workers.wait_for_complete()
         assert not screen.stage_passed("repair")
-        editor.load_text(lesson.solution)
+        repair = lesson.stage_contract("repair")
+        editor.load_text(repair.reference_files[lesson.entrypoint])
         await pilot.pause()
         await pilot.press("f5")
         await app.workers.wait_for_complete()
@@ -53,8 +55,11 @@ async def test_new_lesson_build_repair_and_saved_drafts(tmp_path, identifier):
         await pilot.press("ctrl+b")
     restored = Store(tmp_path)
     entry = restored.entry(lesson)
-    assert entry["code"] == lesson.solution
-    assert entry["repair"]["code"] == lesson.solution
+    assert entry["code"] == lesson.stage_contract("build").reference_files[lesson.entrypoint]
+    assert (
+        entry["repair"]["code"]
+        == lesson.stage_contract("repair").reference_files[lesson.entrypoint]
+    )
     assert restored.status(lesson) == "completed"
     restored.close()
 

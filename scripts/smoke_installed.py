@@ -22,10 +22,16 @@ async def main():
     assert files("pytuitor").joinpath("theme.tcss").is_file()
     for lesson in LESSONS:
         assert lesson.body.strip()
-        result = await execute(
-            lesson, lesson.solution, default_input(lesson), files=lesson.solution_files
-        )
-        assert result.passed, (lesson.id, result.error, result.checks)
+        for stage_name in ("build", "repair"):
+            contract = lesson.stage_contract(stage_name)
+            result = await execute(
+                lesson,
+                contract.reference_files[lesson.entrypoint],
+                default_input(lesson, stage_name),
+                files=contract.reference_files,
+                stage=contract,
+            )
+            assert result.passed, (lesson.id, stage_name, result.error, result.checks)
     with tempfile.TemporaryDirectory() as directory:
         app = TutorApp(Path(directory))
         async with app.run_test(size=(80, 24)) as pilot:
@@ -34,7 +40,10 @@ async def main():
             assert isinstance(app.screen, LessonScreen)
             screen = app.screen
             for stage in ("build", "repair"):
-                screen.query_one("#editor", TextArea).load_text(screen.lesson.solution)
+                contract = screen.lesson.stage_contract(stage)
+                screen.query_one("#editor", TextArea).load_text(
+                    contract.reference_files[screen.lesson.entrypoint]
+                )
                 await pilot.pause()
                 await pilot.press("f5")
                 await app.workers.wait_for_complete()
@@ -45,7 +54,7 @@ async def main():
             assert app.store.status(screen.lesson) == "completed"
     print(
         f"Pytuitor {version('pytuitor')}: installed content and all "
-        f"{len(LESSONS)} reference programs passed."
+        f"{len(LESSONS) * 2} Build and Repair reference programs passed."
     )
 
 

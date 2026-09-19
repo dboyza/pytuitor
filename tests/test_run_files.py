@@ -28,7 +28,12 @@ async def test_run_returns_generated_utf8_data_and_changed_source_without_changi
 
 
 async def test_check_never_returns_its_fixtures():
-    lesson = replace(LESSONS[0], checks=(Check("Works", "answer", 42, "Return 42."),))
+    lesson = replace(
+        LESSONS[0],
+        checks=(Check("Works", "answer", 42, "Return 42."),),
+        build_stage=None,
+        repair_stage=None,
+    )
     result = await execute(
         lesson,
         "from pathlib import Path\n"

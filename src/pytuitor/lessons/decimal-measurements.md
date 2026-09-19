@@ -51,5 +51,6 @@ Checks allow tiny floating-point differences in the calculated value and require
 
 ## Repair
 
-The supplied program uses `//` to round the converted measurement down to whole meters and does not format the display.
-Use division that keeps the fractional part, then match the required output format.
+Repair uses a Fahrenheit-to-Celsius temperature display.
+Calculate `(fahrenheit - 32) / 1.8` without rounding the stored value, then print one decimal place followed by ` C`.
+The checks include freezing, boiling, a decimal temperature, and a negative value.

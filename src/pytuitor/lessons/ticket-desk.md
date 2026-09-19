@@ -19,7 +19,7 @@ There are two separate decisions: first select a price by age, then decide wheth
 Use a fresh `if` for the second decision because it applies after every age branch.
 
 ## Repair and explore
-A **boundary** is a value where the rule changes, such as age 12 or 65.
-Repair has incorrect comparisons at those boundaries and an incorrect return-ticket calculation.
-After it passes, try the ages immediately before and after each price boundary.
-Those inputs reveal mistakes that testing only an ordinary adult can miss.
+
+Repair uses a parcel-pricing scenario with a zone, weight, and express choice.
+Choose a base price by zone, add a weight surcharge only above 5, and add an express surcharge when the answer is `yes`.
+After it passes, try the weight boundary and both kinds of zone and express choices.

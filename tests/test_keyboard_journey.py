@@ -48,7 +48,7 @@ async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size)
         await pilot.pause()
         assert isinstance(app.screen, LessonScreen)
         await pilot.press(
-            "ctrl+t", "ctrl+a", *'print("Hello, explorer!")', "enter", *"print(6 * 7)"
+            "ctrl+t", "ctrl+a", *'print("Welcome, explorer!")', "enter", *"print(8 + 5)"
         )
         await pilot.press("f5")
         await until(pilot, lambda: not app.screen.running)
@@ -57,7 +57,13 @@ async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size)
         await pilot.pause()
         assert app.store.status(LESSONS[0]) != "completed"
         await pilot.press(
-            "ctrl+n", "ctrl+a", *'print("Hello, explorer!")', "enter", *"print(6 * 7)"
+            "ctrl+n",
+            "ctrl+a",
+            *'print("Scoreboard")',
+            "enter",
+            *"print(4 + 3)",
+            "enter",
+            *"print(4 + 3 + 2)",
         )
         await pilot.press("f5")
         await until(pilot, lambda: not app.screen.running)
@@ -84,7 +90,8 @@ async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size)
         await pilot.pause()
         assert app.store.status(BY_ID["names-and-voices"]) != "completed"
         await pilot.press("ctrl+n", "ctrl+a")
-        for index, line in enumerate(BY_ID["names-and-voices"].solution.splitlines()):
+        repair = BY_ID["names-and-voices"].stage_contract("repair")
+        for index, line in enumerate(repair.reference_files["lesson.py"].splitlines()):
             if index:
                 await pilot.press("enter")
             await pilot.press(*line)

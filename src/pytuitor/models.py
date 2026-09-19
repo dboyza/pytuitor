@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from importlib.resources import files
 from textwrap import dedent
+from typing import Literal
 
 
 @dataclass(frozen=True)
@@ -14,6 +15,19 @@ class Check:
     stdin: str | None = None
     expected_output: str | None = None
     description: str = ""
+
+
+@dataclass(frozen=True)
+class StageContract:
+    """The learner-facing and executable contract for one exercise stage."""
+
+    instructions: str = ""
+    checks: tuple[Check, ...] = ()
+    hints: tuple[str, ...] = ()
+    stdin: str = ""
+    files: tuple[str, ...] = ("lesson.py",)
+    starter_files: dict[str, str] | None = None
+    reference_files: dict[str, str] | None = None
 
 
 @dataclass(frozen=True)
@@ -43,10 +57,38 @@ class Lesson:
     solution_files: dict[str, str] | None = None
     repair_files: dict[str, str] | None = None
     stdin: str = ""
+    build_stage: StageContract | None = None
+    repair_stage: StageContract | None = None
 
     @property
     def starter(self) -> str:
         return ""
+
+    def stage_contract(self, stage: Literal["build", "repair"]) -> StageContract:
+        """Return a stage contract, preserving the original fields by default."""
+        if stage == "build" and self.build_stage is not None:
+            return self.build_stage
+        if stage == "repair" and self.repair_stage is not None:
+            return self.repair_stage
+        if stage not in ("build", "repair"):
+            raise ValueError(f"Unknown exercise stage: {stage}")
+        if stage == "build":
+            return StageContract(
+                checks=self.checks,
+                hints=self.hints,
+                stdin=self.stdin,
+                files=self.files,
+                starter_files={name: "" for name in self.files},
+                reference_files=self.solution_files or {self.entrypoint: self.solution},
+            )
+        return StageContract(
+            checks=self.checks,
+            hints=self.hints,
+            stdin=self.stdin,
+            files=self.files,
+            starter_files=self.repair_files or {self.entrypoint: self.repair},
+            reference_files=self.solution_files or {self.entrypoint: self.solution},
+        )
 
 
 def lesson_text(lesson_id: str) -> str:

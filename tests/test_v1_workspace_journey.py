@@ -26,6 +26,8 @@ def project():
             "main.py": "from helpers import double\nanswer = double(21)\n",
             "helpers.py": "def double(value):\n    return value + 2\n",
         },
+        build_stage=None,
+        repair_stage=None,
     )
 
 

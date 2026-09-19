@@ -75,3 +75,6 @@ Print the greeting.
 Use Run to try your own name in the console.
 Then use Check: it tests several names automatically.
 A **hard-coded** greeting uses one fixed name instead of the answer from `input()`, so it will not pass.
+
+After Build passes, Repair uses two answers to create a mailing label.
+It checks that the label changes when both the given name and city change.

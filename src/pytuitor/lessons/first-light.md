@@ -71,12 +71,12 @@ Errors are clues you can use, not a sign that you cannot program.
 
 ## Exercise
 
-Write a complete program that displays `Hello, explorer!` on the first line and the result of `6 * 7` on the second line.
+Build displays `Welcome, explorer!` on the first line and the result of `8 + 5` on the second line.
 Keep the greeting in quotes and write the calculation without quotes.
 
 The **editor** is the area where you write code; the **console** shows output and accepts answers when a program asks for input.
 Press **Ctrl+T** to move from the lesson to the editor, then type your changes.
 Press **Ctrl+R** to run the program and see its output in the console.
 Press **F5** to check the exercise requirements.
-After Build passes, open Repair and fix a separate program that should produce the same output.
+After Build passes, Repair asks you to investigate a three-line scoreboard with an order and arithmetic mistake.
 The short question below is optional practice.

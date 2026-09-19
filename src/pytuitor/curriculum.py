@@ -75,5 +75,9 @@ def chapter_lessons(chapter_id: str) -> list[Lesson]:
     return [lesson for lesson in LESSONS if lesson.chapter_id == chapter_id]
 
 
-def default_input(lesson: Lesson) -> str:
-    return lesson.stdin or legacy_input(lesson)
+def default_input(lesson: Lesson, stage: str = "build") -> str:
+    contract = lesson.stage_contract(stage)
+    has_override = (stage == "build" and lesson.build_stage is not None) or (
+        stage == "repair" and lesson.repair_stage is not None
+    )
+    return contract.stdin if has_override else contract.stdin or legacy_input(lesson)

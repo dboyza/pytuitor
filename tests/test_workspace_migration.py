@@ -13,6 +13,8 @@ async def test_changed_entrypoint_preserves_existing_files_and_legacy_draft(tmp_
         id="workspace-upgrade-fixture",
         entrypoint="main.py",
         files=("main.py", "helpers.py"),
+        build_stage=None,
+        repair_stage=None,
     )
     app = TutorApp(tmp_path)
     app.store.data["onboarded"] = True

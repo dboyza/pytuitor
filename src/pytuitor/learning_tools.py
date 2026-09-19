@@ -9,7 +9,7 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Select, Static, TextArea
 
-from pytuitor.models import Lesson
+from pytuitor.models import Lesson, StageContract
 from pytuitor.workspace import (
     WorkspaceError,
     create_environment,
@@ -21,10 +21,10 @@ from pytuitor.workspace import (
 class SolutionDialog(ModalScreen):
     BINDINGS = [Binding("escape", "close", "Close")]
 
-    def __init__(self, lesson: Lesson):
+    def __init__(self, lesson: Lesson, contract: StageContract):
         super().__init__()
         self.lesson = lesson
-        self.files = lesson.solution_files or {lesson.entrypoint: lesson.solution}
+        self.files = contract.reference_files or {lesson.entrypoint: lesson.solution}
 
     def compose(self) -> ComposeResult:
         with Vertical(classes="dialog", id="solution-dialog"):

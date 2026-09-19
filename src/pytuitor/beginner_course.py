@@ -5,7 +5,7 @@ from dataclasses import replace
 from pytuitor.beginner_extensions import INSERT_AFTER
 from pytuitor.beginner_extensions import LESSONS as EXTRA_LESSONS
 from pytuitor.legacy import LESSONS as LEGACY
-from pytuitor.models import Chapter, Check, Lesson, code, lesson_text
+from pytuitor.models import Chapter, Check, Lesson, StageContract, code, lesson_text
 
 CHAPTERS = (
     Chapter(
@@ -101,6 +101,17 @@ def case(
     return Check(label, expression, expected, nudge, stdin=stdin, expected_output=output)
 
 
+def stage_contract(instructions, reference, starter, checks, hints, stdin=""):
+    return StageContract(
+        instructions=instructions,
+        checks=tuple(checks),
+        hints=tuple(hints),
+        stdin=stdin,
+        starter_files={"lesson.py": code(starter) if starter else ""},
+        reference_files={"lesson.py": code(reference)},
+    )
+
+
 _units = []
 
 
@@ -112,143 +123,6 @@ def reuse(identifier, chapter, *, stdin=""):
     old = next(lesson for lesson in LEGACY if lesson.id == identifier)
     _units.append(replace(old, revision=4, chapter_id=chapter, stdin=stdin))
 
-
-reuse("first-light", "b-foundations")
-reuse("names-and-voices", "b-foundations", stdin="Ada\n")
-
-add(
-    "numbers-from-input",
-    "Numbers from input",
-    "Convert text and calculate whole-number results",
-    "b-foundations",
-    (
-        code("""
-            minutes = int(input("Minutes: "))
-            hours = minutes // 60
-            remaining = minutes % 60
-            print(hours)
-            print(remaining)
-        """)
-    ),
-    (
-        code("""
-            minutes = int(input("Minutes: "))
-            hours = minutes / 60
-            remaining = minutes // 60
-            print(hours)
-            print(remaining)
-        """)
-    ),
-    tuple(
-        case(
-            f"Convert {n} minutes", "[hours, remaining]", [h, r], stdin=f"{n}\n", output=f"{h}\n{r}"
-        )
-        for n, h, r in ((125, 2, 5), (0, 0, 0), (59, 0, 59), (60, 1, 0))
-    ),
-    (
-        "Convert the answer with int(input(...)).",
-        "Use // for complete hours and % for what remains after groups of 60.",
-    ),
-    stdin="125\n",
-)
-
-add(
-    "decimal-measurements",
-    "Decimal measurements",
-    "Read decimal input and format a calculated measurement",
-    "b-foundations",
-    code("""
-        centimeters = float(input("Centimeters: "))
-        meters = centimeters / 100
-        print(f"{meters:.2f} m")
-    """),
-    code("""
-        centimeters = float(input("Centimeters: "))
-        meters = centimeters // 100
-        print(f"{meters} m")
-    """),
-    tuple(
-        case(
-            label,
-            f"abs(meters - {expected!r}) < 0.000000001",
-            True,
-            stdin=text + "\n",
-            output=output,
-        )
-        for label, text, expected, output in (
-            ("Fractional centimeters", "172.4", 1.724, "1.72 m"),
-            ("Zero length", "0", 0.0, "0.00 m"),
-            ("Small length", "1.2", 0.012, "0.01 m"),
-            ("Exact meter", "100", 1.0, "1.00 m"),
-            ("Keep the unrounded value before printing", "234.56", 2.3456, "2.35 m"),
-        )
-    ),
-    (
-        "Read with float(input(...)) to keep the fractional part of the measurement.",
-        'Divide by 100 with /; use f"{meters:.2f} m" only when printing.',
-    ),
-    stdin="172.4\n",
-)
-
-reuse("choose-a-door", "b-foundations", stdin="gold\n")
-
-add(
-    "ticket-desk",
-    "Project: the ticket desk",
-    "Combine input, arithmetic, and decisions",
-    "b-foundations",
-    (
-        code("""
-            age = int(input("Age: "))
-            kind = input("Ticket type: ")
-            if age < 12:
-                price = 5
-            elif age >= 65:
-                price = 7
-            else:
-                price = 10
-            if kind == "return":
-                price = price * 2
-            print(f"Price: {price}")
-        """)
-    ),
-    (
-        code("""
-            age = int(input("Age: "))
-            kind = input("Ticket type: ")
-            if age <= 12:
-                price = 5
-            elif age > 65:
-                price = 7
-            else:
-                price = 10
-            if kind == "return":
-                price = price + 2
-            print(f"Price: {price}")
-        """)
-    ),
-    tuple(
-        case(
-            f"Age {age}, {kind}", "price", price, stdin=f"{age}\n{kind}\n", output=f"Price: {price}"
-        )
-        for age, kind, price in (
-            (4, "single", 5),
-            (12, "return", 20),
-            (65, "single", 7),
-            (64, "single", 10),
-            (80, "return", 14),
-        )
-    ),
-    (
-        "Write the age price chain first and test it without the return adjustment.",
-        "Use age < 12, then age >= 65; after the chain multiply price by 2 only for return.",
-    ),
-    project=True,
-    stdin=code("""
-        12
-        return
-    """),
-)
 
 reuse("pack-your-bag", "b-collections", stdin="2 5 1\n")
 
@@ -1995,6 +1869,560 @@ add(
         },
     ),
 )
+
+_FOUNDATION_STAGES = {
+    "first-light": (
+        stage_contract(
+            "Build a two-line welcome display. Print `Welcome, explorer!` first. "
+            "Print the result of `8 + 5` second. Keep text quoted and arithmetic unquoted.",
+            """
+            print("Welcome, explorer!")
+            print(8 + 5)
+            """,
+            "",
+            (
+                case(
+                    "Welcome display",
+                    "__stdout__.strip().splitlines()",
+                    ["Welcome, explorer!", "13"],
+                    output="Welcome, explorer!\n13",
+                    nudge="Check the quotes around the greeting and leave 8 + 5 outside quotes.",
+                ),
+            ),
+            (
+                "Use one print call for the text and one for the arithmetic expression.",
+                "The second line should evaluate 8 + 5, not print those characters as text.",
+            ),
+        ),
+        stage_contract(
+            "Repair a three-line scoreboard. It must print `Scoreboard`, then the result of "
+            "`4 + 3`, then the result of `4 + 3 + 2`. Investigate the order and arithmetic "
+            "before changing the supplied program.",
+            """
+            print("Scoreboard")
+            print(4 + 3)
+            print(4 + 3 + 2)
+            """,
+            """
+            print("Scoreboard")
+            print(4 + 3 + 2)
+            print(4 + 3)
+            """,
+            (
+                case(
+                    "Scoreboard sequence",
+                    "__stdout__.strip().splitlines()",
+                    ["Scoreboard", "7", "9"],
+                    output="Scoreboard\n7\n9",
+                    nudge="Compare the two arithmetic results and print 4 + 3 before 4 + 3 + 2.",
+                ),
+            ),
+            (
+                "Use three print calls in the required order.",
+                "The third line adds 2 to the first arithmetic result, so it should display 9.",
+            ),
+        ),
+    ),
+    "names-and-voices": (
+        stage_contract(
+            "Ask for a name and store it in `student`. Build `greeting` with an f-string "
+            "containing `Welcome, `, the name, and `!`, then print it.",
+            """
+            student = input("What is your name? ")
+            greeting = f"Welcome, {student}!"
+            print(greeting)
+            """,
+            "",
+            tuple(
+                case(
+                    f"Greeting for {student}",
+                    "greeting",
+                    f"Welcome, {student}!",
+                    stdin=student + "\n",
+                    output=f"Welcome, {student}!",
+                    nudge=(
+                        "Check that input is stored in student and the f-string uses that variable."
+                    ),
+                )
+                for student in ("Ada", "Lin", "Alex Chen")
+            ),
+            (
+                "Store input(...) in student before constructing the greeting.",
+                "Start the greeting with f and put {student} inside the quotes.",
+            ),
+            "Ada\n",
+        ),
+        stage_contract(
+            "Repair a mailing label. Read a given name, then a city, store the complete label in "
+            "`label`, and print `Given lives in City.` with the supplied values.",
+            """
+            given = input("Given name: ")
+            city = input("City: ")
+            label = f"{given} lives in {city}."
+            print(label)
+            """,
+            """
+            given = input("Given name: ")
+            city = input("City: ")
+            label = "given lives in city."
+            print(label)
+            """,
+            tuple(
+                case(
+                    f"Label for {given} in {city}",
+                    "label",
+                    f"{given} lives in {city}.",
+                    stdin=f"{given}\n{city}\n",
+                    output=f"{given} lives in {city}.",
+                    nudge=(
+                        "Use both input variables in the f-string; literal words cannot adapt "
+                        "to new answers."
+                    ),
+                )
+                for given, city in (("Ada", "Boston"), ("Lin", "Oslo"), ("Mina", "Lima"))
+            ),
+            (
+                "Read two answers, storing them in given and city.",
+                'Write label = f"{given} lives in {city}." before printing label.',
+            ),
+            "Ada\nBoston\n",
+        ),
+    ),
+    "numbers-from-input": (
+        stage_contract(
+            "Read a nonnegative whole number of minutes into `minutes`. Store complete hours "
+            "in `hours` with `//`, leftover minutes in `remaining` with `%`, and print both "
+            "values on separate lines.",
+            """
+            minutes = int(input("Minutes: "))
+            hours = minutes // 60
+            remaining = minutes % 60
+            print(hours)
+            print(remaining)
+            """,
+            "",
+            tuple(
+                case(
+                    f"Convert {n} minutes",
+                    "[hours, remaining]",
+                    [h, r],
+                    stdin=f"{n}\n",
+                    output=f"{h}\n{r}",
+                    nudge="Use // for complete groups of 60 and % for the leftover minutes.",
+                )
+                for n, h, r in ((125, 2, 5), (0, 0, 0), (59, 0, 59), (60, 1, 0))
+            ),
+            (
+                "Convert input text with int(input(...)) before doing arithmetic.",
+                "Use // for hours and % for the remainder, then print hours followed by remaining.",
+            ),
+            "125\n",
+        ),
+        stage_contract(
+            "Repair a study-time summary. Read morning minutes and afternoon minutes, add them "
+            "into `total`, calculate complete `hours` and leftover `minutes`, and print "
+            "`H h M min`. At a total of exactly 60 minutes, print `1 h 0 min`.",
+            """
+            morning = int(input("Morning minutes: "))
+            afternoon = int(input("Afternoon minutes: "))
+            total = morning + afternoon
+            hours = total // 60
+            minutes = total % 60
+            print(f"{hours} h {minutes} min")
+            """,
+            """
+            morning = int(input("Morning minutes: "))
+            afternoon = int(input("Afternoon minutes: "))
+            total = morning + afternoon
+            hours = total // 60
+            minutes = morning % 60
+            print(f"{hours} h {minutes} min")
+            """,
+            tuple(
+                case(
+                    f"Study total {morning} + {afternoon}",
+                    "[hours, minutes]",
+                    [hours, minutes],
+                    stdin=f"{morning}\n{afternoon}\n",
+                    output=f"{hours} h {minutes} min",
+                    nudge=(
+                        "Add both inputs before splitting total; the remainder belongs to total, "
+                        "not one session."
+                    ),
+                )
+                for morning, afternoon, hours, minutes in (
+                    (30, 30, 1, 0),
+                    (0, 0, 0, 0),
+                    (20, 39, 0, 59),
+                    (75, 60, 2, 15),
+                )
+            ),
+            (
+                "Convert both answers with int(input(...)) and add them into total.",
+                "Apply // 60 and % 60 to total after the addition, not to just one input.",
+            ),
+            "30\n30\n",
+        ),
+    ),
+    "decimal-measurements": (
+        stage_contract(
+            "Read a decimal number of centimeters into `centimeters`. Store the unrounded "
+            "meter value in `meters` by dividing by 100, then print it with two decimal places "
+            "and the suffix ` m`.",
+            """
+            centimeters = float(input("Centimeters: "))
+            meters = centimeters / 100
+            print(f"{meters:.2f} m")
+            """,
+            "",
+            tuple(
+                case(
+                    label,
+                    f"abs(meters - {expected!r}) < 0.000000001",
+                    True,
+                    stdin=text + "\n",
+                    output=output,
+                    nudge=(
+                        "Keep the fractional value with / and apply .2f only in the printed text."
+                    ),
+                )
+                for label, text, expected, output in (
+                    ("Fractional centimeters", "172.4", 1.724, "1.72 m"),
+                    ("Zero length", "0", 0.0, "0.00 m"),
+                    ("Small length", "1.2", 0.012, "0.01 m"),
+                    ("Exact meter", "100", 1.0, "1.00 m"),
+                    ("Keep the unrounded value", "234.56", 2.3456, "2.35 m"),
+                )
+            ),
+            (
+                "Read with float(input(...)) so a decimal fraction is not discarded.",
+                'Divide by 100 with / and use f"{meters:.2f} m" only when printing.',
+            ),
+            "172.4\n",
+        ),
+        stage_contract(
+            "Repair a temperature display. Read Fahrenheit into `fahrenheit`, calculate the "
+            "unrounded Celsius value in `celsius` with `(fahrenheit - 32) / 1.8`, and print "
+            "one line with one decimal place followed by ` C`.",
+            """
+            fahrenheit = float(input("Fahrenheit: "))
+            celsius = (fahrenheit - 32) / 1.8
+            print(f"{celsius:.1f} C")
+            """,
+            """
+            fahrenheit = float(input("Fahrenheit: "))
+            celsius = fahrenheit - 32 / 1.8
+            print(f"{celsius} C")
+            """,
+            tuple(
+                case(
+                    f"{fahrenheit} F",
+                    f"abs(celsius - {expected!r}) < 0.000000001",
+                    True,
+                    stdin=f"{fahrenheit}\n",
+                    output=f"{display} C",
+                    nudge=(
+                        "Use parentheses around Fahrenheit minus 32, then format celsius at print "
+                        "time."
+                    ),
+                )
+                for fahrenheit, expected, display in (
+                    (32, 0.0, "0.0"),
+                    (212, 100.0, "100.0"),
+                    (98.6, 37.0, "37.0"),
+                    (-40, -40.0, "-40.0"),
+                )
+            ),
+            (
+                "Subtract 32 before dividing by 1.8; parentheses control that order.",
+                "Format the stored celsius value with one decimal place in the print f-string.",
+            ),
+            "98.6\n",
+        ),
+    ),
+    "choose-a-door": (
+        stage_contract(
+            "Ask for a key and store it in `key`. Set `destination` to `treasure` for `gold`, "
+            "`garden` for `green`, and `locked` for every other answer. Use one if/elif/else "
+            "chain, then print destination.",
+            """
+            key = input("Which key? ")
+            if key == "gold":
+                destination = "treasure"
+            elif key == "green":
+                destination = "garden"
+            else:
+                destination = "locked"
+            print(destination)
+            """,
+            "",
+            tuple(
+                case(
+                    f"Key: {key}",
+                    "destination",
+                    destination,
+                    stdin=key + "\n",
+                    output=destination,
+                    nudge=(
+                        "Use elif so the final else belongs to the whole choice, not only the "
+                        "second test."
+                    ),
+                )
+                for key, destination in (
+                    ("gold", "treasure"),
+                    ("green", "garden"),
+                    ("blue", "locked"),
+                )
+            ),
+            (
+                'Begin with if key == "gold" and indent its assignment beneath it.',
+                (
+                    "Use elif for green and else for every other key, then print destination "
+                    "outside the chain."
+                ),
+            ),
+            "gold\n",
+        ),
+        stage_contract(
+            "Repair a parcel-size classifier. Read an integer item count into `items`. Set "
+            "`size` to `empty` for 0, `small` for 1 through 3, and `large` for anything "
+            "greater than 3. Print size. Check the equality boundaries carefully.",
+            """
+            items = int(input("Items: "))
+            if items == 0:
+                size = "empty"
+            elif items <= 3:
+                size = "small"
+            else:
+                size = "large"
+            print(size)
+            """,
+            """
+            items = int(input("Items: "))
+            if items <= 1:
+                size = "empty"
+            elif items < 3:
+                size = "small"
+            else:
+                size = "large"
+            print(size)
+            """,
+            tuple(
+                case(
+                    f"{items} parcel items",
+                    "size",
+                    expected,
+                    stdin=f"{items}\n",
+                    output=expected,
+                    nudge="Test the exact boundaries: only zero is empty, and 3 is still small.",
+                )
+                for items, expected in (
+                    (0, "empty"),
+                    (1, "small"),
+                    (3, "small"),
+                    (4, "large"),
+                    (10, "large"),
+                )
+            ),
+            (
+                "Convert the input to int before comparing it with zero and three.",
+                "Use one if/elif/else chain so each count receives exactly one size.",
+            ),
+            "3\n",
+        ),
+    ),
+    "ticket-desk": (
+        stage_contract(
+            "Read an integer age and a ticket type. Ages under 12 cost 5, ages 65 and over "
+            "cost 7, and all other ages cost 10. Double the price for a `return` ticket, "
+            "then print `Price: N`.",
+            """
+            age = int(input("Age: "))
+            kind = input("Ticket type: ")
+            if age < 12:
+                price = 5
+            elif age >= 65:
+                price = 7
+            else:
+                price = 10
+            if kind == "return":
+                price = price * 2
+            print(f"Price: {price}")
+            """,
+            "",
+            tuple(
+                case(
+                    f"Age {age}, {kind}",
+                    "price",
+                    price,
+                    stdin=f"{age}\n{kind}\n",
+                    output=f"Price: {price}",
+                    nudge=(
+                        "Check both age boundaries, then apply the return adjustment after "
+                        "choosing the base price."
+                    ),
+                )
+                for age, kind, price in (
+                    (4, "single", 5),
+                    (12, "return", 20),
+                    (65, "single", 7),
+                    (64, "single", 10),
+                    (80, "return", 14),
+                )
+            ),
+            (
+                "Write and test the age price chain before adding the ticket-type adjustment.",
+                'After the chain, multiply price by 2 only when kind == "return".',
+            ),
+            "12\nreturn\n",
+        ),
+        stage_contract(
+            "Repair a parcel-pricing tool. Read `zone`, an integer `weight`, and `express`. "
+            "Use base prices 4 for `local`, 8 for `regional`, and 12 otherwise. Add 3 only "
+            "when weight is over 5, add 5 only when express is `yes`, and print `Charge: N`.",
+            """
+            zone = input("Zone: ")
+            weight = int(input("Weight: "))
+            express = input("Express? ")
+            if zone == "local":
+                price = 4
+            elif zone == "regional":
+                price = 8
+            else:
+                price = 12
+            if weight > 5:
+                price = price + 3
+            if express == "yes":
+                price = price + 5
+            print(f"Charge: {price}")
+            """,
+            """
+            zone = input("Zone: ")
+            weight = int(input("Weight: "))
+            express = input("Express? ")
+            if zone == "local":
+                price = 4
+            elif zone == "regional":
+                price = 12
+            else:
+                price = 8
+            if weight >= 5:
+                price = price + 3
+            if express == "yes":
+                price = price + 3
+            print(f"Charge: {price}")
+            """,
+            tuple(
+                case(
+                    f"{zone}, {weight} kg, {express}",
+                    "price",
+                    expected,
+                    stdin=f"{zone}\n{weight}\n{express}\n",
+                    output=f"Charge: {expected}",
+                    nudge=(
+                        "Check the regional base price, the strict over-5 boundary, and the "
+                        "express addition."
+                    ),
+                )
+                for zone, weight, express, expected in (
+                    ("local", 2, "no", 4),
+                    ("regional", 5, "no", 8),
+                    ("regional", 6, "yes", 16),
+                    ("international", 2, "yes", 17),
+                    ("local", 8, "yes", 12),
+                )
+            ),
+            (
+                "Build the zone chain first, including the default for every other zone.",
+                "Use > 5 for the weight surcharge and add 5, not 3, for express service.",
+            ),
+            "regional\n6\nyes\n",
+        ),
+    ),
+}
+
+
+_FOUNDATION_METADATA = {
+    "first-light": (
+        "Your first program",
+        "Strings, integers, and output",
+        8,
+        ("Values & output",),
+        False,
+    ),
+    "names-and-voices": (
+        "Variables and input",
+        "Store values and ask the user a question",
+        10,
+        ("Variables & strings",),
+        False,
+    ),
+    "numbers-from-input": (
+        "Numbers from input",
+        "Convert text and calculate whole-number results",
+        15,
+        ("Numbers & arithmetic",),
+        False,
+    ),
+    "decimal-measurements": (
+        "Decimal measurements",
+        "Read decimal input and format a calculated measurement",
+        15,
+        ("Numbers & arithmetic",),
+        False,
+    ),
+    "choose-a-door": (
+        "Making decisions",
+        "Comparisons, booleans, if, elif, and else",
+        15,
+        ("Conditions",),
+        False,
+    ),
+    "ticket-desk": (
+        "Project: the ticket desk",
+        "Combine input, arithmetic, and decisions",
+        35,
+        ("Conditions",),
+        True,
+    ),
+}
+
+
+def foundation_lesson(identifier):
+    build, repair = _FOUNDATION_STAGES[identifier]
+    title, subtitle, minutes, concepts, project = _FOUNDATION_METADATA[identifier]
+    legacy = next((lesson for lesson in LEGACY if lesson.id == identifier), None)
+    return Lesson(
+        identifier,
+        "beginner",
+        title,
+        subtitle,
+        minutes,
+        concepts,
+        lesson_text(identifier),
+        repair.starter_files["lesson.py"],
+        build.checks,
+        build.hints,
+        legacy.prediction if legacy else "",
+        legacy.choices if legacy else (),
+        legacy.answer if legacy else 0,
+        legacy.explanation if legacy else "",
+        build.reference_files["lesson.py"],
+        project=project,
+        revision=4,
+        chapter_id="b-foundations",
+        files=build.files,
+        solution_files=build.reference_files,
+        repair_files=repair.starter_files,
+        stdin=build.stdin,
+        build_stage=build,
+        repair_stage=repair,
+    )
+
+
+_foundation_lessons = [foundation_lesson(identifier) for identifier in _FOUNDATION_METADATA]
+_pack_position = next(index for index, lesson in enumerate(_units) if lesson.id == "pack-your-bag")
+_units[_pack_position:_pack_position] = _foundation_lessons
 
 _extra_by_id = {lesson.id: lesson for lesson in EXTRA_LESSONS}
 for _anchor, _identifier in INSERT_AFTER.items():

@@ -58,6 +58,7 @@ Verify implementation details against code.
 
 - `models.py` defines contracts; `beginner_course.py`, `beginner_extensions.py`, and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
+- Stage-specific authoring uses `StageContract`; see [the authoring guide](docs/authoring.md).
 - `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
 - `course_map.py` defines section/chapter order and project preparation; `syllabus.py` renders it.
@@ -91,3 +92,10 @@ Verify implementation details against code.
 - Use subagents only when explicitly requested for the current task.
 - Make local commits when Git metadata exists; only push or publish when instructed.
 - Suggest a concrete next step after major work.
+
+## Maintaining this file
+
+Keep this file for knowledge useful to almost every future agent session in this project.
+Do not repeat what the codebase already shows; point to the authoritative file or command instead.
+Prefer rewriting or pruning existing entries over appending new ones.
+When updating this file, preserve this bar for all agents and keep entries concise.

@@ -31,5 +31,8 @@ For input `0`, both lines contain `0`.
 You may choose any input prompt.
 
 ## Repair
-The supplied program calculates the two parts incorrectly.
-Fix it to satisfy the same requirements.
+
+Repair uses a study-time summary instead of the Build scenario.
+Read morning and afternoon minutes, add them, and display complete hours and leftover minutes as `H h M min`.
+At exactly 60 minutes, the result must be `1 h 0 min`.
+Use the failing checks to diagnose the division and remainder calculations.
