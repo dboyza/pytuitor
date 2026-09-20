@@ -39,23 +39,3 @@ This prints `2`, `True`, and `True`.
 The **membership** operator `in` asks whether a value is present; `not in` asks whether it is absent.
 These operators also work with lists and tuples.
 Sets do not support indexing, because there is no first or last position.
-
-## Build
-
-Read two input lines; you may choose any prompts.
-The first line contains exactly two space-separated names.
-Store them as a tuple called `pair`, then assign its first item to `first` and its second item to `second`.
-The second line contains zero or more space-separated visitor names, possibly repeated.
-Store the distinct visitors in a set called `seen`.
-Names are case-sensitive, so `Ada` and `ada` are different.
-
-Print three lines: whether `first` is in `seen`, whether `second` is in `seen`, and the number of distinct visitors.
-Use Python's `True` and `False` spelling for membership results.
-For first line `Mira Sol` and second line `Sol Sol Bo`, print `False`, `True`, and `2` on separate lines.
-For an empty second line, print `False`, `False`, and `0`.
-Keep `pair`, `first`, `second`, and `seen` available for checks; do not print the set itself, since its order is not guaranteed.
-
-## Repair
-
-The supplied program reverses the two names and counts repeat visits as separate visitors.
-Fix it to preserve the first line's order and count only distinct visitor names.

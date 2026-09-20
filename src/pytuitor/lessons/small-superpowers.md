@@ -64,12 +64,3 @@ The function tries to add that string to the integer `5`.
 Read both the operation and the values involved before choosing a fix: this function expects a number, so call `add_bonus(10)`.
 If the value comes from `input()`, convert the input text with `int()` first.
 Run again after each correction and compare the result with what you expected.
-
-## Exercise
-
-Write `def heal(health, potion):` and implement its body to return `health + potion`, with a maximum result of `100`.
-For example, `heal(20, 10)` should return `30`, and `heal(90, 25)` should return `100`.
-
-Use a variable to calculate the new health, an `if` to handle values above 100, and `return` to send back the answer.
-You may add `print(heal(90, 25))` outside the function so you can see the result when you run it.
-Checks call the function directly, so this extra print is optional.

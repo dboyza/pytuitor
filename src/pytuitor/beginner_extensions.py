@@ -60,15 +60,7 @@ LESSONS = (
         exclusive = required ^ available
         ready = required <= available
         """,
-        """
-        required = set(input("Required: ").split())
-        available = set(input("Available: ").split())
-        shared = required | available
-        missing = available - required
-        combined = required & available
-        exclusive = required | available
-        ready = required < available
-        """,
+        "",
         [
             _check(
                 label,
@@ -121,25 +113,7 @@ LESSONS = (
                 positions.append((r, c, value))
             row_totals.append(total)
         """,
-        """
-        count = int(input("Rows: "))
-        grid = []
-        for number in range(count):
-            row = []
-            for word in input("Row: ").split():
-                row.append(int(word))
-            grid.append(row)
-        row_totals = []
-        flat = []
-        positions = []
-        total = 0
-        for r, row in enumerate(grid):
-            for c, value in enumerate(row):
-                total += value
-                flat.append(value)
-                positions.append((c, r, value))
-            row_totals.append(total)
-        """,
+        "",
         [
             _check(
                 label,
@@ -184,21 +158,7 @@ LESSONS = (
         removed = counts.pop(target, 0)
         keys = sorted(counts.keys())
         """,
-        """
-        items = input("Items: ").split()
-        target = input("Remove: ")
-        incoming = input("Add: ")
-        if target in items:
-            items.remove(target)
-        if target in items:
-            items.remove(target)
-        items.insert(0, incoming)
-        counts = {}
-        for item in items:
-            counts[item] = 1
-        removed = counts.pop(target, 0)
-        keys = list(counts.keys())
-        """,
+        "",
         [
             _check(
                 "Remove only the first occurrence",
@@ -244,13 +204,7 @@ LESSONS = (
             end = start + timedelta(minutes=minutes)
             return end.strftime("%Y-%m-%d %H:%M")
         """,
-        """
-        from datetime import datetime, timedelta
-        def appointment(day, clock, minutes):
-            start = datetime.combine(datetime.strptime(day, "%m/%d/%Y").date(),
-                                     datetime.strptime(clock, "%H:%M").time())
-            return (start + timedelta(hours=minutes)).strftime("%Y-%m-%d %H:%M")
-        """,
+        "",
         [
             _check("Cross midnight", "appointment('31/12/2024', '23:50', 20)", "2025-01-01 00:10"),
             _check(
@@ -290,15 +244,7 @@ LESSONS = (
             return (statistics.mean(values), statistics.median(values),
                     math.ceil(len(values) / capacity))
         """,
-        """
-        import math
-        import statistics
-        def summarize(values, capacity):
-            if capacity <= 0 or not values:
-                raise ValueError("Need data and positive capacity")
-            return (statistics.mean(values), values[len(values) // 2],
-                    len(values) // capacity)
-        """,
+        "",
         [
             _check("Unsorted even sample", "list(summarize([9, 1, 5, 3], 3))", [4.5, 4.0, 2]),
             _check("Negative and positive", "list(summarize([-2, 0, 5], 2))", [1.0, 0, 2]),
@@ -342,17 +288,7 @@ LESSONS = (
                 result.append(rng.choice(items))
             return result
         """,
-        """
-        import random
-        def draw(items, count, seed):
-            if count < 0 or (count > 0 and not items):
-                raise ValueError("Invalid draw")
-            random.seed(seed)
-            result = []
-            for index in range(count):
-                result.append(random.choice(items))
-            return result
-        """,
+        "",
         [
             _check(
                 "Repeatable draws",

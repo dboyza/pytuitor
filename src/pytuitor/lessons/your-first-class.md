@@ -22,16 +22,3 @@ Python calls it when you create an object with `Counter(4)`, passing `4` as `sta
 `self` refers to the instance receiving a method call; Python supplies it automatically when you call `counter.increment()`.
 Attributes such as `self.value` keep data on that object between method calls.
 A method is a function defined inside a class.
-
-## Build
-Define a class `Wallet`.
-`Wallet()` starts with a `.balance` of `0`.
-Its method `deposit(amount)` adds a nonnegative integer amount to the balance and returns the new balance.
-Its method `spend(amount)` returns `True` and subtracts the amount when affordable; otherwise it returns `False` without changing the balance.
-Each wallet must have its own balance.
-Amounts are always nonnegative integers.
-Spending zero succeeds, even for an empty wallet.
-
-## Repair
-The broken spend method deducts money before checking affordability.
-An unsuccessful spend must leave the wallet's balance unchanged.

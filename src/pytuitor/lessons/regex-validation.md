@@ -19,16 +19,3 @@ A match function returns an object describing the matched text when successful a
 `is not None` turns that result into a Boolean.
 `fullmatch` checks the whole string, while `search` finds a matching portion anywhere inside it.
 Prefer ordinary string methods for simple operations; use regex when a text shape combines several rules.
-
-## Build
-Define `valid_code(text)` returning `True` only for exactly two uppercase ASCII letters, one hyphen, and exactly three ASCII digits.
-`"AB-123"` and `"ZZ-000"` are valid.
-Lowercase letters, spaces, extra characters, trailing newlines, and non-ASCII digits are invalid.
-An empty string is invalid.
-The input is always a string; do not remove whitespace or change its characters before checking it.
-Use `[A-Z]` for uppercase ASCII letters and `[0-9]` for ASCII digits.
-Return a Boolean without printing.
-
-## Repair
-The broken version accepts a matching part of a string even when the complete string is invalid.
-Choose the matching operation that enforces the complete contract.

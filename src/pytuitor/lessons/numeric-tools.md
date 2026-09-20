@@ -35,19 +35,3 @@ def square_root(value):
 ```
 
 This stops the function and reports the error to its caller, which can handle it with `try` and `except`.
-
-## Build
-
-Define `summarize(values, capacity)`.
-`values` is a list of finite numbers: ordinary integers or floats, excluding infinity and the special not-a-number value `nan`.
-`capacity` is an integer representing how many readings fit into one group.
-Return a tuple containing the mean, the median, and the number of groups needed to hold all readings.
-A partial last group counts, so four readings with capacity three need two groups.
-Reject an empty values list or a capacity of zero or less with `ValueError`.
-Do not change `values`, read input, or print.
-For `[9, 1, 5, 3]` and capacity `3`, return `(4.5, 4.0, 2)`.
-
-## Repair
-
-The supplied program mistakes a middle input position for the median and drops a partial final group.
-Use the data's statistics and round the group count in the appropriate direction.

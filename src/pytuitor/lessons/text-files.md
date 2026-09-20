@@ -33,16 +33,3 @@ Binary files, such as images, do not contain ordinary text.
 Symbolic links point to another file or folder instead of containing their own data.
 Those files, and files beyond the workspace limits, are omitted from the preview.
 For experiments with those files, export the workspace and run it in a folder you control.
-
-## Build
-Define `line_total(path)` that reads a UTF-8 file of integers, one per line, and returns their sum.
-Ignore blank and whitespace-only lines.
-All nonblank lines contain valid integers, including negatives.
-An empty file returns `0`.
-For file contents `4`, a blank line, and `-1`, return `3`.
-Read only the supplied path and do not change its contents.
-Checks create temporary files before calling your function.
-
-## Repair
-The broken version tries to convert blank lines to integers.
-Decide which lines contain a number before converting them.

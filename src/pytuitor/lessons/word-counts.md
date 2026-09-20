@@ -19,15 +19,3 @@ print(counts)
 ```
 
 The result is `{'blue': 2, 'red': 1}`.
-
-## Build
-Read space-separated words from one input line.
-Create a dictionary called `counts` whose keys are the words and whose values are the number of times each word appears.
-Treat `Cat` and `cat` as different words.
-An empty input produces `{}`.
-You may print `counts` so Run shows your result.
-Checks compare the dictionary itself, so printing is optional and key order does not matter.
-
-## Repair
-The broken version forgets earlier occurrences.
-Make each repeated word increase its existing count.

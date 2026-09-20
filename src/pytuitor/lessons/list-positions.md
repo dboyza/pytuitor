@@ -19,13 +19,3 @@ else:
     message = colors[-1]
 print(message)
 ```
-
-## Build
-Read one line of space-separated words into a list called `items`.
-Set `first` to the first word and `last` to the last word.
-If there are no words, set both variables to `"empty"`.
-Print `first`, then `last`, on separate lines.
-A one-word input should print that word twice.
-
-## Repair
-Find why the provided indexing chooses the wrong words and fails on an empty list.

@@ -12,4 +12,8 @@ New authoring should provide both stage contracts when Build and Repair need dif
 
 Keep each Repair solvable with concepts already taught, behavior-based, and meaningfully different from its Build scenario.
 
+The refreshed owned beginner stages are authored in `src/pytuitor/beginner_stage_refresh.py` and projected into the compatibility fields by `beginner_course.py`.
+
+Owned lesson Markdown keeps teaching and worked examples; stage requirements, starters, references, checks, and hints belong to the stage contracts.
+
 Run the catalog tests and `scripts/smoke_installed.py` after changing a stage contract.

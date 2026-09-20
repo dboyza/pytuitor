@@ -18,17 +18,3 @@ with open("source.dat", "rb") as source:
     with open("new.dat", "xb") as destination:
         shutil.copyfileobj(source, destination)
 ```
-
-## Build
-Define `copy_new(source, destination)`.
-Copy the source's bytes to the destination and return `True` if a new destination was created.
-If the destination already exists, return `False` without changing either file.
-Use exclusive creation so the overwrite rule also holds if the file appears just before opening it.
-The source is an existing regular file, meaning a file containing data rather than a folder or symbolic link.
-The destination's parent folder exists.
-Input/output errors, often shortened to I/O errors, report problems reading or writing data.
-Let errors other than `FileExistsError` reach the caller instead of catching them or reporting a successful copy.
-
-## Repair
-The broken function uses a mode that destroys an existing destination.
-Fix the open mode and catch `FileExistsError` when the destination name is already taken.

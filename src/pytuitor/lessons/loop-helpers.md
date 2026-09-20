@@ -47,32 +47,3 @@ This prints `soup: 4` and `salad: 6`; there is no pair for `bread`.
 If either collection is empty, there are no pairs.
 When mismatched lengths would be a mistake in a real program, check the lengths first.
 In this exercise, ignoring unpaired items is intentional.
-
-## Build
-
-Read three input lines, with any prompts you choose.
-The first is a nonnegative whole number called `count`.
-The second contains space-separated names; store its split result in `names`.
-The third contains space-separated colors; store its split result in `colors`.
-Either word line may be empty.
-
-Create these three result lists:
-
-- `slots`: integers from `1` through `count`, inclusive; use `[]` when `count` is zero.
-- `numbered`: a tuple `(number, name)` for each name, counting from `1` in input order.
-- `pairs`: a tuple `(name, color)` for each corresponding name and color, stopping at the shorter input list.
-
-Start each result as an empty list and append its values inside a loop, or use another implementation that produces the same results.
-To append one pair, write `result.append((left, right))`; the inner parentheses create the tuple passed to `append`.
-Try `range`, `enumerate`, and `zip` for the three loops.
-Checks compare the lists and tuples, so printing is optional.
-You may print all three lists to inspect them with Run.
-
-For input lines `2`, `Mira Sol`, and `red`, the results are `slots = [1, 2]`, `numbered = [(1, "Mira"), (2, "Sol")]`, and `pairs = [("Mira", "red")]`.
-Preserve duplicate names and colors in their original positions.
-If both word lines are empty, `numbered` and `pairs` are both empty regardless of `count`.
-
-## Repair
-
-The supplied program omits the final slot, starts numbering at zero, and reverses the items in each name/color pair.
-Fix each result while preserving the intentional behavior of stopping at the shorter input list.

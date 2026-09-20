@@ -4,8 +4,16 @@ from dataclasses import replace
 
 from pytuitor.beginner_extensions import INSERT_AFTER
 from pytuitor.beginner_extensions import LESSONS as EXTRA_LESSONS
+from pytuitor.beginner_stage_refresh import BUILD_INSTRUCTIONS, REPAIR_STAGES
 from pytuitor.legacy import LESSONS as LEGACY
-from pytuitor.models import Chapter, Check, Lesson, StageContract, code, lesson_text
+from pytuitor.models import (
+    Chapter,
+    Check,
+    Lesson,
+    StageContract,
+    code,
+    lesson_text,
+)
 
 CHAPTERS = (
     Chapter(
@@ -84,7 +92,7 @@ def exercise(
         files=tuple(files[0]) if files else ("lesson.py",),
         entrypoint=entrypoint,
         solution_files=files[0] if files else None,
-        repair_files=files[1] if files else None,
+        repair_files=files[1] if files and len(files) > 1 else None,
         stdin=stdin,
     )
 
@@ -144,15 +152,7 @@ add(
             print(last)
         """)
     ),
-    (
-        code("""
-            items = input("Items: ").split()
-            first = items[1]
-            last = items[0]
-            print(first)
-            print(last)
-        """)
-    ),
+    (""),
     tuple(
         case(
             f"Words: {text or 'empty'}",
@@ -183,14 +183,7 @@ add(
         print(second in seen)
         print(len(seen))
     """),
-    code("""
-        pair = tuple(input("Two names: ").split())
-        second, first = pair
-        seen = input("Visitors: ").split()
-        print(first in seen)
-        print(second in seen)
-        print(len(seen))
-    """),
+    "",
     tuple(
         case(
             label,
@@ -239,23 +232,7 @@ add(
         print(numbered)
         print(pairs)
     """),
-    code("""
-        count = int(input("Number of slots: "))
-        names = input("Names: ").split()
-        colors = input("Colors: ").split()
-        slots = []
-        for number in range(1, count):
-            slots.append(number)
-        numbered = []
-        for number, name in enumerate(names):
-            numbered.append((number, name))
-        pairs = []
-        for name, color in zip(colors, names):
-            pairs.append((name, color))
-        print(slots)
-        print(numbered)
-        print(pairs)
-    """),
+    "",
     tuple(
         case(
             label,
@@ -299,12 +276,7 @@ add(
             print(counts)
         """)
     ),
-    code("""
-        counts = {}
-        for word in input("Words: ").split():
-            counts[word] = 1
-        print(counts)
-    """),
+    "",
     tuple(
         case(f"Count {words!r}", "counts", result, stdin=words + "\n")
         for words, result in (
@@ -335,17 +307,7 @@ add(
             print(total)
         """)
     ),
-    (
-        code("""
-            total = 0
-            while True:
-                number = int(input("Number (0 to finish): "))
-                total = total + number
-                if total >= 0:
-                    break
-            print(total)
-        """)
-    ),
+    (""),
     tuple(
         case(label, "total", result, stdin=text, output=str(result))
         for label, text, result in (
@@ -401,20 +363,7 @@ add(
                     print(f"{word}: {counts[word]}")
         """)
     ),
-    (
-        code("""
-            counts = {}
-            order = []
-            for word in input("Supplies: ").split():
-                order.append(word)
-                counts[word] = counts.get(word, 0) + 1
-            if len(order) == 0:
-                print("No supplies")
-            else:
-                for word in order:
-                    print(f"{word}: {counts[word]}")
-        """)
-    ),
+    (""),
     (
         case(
             "Repeated supplies",
@@ -444,11 +393,7 @@ add(
         def slug(text):
             return "-".join(text.lower().split())
     """),
-    code("""
-        def slug(text):
-            text.lower()
-            return text.replace(" ", "-")
-    """),
+    "",
     tuple(
         case(f"slug({text!r})", f"slug({text!r})", result)
         for text, result in (("  Blue   Moon ", "blue-moon"), ("", ""), ("A\tB!", "a-b!"))
@@ -476,15 +421,7 @@ add(
                 return total
         """)
     ),
-    (
-        code("""
-            def subtotal(prices, discount=0):
-                total = 0
-                for price in prices:
-                    total = total + price - discount
-                return total
-        """)
-    ),
+    (""),
     (
         case("Default discount", "subtotal([6, 4])", 10),
         case("One order discount", "subtotal([6, 4], discount=3)", 7),
@@ -510,14 +447,7 @@ add(
             return number % 10 + digit_sum(number // 10)
         """
     ),
-    code(
-        """
-        def digit_sum(number):
-            if number < 10:
-                return 0
-            return number % 10 + digit_sum(number // 10)
-        """
-    ),
+    "",
     (
         case("Digits of 0", "digit_sum(0)", 0),
         case("Digits of 7", "digit_sum(7)", 7),
@@ -549,18 +479,7 @@ add(
             return total
         """
     ),
-    code(
-        """
-        def sum_nested(items):
-            total = 0
-            for item in items:
-                if isinstance(item, list):
-                    total += len(item)
-                else:
-                    total += item
-            return total
-        """
-    ),
+    "",
     (
         case("Nested total 1", "sum_nested([])", 0),
         case("Nested total 2", "sum_nested([3, -2])", 1),
@@ -596,10 +515,7 @@ add(
                 return number
         """)
     ),
-    code("""
-        def parse_quantity(text):
-            return int(text)
-    """),
+    "",
     tuple(
         case(f"Parse {text!r}", f"parse_quantity({text!r})", result)
         for text, result in (
@@ -640,17 +556,7 @@ add(
                 return total
         """)
     ),
-    (
-        code("""
-            def line_total(path):
-                with open(path, "r", encoding="utf-8") as handle:
-                    lines = handle.read().splitlines()
-                total = 0
-                for line in lines:
-                    total = total + int(line)
-                return total
-        """)
-    ),
+    (""),
     tuple(
         case(
             label,
@@ -693,16 +599,7 @@ add(
                 return target
         """)
     ),
-    (
-        code("""
-            from pathlib import Path
-
-            def save_note(folder, text):
-                target = Path(folder + "note.txt")
-                target.write_text(text, encoding="utf-8")
-                return target
-        """)
-    ),
+    (""),
     (
         case(
             "Create nested folder",
@@ -742,17 +639,7 @@ add(
                 return total
         """)
     ),
-    (
-        code("""
-            def save_scores(path, scores):
-                with open(path, "w", encoding="utf-8") as handle:
-                    handle.write(str(scores))
-                total = 0
-                for score in scores.values():
-                    total = total + score
-                return total
-        """)
-    ),
+    (""),
     tuple(
         case(
             label,
@@ -791,18 +678,7 @@ add(
                 return total
         """)
     ),
-    (
-        code("""
-            import csv
-
-            def csv_total(path):
-                total = 0
-                with open(path, newline="", encoding="utf-8") as handle:
-                    for row in csv.DictReader(handle):
-                        total = total + int(row["quantity"]) + int(row["price"])
-                return total
-        """)
-    ),
+    (""),
     tuple(
         case(
             label,
@@ -852,14 +728,7 @@ add(
             return re.fullmatch(r"[A-Z]{2}-[0-9]{3}", text) is not None
         """
     ),
-    code(
-        """
-        import re
-
-        def valid_code(text):
-            return re.search(r"[A-Z]{2}-[0-9]{3}", text) is not None
-        """
-    ),
+    "",
     (
         case("Validate 'AB-123'", "valid_code('AB-123')", True),
         case("Validate 'ZZ-000'", "valid_code('ZZ-000')", True),
@@ -892,16 +761,7 @@ add(
             return names, re.sub(pattern, "[user:hidden]", text)
         """
     ),
-    code(
-        """
-        import re
-
-        def redact_tags(text):
-            pattern = r"\\[user:([a-z]+)\\]"
-            names = re.findall(pattern, text)
-            return names, re.sub(pattern, "[user:hidden]", text, count=1)
-        """
-    ),
+    "",
     (
         case("Redact sample 1", "redact_tags('')", ([], "")),
         case("Redact sample 2", "redact_tags('hello')", ([], "hello")),
@@ -945,21 +805,7 @@ add(
                 return totals
         """)
     ),
-    (
-        code("""
-            import csv
-            import json
-
-            def summarize_expenses(source, destination):
-                totals = {}
-                with open(source, newline="", encoding="utf-8") as handle:
-                    for row in csv.DictReader(handle):
-                        totals[row["category"]] = int(row["amount"])
-                with open(destination, "w", encoding="utf-8") as handle:
-                    json.dump(totals, handle)
-                return totals
-        """)
-    ),
+    (""),
     tuple(
         case(
             label,
@@ -1007,7 +853,7 @@ add(
     "Share functions across Python files",
     "b-tools",
     "from conversions import minutes_to_seconds\n",
-    "from conversions import minutes_to_seconds\n",
+    "",
     (
         case("One minute", "minutes_to_seconds(1)", 60),
         case("No minutes", "minutes_to_seconds(0)", 0),
@@ -1030,13 +876,6 @@ add(
                     return minutes * 60
             """),
         },
-        {
-            "lesson.py": "from conversions import minutes_to_seconds\n",
-            "conversions.py": code("""
-                def minutes_to_seconds(minutes):
-                    return minutes + 60
-            """),
-        },
     ),
 )
 
@@ -1056,17 +895,7 @@ add(
                 return parser
         """)
     ),
-    (
-        code("""
-            import argparse
-
-            def make_parser():
-                parser = argparse.ArgumentParser()
-                parser.add_argument("name")
-                parser.add_argument("--count", default="0")
-                return parser
-        """)
-    ),
+    (""),
     (
         case("Defaults", "vars(make_parser().parse_args(['Ada']))", {"name": "Ada", "count": 1}),
         case(
@@ -1103,21 +932,7 @@ add(
                     return True
         """)
     ),
-    (
-        code("""
-            class Wallet:
-                def __init__(self):
-                    self.balance = 0
-
-                def deposit(self, amount):
-                    self.balance = self.balance + amount
-                    return self.balance
-
-                def spend(self, amount):
-                    self.balance = self.balance - amount
-                    return self.balance >= 0
-        """)
-    ),
+    (""),
     (
         case(
             "Successful and refused spending",
@@ -1162,21 +977,7 @@ add(
             return Status.DONE
         """
     ),
-    code(
-        """
-        from enum import Enum
-
-        class Status(Enum):
-            TODO = "todo"
-            DOING = "doing"
-            DONE = "done"
-
-        def next_status(status):
-            if status is Status.TODO:
-                return Status.DOING
-            return Status.TODO
-        """
-    ),
+    "",
     (
         case(
             "Defined members",
@@ -1222,28 +1023,7 @@ add(
                     self.assertEqual(clamp(12, 0, 10), 10)
         """)
     ),
-    (
-        code("""
-            import unittest
-
-            def clamp(value, low, high):
-                if value > low:
-                    return low
-                if value > high:
-                    return high
-                return value
-
-            class ClampTests(unittest.TestCase):
-                def test_below(self):
-                    self.assertEqual(clamp(-2, 0, 10), 0)
-
-                def test_inside(self):
-                    self.assertEqual(clamp(5, 0, 10), 5)
-
-                def test_above(self):
-                    self.assertEqual(clamp(12, 0, 10), 10)
-        """)
-    ),
+    (""),
     (
         case("Lower boundary", "clamp(-2, 0, 10)", 0),
         case("Upper boundary", "clamp(12, 0, 10)", 10),
@@ -1298,17 +1078,7 @@ add(
                 return tasks.pending()
         """)
     ),
-    (
-        code("""
-            from tasks import TaskList
-
-            def build_report(titles):
-                tasks = TaskList()
-                for title in titles:
-                    tasks.add(title)
-                return tasks.pending()
-        """)
-    ),
+    (""),
     (
         case(
             "Clean titles and remove repeats",
@@ -1365,34 +1135,6 @@ add(
                 """)
             ),
         },
-        {
-            ("lesson.py"): (
-                code("""
-                    from tasks import TaskList
-
-                    def build_report(titles):
-                        tasks = TaskList()
-                        for title in titles:
-                            tasks.add(title)
-                        return tasks.pending()
-                """)
-            ),
-            ("tasks.py"): (
-                code("""
-                    class TaskList:
-                        def __init__(self):
-                            self.items = []
-
-                        def add(self, title):
-                            clean = title.strip()
-                            if clean != "" and clean not in self.items:
-                                self.items.append(clean)
-
-                        def pending(self):
-                            return self.items
-                """)
-            ),
-        },
     ),
 )
 
@@ -1407,12 +1149,7 @@ add(
                 return sorted([number * number for number in numbers if number > 0])
         """)
     ),
-    (
-        code("""
-            def positive_squares(numbers):
-                return sorted(set([number * number for number in numbers if number >= 0]))
-        """)
-    ),
+    (""),
     (
         case("Filter, order, retain duplicates", "positive_squares([3, -2, 1, 3, 0])", [1, 9, 9]),
         case("No positives", "positive_squares([-2, 0])", []),
@@ -1447,19 +1184,7 @@ add(
             return dict(counts), dict(pages)
         """
     ),
-    code(
-        """
-        from collections import Counter, defaultdict
-
-        def summarize_visits(visits):
-            counts = Counter()
-            pages = defaultdict(list)
-            for user, page in visits:
-                counts[user] += 1
-                pages[user] = [page]
-            return dict(counts), dict(pages)
-        """
-    ),
+    "",
     (
         case("Visit summary 1", "summarize_visits([])", ({}, {})),
         case(
@@ -1505,19 +1230,7 @@ add(
             return served, list(queue)
         """
     ),
-    code(
-        """
-        from collections import deque
-
-        def process_queue(waiting, arrivals, limit):
-            queue = deque(waiting)
-            queue.extend(arrivals)
-            served = []
-            while queue and len(served) < limit:
-                served.append(queue.pop())
-            return served, list(queue)
-        """
-    ),
+    "",
     (
         case("Arrival order", "process_queue(['a', 'b'], ['c'], 2)", (["a", "b"], ["c"])),
         case("No capacity", "process_queue(['a'], ['b'], 0)", ([], ["a", "b"])),
@@ -1550,14 +1263,7 @@ add(
                 return (date.fromisoformat(start) + timedelta(days=days)).isoformat()
         """)
     ),
-    (
-        code("""
-            from datetime import date, timedelta
-
-            def due_date(start, days):
-                return (date.fromisoformat(start) + timedelta(days=days + 1)).isoformat()
-        """)
-    ),
+    (""),
     tuple(
         case(f"{start} plus {days} days", f"due_date({start!r}, {days})", expected)
         for start, days, expected in (
@@ -1587,10 +1293,7 @@ add(
                 return name == name.strip()
         """)
     ),
-    code("""
-        def valid_filename(name):
-            return name != ""
-    """),
+    "",
     tuple(
         case(f"Validate {name!r}", f"valid_filename({name!r})", expected)
         for name, expected in (
@@ -1630,17 +1333,7 @@ add(
                 return True
         """)
     ),
-    (
-        code("""
-            import shutil
-
-            def copy_new(source, destination):
-                with open(source, "rb") as input_file:
-                    with open(destination, "wb") as output_file:
-                        shutil.copyfileobj(input_file, output_file)
-                return True
-        """)
-    ),
+    (""),
     (
         case(
             "Copy new bytes",
@@ -1700,32 +1393,7 @@ add(
                 return names
         """)
     ),
-    (
-        code("""
-            from pathlib import Path
-            import shutil
-            from selection import eligible
-
-            def archive_notes(source, destination, dry_run=True):
-                source = Path(source)
-                destination = Path(destination)
-                names = []
-                for name in eligible(source):
-                    target = destination / name
-                    if target.exists():
-                        continue
-                    if True:
-                        destination.mkdir(parents=True, exist_ok=True)
-                        with open(source / name, "rb") as input_file:
-                            try:
-                                with open(target, "xb") as output_file:
-                                    shutil.copyfileobj(input_file, output_file)
-                            except FileExistsError:
-                                continue
-                    names.append(name)
-                return names
-        """)
-    ),
+    (""),
     (
         case(
             "Dry run creates nothing",
@@ -1803,46 +1471,6 @@ add(
                             if target.exists():
                                 continue
                             if not dry_run:
-                                destination.mkdir(parents=True, exist_ok=True)
-                                with open(source / name, "rb") as input_file:
-                                    try:
-                                        with open(target, "xb") as output_file:
-                                            shutil.copyfileobj(input_file, output_file)
-                                    except FileExistsError:
-                                        continue
-                            names.append(name)
-                        return names
-                """)
-            ),
-            ("selection.py"): (
-                code("""
-                    from pathlib import Path
-
-                    def eligible(source):
-                        paths = []
-                        for path in Path(source).iterdir():
-                            if path.is_file() and not path.is_symlink() and path.suffix == ".txt":
-                                paths.append(path.name)
-                        return sorted(paths)
-                """)
-            ),
-        },
-        {
-            ("lesson.py"): (
-                code("""
-                    from pathlib import Path
-                    import shutil
-                    from selection import eligible
-
-                    def archive_notes(source, destination, dry_run=True):
-                        source = Path(source)
-                        destination = Path(destination)
-                        names = []
-                        for name in eligible(source):
-                            target = destination / name
-                            if target.exists():
-                                continue
-                            if True:
                                 destination.mkdir(parents=True, exist_ok=True)
                                 with open(source / name, "rb") as input_file:
                                     try:
@@ -2447,3 +2075,40 @@ LESSONS = tuple(
     )
     for index, lesson in enumerate(_units)
 )
+
+
+def _refresh_stages(lessons):
+    refreshed = []
+    for lesson in lessons:
+        repair = REPAIR_STAGES.get(lesson.id)
+        if repair is None:
+            refreshed.append(lesson)
+            continue
+        build = StageContract(
+            instructions=BUILD_INSTRUCTIONS[lesson.id],
+            checks=lesson.checks,
+            hints=lesson.hints,
+            stdin=lesson.stdin,
+            files=lesson.files,
+            starter_files={name: "" for name in lesson.files},
+            reference_files=lesson.solution_files or {lesson.entrypoint: lesson.solution},
+        )
+        refreshed.append(
+            replace(
+                lesson,
+                body=lesson_text(lesson.id),
+                repair=repair.starter_files[lesson.entrypoint],
+                checks=build.checks,
+                hints=build.hints,
+                solution=build.reference_files[lesson.entrypoint],
+                solution_files=build.reference_files,
+                repair_files=repair.starter_files,
+                stdin=build.stdin,
+                build_stage=build,
+                repair_stage=repair,
+            )
+        )
+    return tuple(refreshed)
+
+
+LESSONS = _refresh_stages(LESSONS)

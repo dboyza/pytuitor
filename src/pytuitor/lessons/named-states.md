@@ -27,13 +27,3 @@ Use `Size.SMALL` to access the named choice directly.
 `Size("missing")` raises `ValueError`.
 When reading a choice from user input, catch that error where you convert the string to an enum member.
 Enums suit a fixed set of choices, while ordinary strings suit open-ended text such as a user's name.
-
-## Build
-Import `Enum` and define `Status(Enum)` with exactly three members in this order: `TODO = "todo"`, `DOING = "doing"`, and `DONE = "done"`.
-Define `next_status(status)` returning the next enum member: TODO becomes DOING, DOING becomes DONE, and DONE stays DONE.
-The argument is always a `Status` member; string conversion or invalid-input handling is not required in this function.
-Return enum members, not their string values, and do not print.
-
-## Repair
-The broken transition sends active and finished work back to TODO.
-A completed task must stay completed.

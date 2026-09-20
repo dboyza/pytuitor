@@ -20,15 +20,3 @@ The test runner, the code that executes the tests, finds methods whose names beg
 In an external terminal, `python -m unittest` runs the `unittest` module and looks for test files.
 Their names start with `test` and end with `.py`, for example `test_addition.py`.
 Here, Check will load and run the test class for you.
-
-## Build
-Define `clamp(value, low, high)` that returns `low` below the lower boundary, `high` above the upper boundary, and the original value otherwise.
-Assume `low <= high`.
-Also define a `unittest.TestCase` subclass named `ClampTests` with at least three test methods: `test_below`, `test_inside`, and `test_above`.
-Each must call `clamp` and assert its expected result.
-Use distinct cases that would detect a clamp implementation always returning the lower bound, the original value, or the upper bound.
-Do not call `unittest.main()` outside a function or class definition because Check manages the test run.
-
-## Repair
-A boundary comparison is reversed in the provided function.
-Use the provided tests to identify and fix it.

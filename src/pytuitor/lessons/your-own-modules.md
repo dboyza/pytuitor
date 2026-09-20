@@ -30,13 +30,3 @@ if __name__ == "__main__":
 ```
 The tutor runs `lesson.py` as the entry point unless the exercise says otherwise.
 Use the workspace file selector to edit each file.
-
-## Build
-Create `conversions.py` with a function `minutes_to_seconds(minutes)` that returns `minutes * 60`.
-Inputs are nonnegative integers.
-In `lesson.py`, import that function so it is available there under the same name.
-Do not print or request input at import time.
-Both files are part of this exercise and both begin blank in Build.
-
-## Repair
-Fix the unit conversion in the reusable module, then check the complete workspace.

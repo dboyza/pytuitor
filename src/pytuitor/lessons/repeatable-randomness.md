@@ -24,19 +24,3 @@ Other tools include `.randint(a, b)` for an integer from `a` through `b`, includ
 The functions called directly through `random`, such as `random.choice(...)`, share a generator.
 `random.seed(...)` resets that shared generator and affects other callers, so avoid it in reusable functions.
 Use the separate `secrets` module for values that must be hard to guess, such as password-reset codes; ordinary random choices are for simulations and similar tasks.
-
-## Build
-
-Define `draw(items, count, seed)`.
-`items` is a list, `count` is an integer, and `seed` is an integer.
-Use an independent `random.Random(seed)` and call its `choice(items)` exactly once per draw, in order.
-Return the choices in a new list, leaving both `items` and the module's shared random generator state unchanged.
-Reject negative counts, or a positive count with empty items, using `ValueError`.
-Zero draws return an empty list even when items is empty.
-The same arguments must give the same result on repeated calls.
-Do not read input or print.
-
-## Repair
-
-The supplied program changes shared random state.
-Give each call its own generator while preserving the same seeded sequence of choices.

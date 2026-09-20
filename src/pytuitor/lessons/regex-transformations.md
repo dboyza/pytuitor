@@ -22,18 +22,3 @@ To match an actual opening bracket instead, write `\[`.
 Likewise, `\]`, `\{`, and `\}` match literal brackets or braces.
 Backslashes inside raw strings reach the regex code unchanged.
 Use the `json` and `csv` modules to read those file formats; their parsing rules handle details a small regex would miss.
-
-## Build
-Define `redact_tags(text)` returning a tuple `(names, redacted)`.
-Here, redacting means hiding the names in the returned text.
-A valid tag is exactly `[user:name]`, where `name` contains one or more lowercase ASCII letters.
-`names` is a list of names from every valid tag, preserving order and duplicates.
-`redacted` replaces every complete valid tag with `[user:hidden]` and preserves all other text exactly.
-For `"[user:ada] met [user:bob]"`, return `(["ada", "bob"], "[user:hidden] met [user:hidden]")`.
-Invalid tags such as `[user:Ada]`, `[user:]`, and `[user:ab2]` remain unchanged and contribute no names.
-Empty input returns `([], "")`.
-The input is always a string; do not print.
-
-## Repair
-Names are extracted correctly, but only the first matching tag is replaced.
-Make extraction and replacement agree about which tags they process.

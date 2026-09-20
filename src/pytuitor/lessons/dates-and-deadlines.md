@@ -19,16 +19,3 @@ For example, `2024-03-01` means March 1, 2024.
 `timedelta(days=...)` represents a duration in days.
 Subtracting two dates returns a `timedelta` object whose `.days` attribute gives the number of days between them.
 Text that does not describe a valid date raises `ValueError`.
-
-## Build
-Define `due_date(start, days)`.
-`start` is a valid ISO date string and `days` is a nonnegative integer.
-Return the ISO date exactly that many days after `start`.
-Zero days returns the same date.
-Handle month ends, year ends, and leap days by using date arithmetic.
-For `due_date("2023-12-31", 1)`, return `"2024-01-01"`.
-Do not use today's date: the supplied start makes results predictable and easy to test.
-
-## Repair
-The broken calculation counts the starting day as an elapsed day.
-Check the zero-day case to make the intended meaning clear.

@@ -20,15 +20,3 @@ Catch the specific exception you expect so unrelated programming mistakes remain
 `None` is a value used to represent the absence of a result.
 It is different from the string `"None"` and the number `0`.
 `result is None` is the conventional way to test for it.
-
-## Build
-To **parse** text is to read it as a value or structure your program can use.
-Define `parse_quantity(text)`.
-Convert a string to an integer and return it if it is nonnegative.
-Return `None` if conversion fails or the integer is negative.
-Surrounding whitespace and a leading plus sign are valid because `int()` accepts them.
-`"3.5"` and `""` are invalid.
-The input will always be a string; no input prompts or printed output are required.
-
-## Repair
-The provided function does not handle conversion errors and accepts negative quantities.

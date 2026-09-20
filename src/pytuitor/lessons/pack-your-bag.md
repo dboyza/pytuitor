@@ -43,10 +43,12 @@ The total changes from `0` to `3`, then to `7`.
 Python calculates the right side before assigning the new total.
 `total += price` is a shorter way to write this addition.
 
-## Exercise
+## Read a line into numbers
 
-Your program needs to build `pouches` from the numbers you type.
-Use the following input-handling pattern before calculating the total:
+`input()` gives your program one string, even when the user types numbers.
+Calling `.split()` turns a space-separated string such as `"2 5 1"` into the list `['2', '5', '1']`.
+Loop over those text pieces and call `int()` on each one when you need whole numbers.
+For example:
 
 ```python
 pouches = []
@@ -54,18 +56,4 @@ for amount in input("Coins in each pouch: ").split():
     pouches.append(int(amount))
 ```
 
-A **method** is a function that belongs to a value and is called with a dot, such as `text.split()`.
-`.split()` turns a string like `"2 5 1"` into the list `["2", "5", "1"]`.
-`int(amount)` converts each string to an integer.
-`pouches.append(...)` adds that integer to the end of the list.
-You now have `[2, 5, 1]` to work with.
-
-Write the input setup in your editor, then add your total calculation below it.
-Create `total = 0`, loop over `pouches`, add each number, then print `total` after the loop.
-
-Try `2 5 1`, which should give `8`.
-Then run again and press Enter without typing any numbers: an empty list should give `0`.
-Putting `total = 0` inside the loop would reset it on every repetition, so keep that line before the loop.
-
-Typing a word instead of a number will produce the `ValueError` introduced in the input lesson.
-Run again and enter whole numbers to continue.
+After entering `2 5 1`, `pouches` contains `[2, 5, 1]`.

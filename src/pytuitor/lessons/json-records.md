@@ -19,18 +19,3 @@ print(record["city"])
 Invalid JSON raises `json.JSONDecodeError`.
 Use UTF-8 when opening the file.
 JSON object keys are strings.
-
-## Build
-Define `save_scores(path, scores)`.
-`scores` is a dictionary mapping names to nonnegative integer scores.
-Write it as JSON to the supplied path and return the sum of its scores.
-A dictionary's `.values()` method gives its values for a loop.
-An empty dictionary must save an empty JSON object and return `0`.
-Keep every name exactly as given, including names with accented letters or characters from other languages.
-These characters are represented using Unicode, the character system Python strings use.
-Formatting and JSON key order do not matter.
-The parent folder already exists.
-
-## Repair
-The broken program writes the text Python shows when displaying a dictionary.
-That text is not reliably valid JSON, which has its own rules for quotes and values.
