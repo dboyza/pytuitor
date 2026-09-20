@@ -1,6 +1,7 @@
 import pytest
 
 from pytuitor.beginner_course import LESSONS
+from pytuitor.beginner_stage_refresh import BUILD_INSTRUCTIONS, REPAIR_STAGES
 from pytuitor.curriculum import default_input
 from pytuitor.runner import execute
 
@@ -17,10 +18,16 @@ OWNED = tuple(lesson for lesson in LESSONS if lesson.id not in EXCLUDED)
 
 def test_refresh_covers_exact_owned_units_with_explicit_stage_contracts():
     assert len(OWNED) == 40
+    assert set(BUILD_INSTRUCTIONS) == set(REPAIR_STAGES) == {lesson.id for lesson in OWNED}
     for lesson in OWNED:
         build = lesson.stage_contract("build")
         repair = lesson.stage_contract("repair")
         assert build.instructions and repair.instructions
+        assert isinstance(build.instructions, str) and isinstance(repair.instructions, str)
+        assert lesson.revision > 4
+        for stage in (build, repair):
+            assert set(stage.files) == set(stage.starter_files) == set(stage.reference_files)
+        assert all(source == "" for source in build.starter_files.values())
         assert build.reference_files != repair.reference_files
         assert not any(
             line.strip() in {"## Build", "## Repair", "## Exercise"}

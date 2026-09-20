@@ -196,7 +196,9 @@ async def test_capstone_run_check_and_export(tmp_path, lesson_id):
         await pilot.pause()
         screen = app.screen
         assert screen.lesson.id == lesson_id
-        screen.query_one("#editor", TextArea).load_text(lesson.solution)
+        screen.query_one("#editor", TextArea).load_text(
+            lesson.stage_contract(screen.stage).reference_files[lesson.entrypoint]
+        )
         await pilot.press("f5")
         await wait_for_run(pilot, screen)
         assert "BUILD PASSED" in str(screen.query_one("#results", Static).content)
@@ -208,12 +210,17 @@ async def test_capstone_run_check_and_export(tmp_path, lesson_id):
         assert app.store.status(lesson) != "completed"
         await pilot.press("ctrl+n")
         await pilot.pause()
-        screen.query_one("#editor", TextArea).load_text(lesson.solution)
+        screen.query_one("#editor", TextArea).load_text(
+            lesson.stage_contract(screen.stage).reference_files[lesson.entrypoint]
+        )
         await pilot.press("f5")
         await wait_for_run(pilot, screen)
         assert app.store.status(lesson) == "completed"
         screen.action_export()
-        assert next((tmp_path / "exports").glob("*.py")).read_text() == lesson.solution
+        assert (
+            next((tmp_path / "exports").glob("*.py")).read_text()
+            == lesson.stage_contract("repair").reference_files[lesson.entrypoint]
+        )
 
 
 async def test_stop_recovers_and_does_not_complete(tmp_path):

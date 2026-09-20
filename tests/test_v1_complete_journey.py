@@ -20,14 +20,14 @@ async def test_project_build_and_repair_keep_course_progress(tmp_path):
         app.screen.open_lesson(lesson)
         await pilot.pause()
         screen = app.screen
-        await fill_workspace(screen, pilot, lesson.solution_files)
+        await fill_workspace(screen, pilot, lesson.stage_contract(screen.stage).reference_files)
         await pilot.press("f5")
         await app.workers.wait_for_complete()
         assert screen.stage_passed("build")
         await pilot.press("ctrl+n")
         await pilot.pause()
         assert screen.stage == "repair"
-        await fill_workspace(screen, pilot, lesson.solution_files)
+        await fill_workspace(screen, pilot, lesson.stage_contract(screen.stage).reference_files)
         await pilot.press("f5")
         await app.workers.wait_for_complete()
         assert app.store.status(lesson) == "completed"

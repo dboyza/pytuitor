@@ -97,7 +97,7 @@ async def test_new_topics_are_reachable_and_complete_both_stages(tmp_path, ident
         assert not editor.text
         for stage in ("build", "repair"):
             assert screen.stage == stage
-            editor.load_text(lesson.solution)
+            editor.load_text(lesson.stage_contract(stage).reference_files[lesson.entrypoint])
             await pilot.pause()
             await pilot.press("f5")
             await app.workers.wait_for_complete()
@@ -112,7 +112,10 @@ async def test_new_topics_are_reachable_and_complete_both_stages(tmp_path, ident
     restored = Store(tmp_path)
     assert restored.status(lesson) == "completed"
     assert restored.entry(lesson)["code"] == lesson.solution
-    assert restored.entry(lesson)["repair"]["code"] == lesson.solution
+    assert (
+        restored.entry(lesson)["repair"]["code"]
+        == (lesson.stage_contract("repair").reference_files[lesson.entrypoint])
+    )
     restored.close()
 
 

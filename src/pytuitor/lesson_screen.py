@@ -120,7 +120,7 @@ class LessonScreen(TutorScreen):
                             classes="topic-preview",
                         )
                     yield Markdown(self.lesson.body, id="lesson-markdown")
-                    yield Static(id="stage-instructions", classes="stage-instructions")
+                    yield Markdown(id="stage-instructions", classes="stage-instructions")
                     yield Static(
                         "OPTIONAL: CHECK YOUR UNDERSTANDING",
                         classes="eyebrow",
@@ -323,8 +323,8 @@ class LessonScreen(TutorScreen):
             else "This separate program contains a mistake. Run and Check to investigate, then "
             "fix it to meet the requirements. Your Build draft is saved separately."
         )
-        self.query_one("#stage-instructions", Static).update(
-            f"STAGE {1 if self.stage == 'build' else 2} OF 2 · {self.stage.upper()}\n"
+        self.query_one("#stage-instructions", Markdown).update(
+            f"### STAGE {1 if self.stage == 'build' else 2} OF 2 · {self.stage.upper()}\n\n"
             + (self.stage_contract().instructions or default_instructions)
         )
         self.query_one("#next", Button).label = "Repair →" if self.stage == "build" else "Next →"

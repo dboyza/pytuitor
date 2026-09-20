@@ -33,7 +33,7 @@ Verify implementation details against code.
 - Distinguish variables/values, print/return, and user input/prompt text.
 - Verify correct reference programs pass and broken Repair programs fail meaningfully.
 - Accept valid alternative implementations; test observable behavior rather than source spelling.
-- Keep prose, hints, checks, repair code, and references synchronized.
+- Keep prose, hints, checks, repair code, and references synchronized; preserve full contracts when moving prose, and bump revisions when stage behavior changes.
 
 ## Interaction contracts
 

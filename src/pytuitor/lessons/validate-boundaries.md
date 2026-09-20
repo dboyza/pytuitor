@@ -10,3 +10,7 @@ It can return `True` or `False` instead of raising an error.
 Boolean operators combine conditions.
 `a and b` is true when both conditions are true; `a or b` is true when at least one is true; `not a` reverses the truth value.
 `part in text` asks whether one string occurs inside another.
+
+`text.isalpha()` is true when all characters are letters and text is nonempty.
+`text.isalnum()` also allows digits, including letters and digits from other languages.
+Neither method accepts an underscore; allow that character explicitly when your rules need it.

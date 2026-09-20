@@ -142,7 +142,8 @@ ModalScreen { align: center middle; background: #000000 60%; }
 
 #stage-navigation { height: 3; margin: 0 3; }
 #stage-navigation Button { margin-right: 1; width: 1fr; }
-.stage-instructions { height: auto; padding: 1; background: #222629; color: #ffd343; }
+.stage-instructions { height: auto; margin-top: 1; padding: 1; border-left: thick #ffd343; background: #222629; color: #eee9e0; }
+.stage-instructions MarkdownH3 { color: #ffd343; margin: 0 0 1 0; }
 #reading-panel, #editor, #console-pane { border: solid transparent; }
 #reading-panel:focus, #reading-panel:focus-within,
 #editor:focus, #console-pane:focus-within { border: solid #3776ab; }

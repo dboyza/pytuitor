@@ -19,3 +19,9 @@ def tidy_title(text):
 
 print(tidy_title("  Night   sky  "))
 ```
+
+## Title case
+
+`.title()` uppercases the first letter of each word and lowercases the remaining letters.
+It starts a new word after punctuation too: `"DON'T stop".title()` gives `"Don'T Stop"`.
+It does not clean up whitespace, so use split and join first when spacing matters.

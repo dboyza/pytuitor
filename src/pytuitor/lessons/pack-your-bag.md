@@ -56,4 +56,6 @@ for amount in input("Coins in each pouch: ").split():
     pouches.append(int(amount))
 ```
 
+A **method** is an operation called through a value with a dot, such as `text.split()`.
+`pouches.append(value)` adds one value to the end of the list.
 After entering `2 5 1`, `pouches` contains `[2, 5, 1]`.

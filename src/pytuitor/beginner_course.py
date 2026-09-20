@@ -2096,7 +2096,7 @@ def _refresh_stages(lessons):
         refreshed.append(
             replace(
                 lesson,
-                body=lesson_text(lesson.id),
+                revision=5,
                 repair=repair.starter_files[lesson.entrypoint],
                 checks=build.checks,
                 hints=build.hints,
