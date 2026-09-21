@@ -39,6 +39,8 @@ def clean_environment(home: str, *, temporary: bool = False) -> dict[str, str]:
 
 async def terminate_group(process: asyncio.subprocess.Process) -> None:
     """Join the parent and kill descendants even if the parent already exited."""
+    if process.stdin is not None:
+        process.stdin.close()
     with contextlib.suppress(ProcessLookupError):
         if os.name == "nt":
             process.kill()  # Closing the launcher job kills its descendants too.

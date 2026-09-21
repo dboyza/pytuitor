@@ -20,6 +20,8 @@ class ObservedApp(TutorApp):
     def record_state(self):
         screen = self.screen
         lesson = isinstance(screen, LessonScreen)
+        if lesson and (not screen.is_mounted or not screen.query("#editor")):
+            return  # Observe only complete mounts, never interrupt a screen transition.
         observation = {
             "screen": type(screen).__name__,
             "pane": getattr(screen, "active_pane", "dashboard"),
