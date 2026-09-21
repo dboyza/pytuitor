@@ -5,6 +5,7 @@ from dataclasses import replace
 from pytuitor.beginner_extensions import INSERT_AFTER
 from pytuitor.beginner_extensions import LESSONS as EXTRA_LESSONS
 from pytuitor.beginner_stage_refresh import BUILD_INSTRUCTIONS, REPAIR_STAGES
+from pytuitor.checkpoints import apply_checkpoints
 from pytuitor.legacy import LESSONS as LEGACY
 from pytuitor.models import (
     Chapter,
@@ -1501,10 +1502,10 @@ add(
 _FOUNDATION_STAGES = {
     "first-light": (
         stage_contract(
-            "Build a two-line welcome display. Print `Welcome, explorer!` first. "
+            "Build a two-line display. Print the exact text `Hello, world!` first. "
             "Print the result of `8 + 5` second. Keep text quoted and arithmetic unquoted.",
             """
-            print("Welcome, explorer!")
+            print("Hello, world!")
             print(8 + 5)
             """,
             "",
@@ -1512,8 +1513,8 @@ _FOUNDATION_STAGES = {
                 case(
                     "Welcome display",
                     "__stdout__.strip().splitlines()",
-                    ["Welcome, explorer!", "13"],
-                    output="Welcome, explorer!\n13",
+                    ["Hello, world!", "13"],
+                    output="Hello, world!\n13",
                     nudge="Check the quotes around the greeting and leave 8 + 5 outside quotes.",
                 ),
             ),
@@ -1523,31 +1524,33 @@ _FOUNDATION_STAGES = {
             ),
         ),
         stage_contract(
-            "Repair a three-line scoreboard. It must print `Scoreboard`, then the result of "
-            "`4 + 3`, then the result of `4 + 3 + 2`. Investigate the order and arithmetic "
-            "before changing the supplied program.",
+            "Repair a three-line event sign. It must print `Today's plan`, then `Bring water`, "
+            "then `Start at 9`. Run the supplied program to investigate the mistake before "
+            "changing it.",
             """
-            print("Scoreboard")
-            print(4 + 3)
-            print(4 + 3 + 2)
+            print("Today's plan")
+            print("Bring water")
+            print("Start at 9")
             """,
             """
-            print("Scoreboard")
-            print(4 + 3 + 2)
-            print(4 + 3)
+            print("Today's plan")
+            print("Bring water)
+            print("Start at 9")
             """,
             (
                 case(
-                    "Scoreboard sequence",
+                    "Event sign",
                     "__stdout__.strip().splitlines()",
-                    ["Scoreboard", "7", "9"],
-                    output="Scoreboard\n7\n9",
-                    nudge="Compare the two arithmetic results and print 4 + 3 before 4 + 3 + 2.",
+                    ["Today's plan", "Bring water", "Start at 9"],
+                    output="Today's plan\nBring water\nStart at 9",
+                    nudge=(
+                        "Read the syntax error and compare the punctuation around each text value."
+                    ),
                 ),
             ),
             (
-                "Use three print calls in the required order.",
-                "The third line adds 2 to the first arithmetic result, so it should display 9.",
+                "Read the error output first and inspect the line it identifies.",
+                "Compare the opening and closing punctuation on each printed text value.",
             ),
         ),
     ),
@@ -2037,7 +2040,7 @@ def foundation_lesson(identifier):
         legacy.explanation if legacy else "",
         build.reference_files["lesson.py"],
         project=project,
-        revision=4,
+        revision=5,
         chapter_id="b-foundations",
         files=build.files,
         solution_files=build.reference_files,
@@ -2112,3 +2115,5 @@ def _refresh_stages(lessons):
 
 
 LESSONS = _refresh_stages(LESSONS)
+
+LESSONS = apply_checkpoints(LESSONS)

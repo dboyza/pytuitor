@@ -28,19 +28,3 @@ def surround(text, left, right):
 quote = partial(surround, left='"', right='"')
 print(quote("hello"))
 ```
-
-## Build
-
-Write `rank(records, key)` to return a new list sorted by the supplied one-argument callable.
-Accept finite one-pass iterables, preserve equal-key order, and leave a caller's list unchanged.
-Empty input returns `[]`.
-Write `make_scaler(factor)` to return a reusable callable accepting one numeric value and multiplying it by the numeric factor.
-Negative values and zero are allowed.
-For example, `make_scaler(3)(4)` returns `12`: the first pair of parentheses creates the callable, and the second calls it with `4`.
-A closure, partial application, or another equivalent callable is valid.
-Do not print or read input.
-
-## Repair
-
-The sorter ignores its key, and the scaler adds instead of multiplying.
-Fix both contracts.

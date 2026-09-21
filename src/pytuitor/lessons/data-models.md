@@ -27,18 +27,10 @@ Value equality compares field values, unlike the identity comparison `is`.
 Annotations describe intended types but do not automatically validate values.
 A hand-written class with equivalent behavior is also valid.
 
-## Build
+## Validate related fields
 
-Implement `Item(name, quantity)` with accessible `name` and `quantity` attributes and value equality.
-Names are strings and initial quantities are nonnegative integers.
-Its method `restock(amount)` accepts an integer, returning a new Item with the same name and its quantity increased by amount.
-Never change the original Item.
-Reject negative amounts with `ValueError`; zero is valid and still returns a new Item.
-For example, restocking `Item('washers', 8)` by two produces an Item with quantity ten while the original remains eight.
-Two Items with the same name and quantity must compare equal.
-Do not print.
-
-## Repair
-
-Repair mutates an existing object, surprising callers holding another reference to it.
-Return a new object for an update and restore the invalid-amount check.
+`__post_init__` runs after a dataclass constructor assigns its fields.
+It can reject an invalid relationship by raising ValueError, even in a frozen dataclass.
+`max(a, b)` selects the larger value, and `min(a, b)` the smaller.
+For intervals, a shared endpoint still belongs to both intervals; only a strict gap means there is no overlap.
+A method may return a new value or None to represent that absence without mutating its operands.

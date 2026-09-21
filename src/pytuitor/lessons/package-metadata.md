@@ -34,17 +34,3 @@ Use `import tomllib` to load Python's standard-library TOML reader, available si
 For the example above, `tomllib.loads(text)["project"]["name"]` is `"small-report"`.
 `project.get("dependencies", [])` supplies an empty list when that field is absent.
 It does not install packages or evaluate arbitrary Python code.
-
-## Build
-
-Write `package_summary(text)`.
-Input is valid TOML with a project table containing string name and version fields and an optional list of dependency strings.
-Return a dictionary with exactly `name`, `version`, and `dependencies`.
-Copy the name and version, and return dependencies sorted using Python's normal string ordering; if absent, use an empty list.
-Do not install anything or print.
-The checks teach metadata inspection; an actual packaging release also requires building and installing its wheel in a clean environment.
-
-## Repair
-
-Repair assumes an optional field always exists and preserves arbitrary dependency order.
-Apply the same contract as Build.

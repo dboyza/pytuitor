@@ -3,14 +3,24 @@
 import ast
 
 import pytest
-from textual.widgets import Button, Markdown, Select, TextArea
+from textual.widgets import Button, Select, Static, TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import BY_ID, default_input
 from pytuitor.runner import execute
 
 
-@pytest.mark.parametrize("identifier", ["pack-your-bag", "task-workspace", "comparing-sets"])
+@pytest.mark.parametrize(
+    "identifier",
+    [
+        "pack-your-bag",
+        "task-workspace",
+        "comparing-sets",
+        "first-light",
+        "typed-contracts",
+        "plugin-system",
+    ],
+)
 async def test_old_passes_are_invalidated_without_losing_drafts(tmp_path, identifier):
     lesson = BY_ID[identifier]
     app = TutorApp(tmp_path)
@@ -57,7 +67,7 @@ async def test_refreshed_projects_through_both_editors_and_saved_stages(tmp_path
             assert screen.stage == name
             contract = lesson.stage_contract(name)
             assert set(screen.project_files()) == set(contract.files)
-            assert screen.query_one("#stage-instructions", Markdown).query("MarkdownH3")
+            assert name.upper() in str(screen.query_one("#stage-heading", Static).content)
             if name == "repair":
                 await pilot.press("f5")
                 await app.workers.wait_for_complete()

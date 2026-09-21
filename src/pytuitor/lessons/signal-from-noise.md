@@ -1,21 +1,13 @@
-## Build a log analyzer
-
 A **log** is a sequence of messages recording what a program did.
 A message's **severity** identifies how serious it is, such as informational, warning, or error.
-Write a program that counts messages in each category and displays a JSON report.
-Use only Python's standard library, so the exported program can run without extra packages.
+Line-oriented reports are useful because a program can process a large log without first copying every line into a list.
 
-`import sys` makes standard input available as `sys.stdin`.
-It is an iterable of text lines; a `for` loop reads until end-of-input.
-`import json` gives you `json.dumps(value)`, which converts a dictionary into JSON text.
+`sys.stdin` is an iterable of text lines.
+A `for` loop can read those lines one at a time until the input ends.
+`json.dumps(value)` converts a Python dictionary into JSON text that another program can read reliably.
 
-## Implement the counting function
-
-`summarize(lines)` should return a dictionary with exactly these keys: `"INFO"`, `"WARNING"`, and `"ERROR"`.
-Start every count at zero, including levels that never appear.
-Each valid line contains a level, whitespace, and a nonempty message.
-Ignore empty lines, unknown levels, and lines with no message.
-Allow surrounding whitespace and normalize the level to uppercase.
+`str.strip()` removes surrounding whitespace.
+`str.split(maxsplit=1)` separates a leading field from the rest of a line while preserving spaces inside the message.
 
 ```python
 line = " warning   low disk "
@@ -24,28 +16,12 @@ print(parts)
 ```
 
 This gives `['warning', 'low disk']`.
-`.strip()` removes whitespace from the ends; `.split(maxsplit=1)` separates the level from the rest of the message.
-`parts[0].upper()` gives `WARNING`.
-Check that `len(parts) == 2` before accessing the message.
-`level in counts` checks whether a dictionary contains that key.
-`counts[level] += 1` increments the corresponding count.
-Process the input iterable once without converting it to a list.
+Check the number of fields before accessing a message field.
+Normalize a severity field before looking it up in a fixed set of report categories.
+Keep parsing separate from the command-line entry point so callers can provide any iterable of lines.
 
-## Add a command-line entry point
+Python sets `__name__` to `"__main__"` when running a file directly.
+An `if __name__ == "__main__":` guard prevents an imported module from unexpectedly reading standard input or printing output.
 
-Implement `main()` to pass `sys.stdin` to `summarize`, then print the result using `json.dumps`.
-At the bottom of your program, write `if __name__ == "__main__":` and put an indented `main()` call underneath it.
-Python sets `__name__` to `"__main__"` when running the file directly; when another file imports it, the guarded call does not run.
-
-Use Run, type log lines into the console, and press Enter after each line.
-Press **Ctrl+D** in the console to signal end-of-input and see the report.
-Check supplies example logs automatically.
-
-## Try it on a real file
-
-Use **Ctrl+P**, search for **Export code**, and press Enter.
-In your regular terminal, run the exported file with `python your_export.py < app.log`.
-The shell's `<` supplies the contents of `app.log` as standard input.
-
-As an optional follow-up outside this exercise, add automated tests for `summarize`.
-Packaging can also provide a **console entry point**, an installed terminal command that calls a chosen Python function.
+In a regular terminal, shell redirection such as `python report.py < app.log` supplies a file as standard input.
+The same standard-library approach can support other line-oriented reports without installing packages.

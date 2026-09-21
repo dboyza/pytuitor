@@ -38,6 +38,6 @@ async def test_errors_are_actionable_and_next_run_recovers():
 
 async def test_run_does_not_mark_passing_checks():
     result = await execute(LESSONS[0], LESSONS[0].solution, check=False)
-    assert result.output == "Welcome, explorer!\n13\n"
+    assert result.output == "Hello, world!\n13\n"
     assert not result.passed
     assert result.checks == []

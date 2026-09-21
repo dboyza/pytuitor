@@ -24,19 +24,3 @@ An empty string is false in a condition, while every nonempty string is true, in
 A value is **truthy** when Python treats it as true in a condition and **falsy** when Python treats it as false.
 `a or b` evaluates to `a` when `a` is truthy; otherwise it evaluates to `b`.
 It does not necessarily return a Boolean.
-
-## Build
-
-Write `display_name(value)`.
-Its argument is either `None` or a string.
-Return `"Anonymous"` for `None` or a string containing only whitespace.
-Otherwise return the string with surrounding whitespace removed, preserving its case and internal spaces.
-For example, `display_name("  Ravi Shah  ")` returns `"Ravi Shah"`.
-The string `"0"` must remain `"0"`.
-Define the function without asking for input or printing.
-Checks call it with several arguments; Run can be used with your own temporary print calls.
-
-## Repair
-
-After Build passes, repair the supplied implementation to meet the same contract.
-Consider what converting `None` to a string actually produces.

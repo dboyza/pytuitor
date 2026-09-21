@@ -29,21 +29,10 @@ The returned `cls` is the new class object; return it after adding or checking a
 The metaclass can also be called directly, such as `NamedMeta('Report', (), {})`.
 Checking namespace distinguishes an attribute explicitly defined by this class from one inherited from a parent.
 
-## Build
+## Read class creation in order
 
-Implement `RegistryMeta(type)` with an initially empty class dictionary `registry`.
-Its `__new__` must create the class using the normal type machinery.
-Declared kind values are strings or None.
-If that class body explicitly declares a non-None `kind` string, register the new class under that string.
-If the key already exists, raise `ValueError` without replacing the existing registration.
-Classes without an explicit kind, including subclasses that only inherit one, are not registered.
-For `class Csv(metaclass=RegistryMeta): kind = 'csv'`, `RegistryMeta.registry['csv']` must be Csv itself.
-Do not define example classes at module level in your answer, since the registry must initially be empty.
-Do not print.
-
-## Repair
-
-Repair registers class names regardless of the declared contract.
-Register only kinds declared in the new class body and reject duplicate keys.
-
-The [class creation reference](https://docs.python.org/3.11/reference/datamodel.html#customizing-class-creation) explains the complete sequence.
+A class statement first prepares a namespace containing its directly declared attributes.
+A metaclass receives the class name, base classes, and that namespace, then creates the class object.
+Checking the namespace distinguishes a new declaration from an inherited attribute.
+If class creation updates a registry, validate a duplicate before changing the registry so a refused class cannot replace a working registration.
+Prefer a plain dictionary or `__init_subclass__` when they express the same need more directly.

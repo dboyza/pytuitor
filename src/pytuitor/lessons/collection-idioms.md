@@ -23,19 +23,3 @@ An **iterable** supplies items to a loop, as lists and tuples do.
 An **iterator** supplies items one at a time and remembers how far it has advanced.
 A one-pass iterator cannot start over after its items have been read.
 A function accepting any iterable therefore cannot assume indexing or a second traversal will work.
-
-## Build
-
-Write `group_names(pairs)`.
-Each pair contains a group string and a name string.
-Return a dictionary mapping each group to its distinct names in first-seen order.
-Keep groups in their first-seen order too.
-Names are case-sensitive and already cleaned; preserve each supplied string exactly.
-For example, `[('team', 'Mina'), ('team', 'Sol'), ('team', 'Mina')]` becomes `{'team': ['Mina', 'Sol']}`.
-Accept an empty iterable and a one-pass iterator.
-Do not mutate the input or print.
-
-## Repair
-
-The broken comprehension replaces earlier names when a group appears again.
-Repair the accumulation while retaining the order and uniqueness requirements.

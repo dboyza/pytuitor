@@ -22,6 +22,7 @@ from pytuitor.learning_tools import (
     error_guidance,
 )
 from pytuitor.models import StageContract
+from pytuitor.progress_types import CheckEvent, DraftState, StageName
 from pytuitor.runner import ConsoleSession, execute
 from pytuitor.ui import CodeEditor, TutorScreen, brand
 from pytuitor.workspace import WorkspaceError, environment_python, export_workspace, validate_files
@@ -43,6 +44,7 @@ class LessonScreen(TutorScreen):
         Binding("ctrl+t", "cycle_pane(1)", "Pane", priority=True, key_display="^t"),
         Binding("f6", "cycle_pane(1)", "Next pane", priority=True, show=False),
         Binding("shift+f6", "cycle_pane(-1)", "Previous pane", priority=True, show=False),
+        Binding("f4", "focus_exercise", "Exercise", priority=True, show=False),
         Binding("f7", "question", "Question", priority=True, show=False),
         Binding("ctrl+n", "next", "Next lesson", priority=True, show=False),
         Binding("f8", "stop", "Stop", priority=True, show=False),
@@ -60,8 +62,8 @@ class LessonScreen(TutorScreen):
         self.transcript = ""
         self.suspend_saves = False
         self.run_serial = 0
-        self.stage = "build"
-        self.check_results = {}
+        self.stage: StageName = "build"
+        self.check_results: dict[int, CheckEvent] = {}
         self.active_file = lesson.entrypoint
         self.run_files = {}
         self.last_run_sources = {}
@@ -120,7 +122,6 @@ class LessonScreen(TutorScreen):
                             classes="topic-preview",
                         )
                     yield Markdown(self.lesson.body, id="lesson-markdown")
-                    yield Markdown(id="stage-instructions", classes="stage-instructions")
                     yield Static(
                         "OPTIONAL: CHECK YOUR UNDERSTANDING",
                         classes="eyebrow",
@@ -137,6 +138,11 @@ class LessonScreen(TutorScreen):
                     yield Button("Next hint  ·  F1", id="hint")
                     yield Button("Reveal reference solution", id="solution")
             with Vertical(id="workbench"):
+                with Vertical(id="exercise-card"):
+                    yield Static(id="stage-heading", classes="exercise-heading")
+                    yield Static(id="stage-transition", classes="exercise-transition")
+                    with VerticalScroll(id="exercise-scroll"):
+                        yield Markdown(id="stage-instructions", classes="stage-instructions")
                 with Horizontal(id="file-toolbar", classes="file-label"):
                     yield Select(
                         [(name, name) for name in sources],
@@ -164,6 +170,7 @@ class LessonScreen(TutorScreen):
                         id="console-status",
                         classes="eyebrow",
                     )
+                    yield Static("", id="check-summary", markup=False)
                     with VerticalScroll(id="results-scroll"):
                         yield Static(
                             "Run your program to see its output here.\n"
@@ -192,6 +199,7 @@ class LessonScreen(TutorScreen):
         self.apply_layout()
         self.show_hints()
         self.update_stage_ui()
+        self.query_one("#stage-transition").display = False
         entry = self.store.entry(self.lesson)
         if entry.get("prediction") is True:
             self.query_one("#prediction-feedback", Static).update(
@@ -281,7 +289,9 @@ class LessonScreen(TutorScreen):
     def action_solution(self) -> None:
         self.stage_entry()["solution_seen"] = True
         self.tutor.persist()
-        self.app.push_screen(SolutionDialog(self.lesson, self.stage_contract()))
+        self.app.push_screen(
+            SolutionDialog(self.lesson, self.stage_contract(), self.capture_editor())
+        )
 
     @property
     def environment_path(self):
@@ -291,7 +301,7 @@ class LessonScreen(TutorScreen):
     def action_environment(self) -> None:
         self.app.push_screen(EnvironmentDialog(self.environment_path))
 
-    def stage_entry(self) -> dict:
+    def stage_entry(self) -> DraftState:
         root = self.store.entry(self.lesson)
         return root if self.stage == "build" else root.setdefault("repair", {})
 
@@ -323,9 +333,13 @@ class LessonScreen(TutorScreen):
             else "This separate program contains a mistake. Run and Check to investigate, then "
             "fix it to meet the requirements. Your Build draft is saved separately."
         )
+        self.query_one("#stage-heading", Static).update(
+            "1 OF 2 · BUILD · WRITE AND CHECK"
+            if self.stage == "build"
+            else "2 OF 2 · REPAIR · INVESTIGATE AND FIX"
+        )
         self.query_one("#stage-instructions", Markdown).update(
-            f"### STAGE {1 if self.stage == 'build' else 2} OF 2 · {self.stage.upper()}\n\n"
-            + (self.stage_contract().instructions or default_instructions)
+            self.stage_contract().instructions or default_instructions
         )
         self.query_one("#next", Button).label = "Repair →" if self.stage == "build" else "Next →"
         self.query_one("#next", Button).disabled = not self.stage_passed(self.stage)
@@ -334,15 +348,17 @@ class LessonScreen(TutorScreen):
     def choose_stage(self, event: Button.Pressed) -> None:
         self.switch_stage(event.button.id.removeprefix("stage-"))
 
-    def switch_stage(self, stage: str) -> None:
+    def switch_stage(self, stage: StageName) -> None:
         if stage == self.stage or self.running:
             return
         if stage == "repair" and not self.stage_passed("build"):
             return
+        repair_saved = "code" in self.store.entry(self.lesson).get("repair", {})
         self.save_draft()
         if self.save_timer:
             self.save_timer.stop()
         self.stage = stage
+        self.check_results = {}
         self.run_files = {}
         self.query_one("#run-files").display = False
         self.store.entry(self.lesson)["stage"] = stage
@@ -356,8 +372,21 @@ class LessonScreen(TutorScreen):
                 if stage == "build"
                 else "Repair program loaded. Run to investigate the mistake, then Check your fix."
             )
+        self.query_one("#check-summary", Static).update("")
         self.query_one("#console-status", Static).update(f"{stage.upper()} · READY")
         self.update_stage_ui()
+        transition = self.query_one("#stage-transition", Static)
+        transition.update(
+            (
+                "Saved Repair draft restored. Build saved."
+                if repair_saved
+                else "New Repair program loaded. Build saved."
+            )
+            if stage == "repair"
+            else "Saved Build draft restored."
+        )
+        transition.display = True
+        self.query_one("#exercise-scroll", VerticalScroll).scroll_home(animate=False)
         self.show_hints()
         self.save_draft()
         self.select_pane("editor")
@@ -399,6 +428,10 @@ class LessonScreen(TutorScreen):
                 self.apply_layout()
                 break
 
+    def action_focus_exercise(self) -> None:
+        self.select_pane("editor")
+        self.query_one("#exercise-scroll", VerticalScroll).focus()
+
     def action_focus_editor(self) -> None:
         self.select_pane("editor")
 
@@ -426,6 +459,15 @@ class LessonScreen(TutorScreen):
         if "code" not in entry:
             entry["revision"] = self.lesson.revision
         self.capture_editor()
+        self.update_stage_ui()
+        if (
+            not self.running
+            and self.check_results
+            and entry.get("checked_files") != self.project_files()
+        ):
+            self.query_one("#check-summary", Static).update(
+                "Draft changed. Check again to verify your current work."
+            )
         self.query_one("#save-status", Static).update("Saving…")
         if self.save_timer:
             self.save_timer.stop()
@@ -524,6 +566,7 @@ class LessonScreen(TutorScreen):
                 ),
             )
         )
+        self.query_one("#check-summary", Static).update("")
         self.select_pane("console")
         self.execution = self.run_code(check, self.run_serial, self.capture_editor())
 
@@ -559,7 +602,7 @@ class LessonScreen(TutorScreen):
             self.append_output("\n[end of input]\n")
             self.query_one("#console-input", Input).disabled = True
 
-    def show_check(self, case: dict) -> None:
+    def show_check(self, case: CheckEvent) -> None:
         if not self.is_mounted or self.suspend_saves or not self.query("#results"):
             return
         self.check_results[case["number"]] = case
@@ -631,10 +674,12 @@ class LessonScreen(TutorScreen):
                 for case in result.checks:
                     self.check_results[case["number"]] = case
                 self.render_checks()
+                summary = self.query_one("#check-summary", Static)
                 if result.error:
                     lines.extend(["Execution stopped:", result.error])
                 if result.passed:
                     if source != self.capture_editor():
+                        summary.update("Draft changed. Check your latest edits again.")
                         lines.append(
                             "Checks passed for an earlier draft. Check your latest changes again."
                         )
@@ -644,14 +689,23 @@ class LessonScreen(TutorScreen):
                         entry["checked_files"] = source
                         entry["checked_revision"] = self.lesson.revision
                         if self.mark_complete():
+                            summary.update("Both stages passed. Next: choose Next to continue.")
                             lines.append(
                                 "✓ LESSON COMPLETE · Both stages passed. "
                                 "Ctrl+N for the next lesson."
                             )
                         else:
+                            summary.update(
+                                "Build passed. Next: choose Repair to investigate a new program."
+                            )
                             lines.append("✓ BUILD PASSED · Ctrl+N or Repair → opens stage 2.")
                         self.tutor.persist()
                 else:
+                    failed = next((case for case in result.checks if not case.get("passed")), None)
+                    summary.update(
+                        "Next: "
+                        + (failed["nudge"] if failed else "Read the error, edit, and Check again.")
+                    )
                     lines.append(
                         "Some checks did not pass. Review the results above, edit, and Check again."
                     )

@@ -29,19 +29,3 @@ async def lengths():
 A normal `for` cannot consume an async generator.
 `async for` belongs inside an async function and may suspend between iterations.
 Returning a final list is appropriate when the contract needs the whole finite result; streaming outputs would instead call for another async generator.
-
-## Build
-
-Write `async def collect_nonempty(source)`.
-The source is a finite async iterable of strings.
-Strip surrounding whitespace from each string, discard empty results, and return a list of the remaining strings in source order.
-Preserve duplicates and internal whitespace.
-Empty input returns `[]`.
-For an async source yielding `'  east '`, `' '`, and `'west'`, return `['east', 'west']`.
-Allow source exceptions to propagate.
-Do not print, modify the source, or run a new event loop inside the function.
-
-## Repair
-
-Repair already uses `async for`, but does not remove surrounding whitespace or discard empty results.
-Fix that behavior while keeping the async interface.

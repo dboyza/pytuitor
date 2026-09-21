@@ -41,19 +41,3 @@ class Temperature:
 
 The underscore is a convention for internal storage, not access enforcement.
 Validate before assigning so rejected updates leave the previous state intact.
-
-## Build
-
-Define `Score(points)` for nonnegative integers, with a readable and writable `points` property.
-Reject negative initialization or assignment with `ValueError`, leaving an existing value unchanged after a rejected update.
-You may assume supplied point values are integers.
-`repr(Score(3))` must be `'Score(3)'`, and `len(score)` must equal its points.
-Two scores compare equal exactly when their points match; a score is unequal to a plain integer.
-Adding two scores returns a new score with their summed points and changes neither operand.
-Adding a score and an unsupported type must raise `TypeError`.
-Do not print or read input.
-
-## Repair
-
-The current object accepts invalid updates, compares everything equal, and mutates the left operand during addition.
-Restore the value contracts and useful representation.

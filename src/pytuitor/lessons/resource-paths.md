@@ -22,20 +22,3 @@ Catch only exceptions your application can recover from; a permissions error is 
 For data delivered inside an installed package, `importlib.resources.files(package)` locates that package's resources, such as bundled text files.
 This avoids assuming that the user is running from the source-code directory.
 The exercise below instead receives an explicit file path.
-
-## Build
-
-Write `read_settings(path)` accepting a string path or a Path object.
-Read UTF-8 text and parse it as JSON.
-Return the parsed dictionary if the top-level value is an object.
-Return `{}` only when the file does not exist.
-Raise `ValueError` for a valid JSON value that is not a dictionary.
-Let malformed JSON errors and other filesystem errors propagate.
-Do not write to the file, change directories, or print.
-For a file containing `{"theme": "blue"}`, return `{'theme': 'blue'}`.
-Checks create their own temporary files, so you do not need to prepare sample data before pressing Check.
-
-## Repair
-
-Repair's broad handler converts every failure into apparently valid empty settings.
-Treat a missing file differently from invalid JSON text or JSON containing the wrong kind of value.

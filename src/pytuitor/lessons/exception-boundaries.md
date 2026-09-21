@@ -30,19 +30,3 @@ try:
 finally:
     handle.close()
 ```
-
-## Build
-
-Define `RecordError` as a subclass of `ValueError`.
-Write `parse_record(text)` accepting a string and returning its `int` conversion, including whitespace, signs, and zero.
-Translate a conversion `ValueError` into `RecordError` with the original exception as its explicit cause; the message is your choice.
-Write `read_record(stream)` to call `stream.read()` once and pass its result to `parse_record`.
-Always call `stream.close()` once after attempting the read, whether reading or parsing succeeds or fails.
-Return the parsed integer on success; let reading errors such as `OSError` propagate unchanged.
-Assume `close()` succeeds.
-The stream is supplied by the caller; do not open files, print, or read console input.
-
-## Repair
-
-Invalid records currently expose the raw conversion error, and a failure prevents cleanup.
-Restore the custom exception, original cause, and unconditional closing.

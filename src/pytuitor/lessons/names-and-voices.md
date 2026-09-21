@@ -66,15 +66,8 @@ This displays `Welcome, Ada!`.
 Python replaces `{student}` with `Ada` when it creates the string.
 The braces are not displayed.
 
-## Exercise
+## Practice in the workspace
 
-Ask for the user's name and store the answer in `student`.
-Create a variable called `greeting` containing `Welcome, `, their name, and `!`.
-Print the greeting.
-
-Use Run to try your own name in the console.
-Then use Check: it tests several names automatically.
-A **hard-coded** greeting uses one fixed name instead of the answer from `input()`, so it will not pass.
-
-After Build passes, Repair uses two answers to create a mailing label.
-It checks that the label changes when both the given name and city change.
+Use the active exercise panel beside the editor for the current task requirements.
+Use Run to try different answers in the console, then use Check to compare your program with several cases.
+A hard-coded message uses one fixed value instead of the answer from `input()`, so it cannot respond to new answers.

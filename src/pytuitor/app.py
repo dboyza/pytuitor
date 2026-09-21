@@ -57,6 +57,8 @@ class TutorApp(App):
     def persist(self) -> bool:
         try:
             self.store.save()
+            if self.store.durability_warning:
+                self.notify(self.store.durability_warning, severity="warning", timeout=10)
             return True
         except OSError as exc:
             self.notify(f"Could not save progress: {exc}", severity="error", timeout=10)
@@ -124,9 +126,15 @@ class TutorApp(App):
         self.switch_screen(Onboarding())
 
     def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
+        from pytuitor.dialogs import ExecutionInfo
         from pytuitor.screens import LessonScreen
         from pytuitor.setup import Onboarding
 
+        yield SystemCommand(
+            "Execution and privacy",
+            "Understand local code access and explicit network actions",
+            lambda: self.push_screen(ExecutionInfo()),
+        )
         yield SystemCommand(
             "Dashboard", "Continue your chapter or revisit lessons", self.action_dashboard
         )
@@ -166,6 +174,11 @@ class TutorApp(App):
             )
             yield SystemCommand(
                 "Focus lesson", "Read and scroll the explanation", screen.action_focus_lesson
+            )
+            yield SystemCommand(
+                "Exercise requirements",
+                "Focus and scroll the complete stage specification",
+                screen.action_focus_exercise,
             )
             yield SystemCommand("Focus editor", "Write Python code", screen.action_focus_editor)
             yield SystemCommand(

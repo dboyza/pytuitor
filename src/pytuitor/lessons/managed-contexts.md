@@ -35,18 +35,3 @@ with Announce("report") as announcement:
 Use suppression only for a narrow, deliberate contract.
 `issubclass(error_type, ValueError)` includes subclasses; guard against `None` first.
 If `__enter__` raises, Python does not call `__exit__` on that manager.
-
-## Build
-
-Define `Closing(resource)` as a context manager returning the supplied resource from `__enter__`.
-After the body, call its `close()` exactly once on normal and exceptional exits, and suppress no exceptions.
-Assume closing succeeds, and use a manager for only one `with` statement.
-Also define `IgnoreValueError()` as a context manager suppressing only `ValueError` and its subclasses.
-It must permit normal exit and propagate unrelated exceptions.
-Do not print, open files, or read input.
-
-## Repair
-
-Closing returns the wrong object, omits cleanup, and hides errors.
-The suppression manager hides every exception.
-Restore cleanup and narrow suppression.

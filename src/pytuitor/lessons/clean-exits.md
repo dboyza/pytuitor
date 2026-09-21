@@ -41,15 +41,3 @@ Putting `*` before it in a function call passes those objects as separate argume
 Calling `gather` with no arguments produces an empty result list when awaited.
 **I/O** means input/output, such as reading from a network connection.
 Async helps when operations can let other work run while waiting for I/O; ordinary blocking calls still prevent the event loop from progressing.
-
-## Exercise
-
-Import `contextmanager` from `contextlib`, then write `def session(events):` with `@contextmanager` directly above it so it appends `"open"` on entry, yields the events list, and always appends `"close"` on exit.
-Use `try`/`finally` so cleanup also happens when the caller raises an error.
-
-Next, write `import asyncio`.
-Define `async def double(value):` with `await asyncio.sleep(0)` followed by `return value * 2`.
-The sleep yields control so other scheduled coroutines can run.
-Then define `async def double_all(values):` using `await asyncio.gather(...)` to call `double` for every value.
-Return results in input order, including an empty list for empty input.
-Schedule all operations together rather than awaiting each one in a loop.

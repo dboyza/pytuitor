@@ -33,19 +33,3 @@ Use the signature information for that question.
 As optional further exploration, **CPython** is the most widely used Python implementation.
 It translates source into **bytecode**, instructions run by its interpreter; `import dis` followed by `dis.dis(fn)` displays those instructions.
 Instruction names and implementation details can change between Python versions, so they should not determine your function's behavior.
-
-## Build
-
-Write `describe_callable(fn)` for an ordinary Python function.
-Return a dictionary with `name` from fn.__name__, `parameters` listing all parameter names in declaration order, and `required` listing only parameters without defaults that are not variadic.
-Include required keyword-only parameters.
-Ignore local variables, annotations, and return values.
-Never execute fn.
-For `def send(message, times=1, *, destination): ...`, required is `['message', 'destination']`.
-An argument-free function produces empty lists.
-Do not print.
-
-## Repair
-
-Repair treats code-object local storage as a complete signature.
-Replace that assumption with inspect's parameter information.

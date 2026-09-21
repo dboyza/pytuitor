@@ -19,18 +19,10 @@ A lazy operation must read only enough input to produce the next requested resul
 Once you yield a mutable object, callers may keep it.
 Reusing and clearing that same list for the next batch would change the caller's previous result too.
 
-## Build
+## Keep a sliding history
 
-Write the generator `batches(items, size)`.
-`size` is an integer and must be positive; raise `ValueError` for zero or negative sizes when iteration starts.
-Yield lists containing up to `size` consecutive items.
-Yield a shorter final list if necessary, but never an empty batch.
-For example, `list(batches('abcde', 3))` is `[['a', 'b', 'c'], ['d', 'e']]`.
-Accept one-pass and infinite iterables while consuming only enough input for the next requested batch.
-Each yielded batch must be a separate list.
-Do not print or read input.
-
-## Repair
-
-Repair currently drops useful data when the final batch is short.
-Restore that behavior and add the argument validation.
+`from collections import deque` imports a double-ended queue.
+`deque(maxlen=2)` keeps at most two values; appending a third automatically discards the oldest.
+For example, after appending `"a"`, `"b"`, and `"c"`, converting the deque to a tuple gives `("b", "c")`.
+A **window** overlaps its predecessor, while a batch starts after the previous batch ends.
+Converting each completed window to a tuple creates a stable snapshot that later appends cannot change.

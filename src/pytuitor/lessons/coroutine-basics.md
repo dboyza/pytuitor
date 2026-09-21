@@ -33,20 +33,10 @@ A long calculation or `time.sleep` blocks the event loop, preventing other tasks
 
 **Parallelism** means executing work at the same instant, for example on multiple processor cores; async alone does not provide that.
 
-## Build
+## Before entering async work
 
-Write `async def delayed_total(values)`.
-Accept a finite iterable of numbers, await `asyncio.sleep(0)` once per value, and return their sum.
-An empty iterable returns zero.
-Accept a one-pass iterator and negative values.
-Do not modify input, print, create your own event loop inside the function, or use `time.sleep`.
-For `[4, -2, 6]`, awaiting the function produces eight.
-The checks call `asyncio.run` for you; Run may use your own temporary script-level demonstration.
-
-## Repair
-
-Repair returns an incorrect total and omits the cooperative await.
-Restore the required total and give other tasks a turn during each iteration.
-
-The [official coroutine guide](https://docs.python.org/3.11/library/asyncio-task.html) provides further examples when you are online.
-All required material is included here.
+You should be comfortable with functions, exceptions, and ordinary iteration before this chapter.
+Review Small superpowers, Handle invalid input, and Loop helpers if returning values or propagating an exception is unfamiliar.
+Calling an `async def` function creates a coroutine object; it does not immediately return the eventual result.
+`asyncio.run(...)` owns an event loop for a standalone program, while `await` is used inside an already-running coroutine.
+Concurrency means overlapping progress at suspension points; it does not imply simultaneous CPU execution.

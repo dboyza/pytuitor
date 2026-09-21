@@ -21,19 +21,3 @@ Unlike `chain`, `product` stores the items from each input before producing pair
 rows = list(zip_longest(["name", "age"], ["Lin"], fillvalue=None))
 outfits = list(product(["blue", "green"], ["small", "large"]))
 ```
-
-## Build
-
-Write `preview(groups, limit)` returning up to `limit` values flattened from an iterable of iterables.
-`limit` is an integer; reject negative values with `ValueError`, and consume no items for zero.
-Never consume more inner values than requested, and support one-pass groups and infinite inner iterables.
-Write `align(left, right)` returning a list of pairs padded with `None` through the longer finite input.
-Write `combinations(left, right)` returning all pairs of values from finite inputs, with the left input changing slowest.
-An empty input produces no combinations.
-Return lists of tuples for pairs; do not print or read input.
-Equivalent implementations are welcome.
-
-## Repair
-
-The preview reads all input before returning, alignment drops unmatched values, and combinations omit pairs.
-Restore each tool's distinct contract.

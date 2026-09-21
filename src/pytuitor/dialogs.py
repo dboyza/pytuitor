@@ -35,6 +35,7 @@ class KeyboardHelp(ModalScreen):
                 "Ctrl+T              Cycle lesson / editor / console\n"
                 "F6 / Shift+F6       Next / previous pane\n"
                 "Ctrl+R              Run interactively\n"
+                "F4                  Focus exercise requirements\n"
                 "F5 or Ctrl+Enter    Check with test inputs\n"
                 "F1                  Reveal a hint\n"
                 "F7                  Focus the lesson question\n"
@@ -111,3 +112,25 @@ class ConfirmReset(ModalScreen[bool]):
     @on(Button.Pressed, "#cancel")
     def action_cancel(self) -> None:
         self.dismiss(False)
+
+
+class ExecutionInfo(ModalScreen):
+    BINDINGS = [Binding("escape", "close", "Close")]
+
+    def compose(self) -> ComposeResult:
+        with VerticalScroll(classes="dialog"):
+            yield Static("Execution and privacy", classes="title")
+            yield Static(
+                "Your lessons and progress stay local. Run and Check execute Python as your "
+                "user, with access to your files and network. Only run code you trust.\n\n"
+                "Temporary workspaces, time limits, output limits, and virtual environments "
+                "help contain mistakes. They are not an operating-system security sandbox.\n\n"
+                "The tutor does not require accounts, send learning telemetry, or download "
+                "packages during lessons. Installing a named package and checking for upgrades "
+                "are explicit network actions."
+            )
+            yield Button("Back to learning", id="close-execution-info")
+
+    @on(Button.Pressed, "#close-execution-info")
+    def action_close(self) -> None:
+        self.dismiss()

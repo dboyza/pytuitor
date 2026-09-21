@@ -26,19 +26,3 @@ from functools import reduce
 
 path = reduce(lambda parent, name: parent + "/" + name, ["notes", "today"], "home")
 ```
-
-## Build
-
-Write `transform_selected(items, predicate, transform)` returning a list of transformed values whose original values satisfy `predicate`.
-Test the predicate before transforming; preserve order and accept finite one-pass iterables.
-Write `fold(items, combine, initial)` applying `combine(accumulator, item)` once per item from left to right.
-Return the final accumulator, or the original initial value for empty input.
-The accumulator need not be numeric.
-For example, `fold([2, 3], lambda acc, x: acc - x, 10)` returns `5`.
-Loops, comprehensions, and library implementations are all valid.
-Do not print or read input.
-
-## Repair
-
-The pipeline keeps every item, and the fold reverses the callback arguments.
-Restore selection and left-to-right accumulation.

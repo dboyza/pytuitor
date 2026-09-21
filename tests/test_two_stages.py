@@ -11,11 +11,9 @@ from pytuitor.screens import Dashboard
 
 
 async def finish(pilot, screen):
-    for _ in range(150):
-        await pilot.pause(0.04)
-        if not screen.running:
-            return
-    raise AssertionError("Check did not finish")
+    await asyncio.wait_for(screen.app.workers.wait_for_complete(), timeout=15)
+    await pilot.pause()
+    assert not screen.running
 
 
 @pytest.mark.parametrize("lesson", LESSONS, ids=lambda lesson: lesson.id)

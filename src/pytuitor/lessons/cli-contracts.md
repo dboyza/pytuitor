@@ -25,21 +25,3 @@ Argparse raises `SystemExit` after printing a usage message for invalid argument
 **Standard output (stdout)** carries normal results, usually from `print`.
 **Standard error (stderr)** carries error messages separately, which helps when another program reads the results.
 Reusable functions should normally return values or raise exceptions so their callers choose how to display them.
-
-## Build
-
-Implement `parse_options(argv)` with argparse.
-`argv` is a list of strings excluding the program name.
-Require one positional argument named `path`.
-Accept `--limit` as an integer with default ten and `--json` as a Boolean flag defaulting to false.
-Return a plain dictionary containing `path`, `limit`, and `json`.
-Options may occur before or after the path.
-A path containing spaces arrives as one list item; do not split it again.
-Zero and negative limits are accepted here, leaving their application meaning to the caller.
-For `['report.txt', '--json']`, return `{'path': 'report.txt', 'limit': 10, 'json': True}`.
-Let argparse handle invalid input and help in its normal way.
-Do not parse arguments at import time.
-
-## Repair
-
-Replace manually reading fixed list positions with parsing that supports the advertised options and ordering.

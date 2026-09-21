@@ -115,7 +115,7 @@ Dashboard.narrow #dashboard-bottom { height: 1; margin-top: 0; }
 #editor:focus { border: none; }
 #execution-actions { height: 3; background: #151719; }
 #execution-actions Button { margin-right: 1; min-width: 8; }
-#console-pane { height: 13; background: #1c1f22; }
+#console-pane { height: 10; max-height: 35%; background: #1c1f22; }
 #console-status { height: 1; margin: 0; padding: 0 1; }
 #console-input { height: 3; border: tall #414749; margin: 0 1; }
 #console-input:focus { border: tall #3776ab; }
@@ -142,7 +142,19 @@ ModalScreen { align: center middle; background: #000000 60%; }
 
 #stage-navigation { height: 3; margin: 0 3; }
 #stage-navigation Button { margin-right: 1; width: 1fr; }
-.stage-instructions { height: auto; margin-top: 1; padding: 1; border-left: thick #ffd343; background: #222629; color: #eee9e0; }
+.stage-instructions { height: auto; padding: 0; background: #222629; color: #eee9e0; }
+#exercise-card { height: auto; max-height: 32%; min-height: 3; margin: 0 1; padding: 0 1; border-left: thick #ffd343; background: #222629; }
+.exercise-heading { height: 1; color: #ffd343; text-style: bold; }
+.exercise-transition { height: auto; color: #86bde8; }
+#exercise-scroll { height: auto; max-height: 7; }
+#exercise-scroll:focus { border-right: tall #3776ab; }
+#stage-instructions MarkdownFence { background: #1c1f22; }
+LessonScreen.narrow #exercise-card { max-height: 45%; }
+LessonScreen.narrow #exercise-scroll { max-height: 5; }
+LessonScreen.narrow.show-console #exercise-card { display: none; }
+LessonScreen.narrow #console-pane { max-height: 100%; }
+LessonScreen.narrow #file-toolbar { height: 2; }
+LessonScreen.narrow #file-toolbar Button { height: 2; }
 .stage-instructions MarkdownH3 { color: #ffd343; margin: 0 0 1 0; }
 #reading-panel, #editor, #console-pane { border: solid transparent; }
 #reading-panel:focus, #reading-panel:focus-within,
@@ -173,3 +185,14 @@ LessonScreen.narrow #stage-navigation Button { height: 1; padding: 0 1; }
 .environment-actions Button { margin-right: 1; }
 #package-name { width: 1fr; }
 #environment-output { height: 1fr; min-height: 2; }
+
+#check-summary { height: auto; max-height: 3; color: #ffd343; padding: 0 1; }
+#solution-actions { height: 3; }
+#solution-actions Button { width: 1fr; margin-right: 1; }
+#compare-prompt { height: auto; margin: 1 0; }
+
+SolutionDialog.compact #solution-dialog { padding: 0 2; }
+SolutionDialog.compact .title { margin: 0; height: 1; }
+SolutionDialog.compact #solution-intro { display: none; }
+SolutionDialog.compact #solution-code { min-height: 6; }
+SolutionDialog.compact #compare-prompt { margin: 0; }

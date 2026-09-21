@@ -26,17 +26,10 @@ Annotations do not enforce the protocol at runtime.
 Its `write(text)` method adds text, and `getvalue()` returns all accumulated text.
 Other writers may return `None` from `write`; avoid depending on that return value.
 
-## Build
+## A read may be only one chunk
 
-Define a `Writer` protocol with a `write(self, text: str)` method, then implement `emit_lines(writer: Writer, lines)`.
-For each string in the finite iterable `lines`, call `writer.write` once with that string followed by exactly one newline character.
-Input strings do not already contain newline characters.
-Return the number of input lines written.
-Accept any object with the required method, including unrelated classes; do not require `isinstance` or inheritance.
-Empty input returns zero without writes.
-For `['one', 'two']`, a StringIO should contain `'one\ntwo\n'` and the return value should be two.
-Do not print or write to the terminal; send text only through the supplied writer.
-
-## Repair
-
-Repair needs correct line endings and a count independent of the writer's return value.
+A stream-like object may return part of its data on each `read()` call.
+Keep reading until it returns an empty string; whitespace inside a nonempty chunk is still data.
+A protocol should require only the arguments the consumer actually passes.
+If the consumer calls `read()` without a size, an unrelated implementation with just that signature is sufficient.
+The consumer does not own a supplied resource unless its contract explicitly says it must close it.

@@ -24,20 +24,20 @@ Calling a particular base directly can skip siblings or execute a shared ancesto
 **Composition** means putting another object in an attribute and using that object's methods, instead of inheriting from its class.
 It can be easier to follow than many interconnected parent classes.
 
-## Build
+## Cooperate during initialization
 
-Define four classes: Root, Left, Right, and Pipeline.
-Root has a `steps(self)` method returning `['root']`.
-Left and Right each inherit Root and prepend their respective names, `'left'` and `'right'`, to the result of a cooperative call to the next steps method.
-Pipeline inherits Left first and Right second without overriding steps.
-`Pipeline().steps()` must return `['left', 'right', 'root']`.
-`Left().steps()` must still return `['left', 'root']`.
-Reversing the bases in a new class must produce `['right', 'left', 'root']` without changing Left or Right.
-Return a fresh list each time and do not print.
-`pass` is the placeholder statement for a class body that adds no behavior.
+The same MRO rules apply to `__init__`.
+A cooperating constructor consumes its own keyword arguments and passes the remainder to the next constructor.
 
-## Repair
+```python
+class Tagged:
+    def __init__(self, *, tag, **kwargs):
+        super().__init__(**kwargs)
+        self.tag = tag
+```
 
-Repair calls Root directly and skips the other parent class.
-This arrangement is called **diamond inheritance** because Left and Right share Root, and Pipeline inherits both Left and Right.
-Restore cooperation through the actual method resolution order.
+The bare `*` makes `tag` keyword-only, and `**kwargs` gathers remaining named arguments.
+`super().__init__(**kwargs)` forwards them rather than discarding them.
+At the end of the chain, `object.__init__` accepts no extra arguments, exposing misspelled or unsupported options as `TypeError`.
+Work before `super()` happens on the way down the chain; work after it happens as calls return in reverse order.
+Create mutable instance state inside initialization so separate instances do not share it.

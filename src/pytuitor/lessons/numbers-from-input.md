@@ -20,19 +20,8 @@ We will handle invalid answers in a later lesson.
 For example, `17 // 5` is `3`, while `17 % 5` is `2`.
 Ordinary `/` division gives a decimal number, called a `float`, even when the division is exact.
 
-## Build
-Read one line of input containing a nonnegative whole number of minutes.
-**Nonnegative** means zero or greater.
-Convert it to an integer called `minutes`.
-Store the number of complete hours in `hours` and the leftover minutes in `remaining`.
-Print `hours` on the first line and `remaining` on the second line.
-For input `125`, the output is `2` followed by `5`.
-For input `0`, both lines contain `0`.
-You may choose any input prompt.
+## Practice in the workspace
 
-## Repair
-
-Repair uses a study-time summary instead of the Build scenario.
-Read morning and afternoon minutes, add them, and display complete hours and leftover minutes as `H h M min`.
-At exactly 60 minutes, the result must be `1 h 0 min`.
-Use the failing checks to diagnose the division and remainder calculations.
+Use the active exercise panel beside the editor for the current task requirements and input examples.
+Use Run to try boundary values such as zero and an exact multiple of 60.
+Use Check to compare your stored values and printed output with several cases.

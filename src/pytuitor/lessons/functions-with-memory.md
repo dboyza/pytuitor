@@ -45,12 +45,11 @@ The wrapper remembers `fn` from the enclosing function; this is a **closure**.
 A scope is the region where a name is available.
 Python looks up names in the current function, then enclosing functions, then the module, and finally its built-in names.
 
-## Exercise
+## Cache keys and successful results
 
-Write `def collect(item, bucket=None):` so calls without a bucket get independent lists, while a supplied list is appended to and returned.
-Append `item` to the list using `.append(item)`.
-Then implement `twice(fn)`: its wrapper should call `fn` once and multiply the returned result by two.
-Forward positional and keyword arguments and preserve metadata with `@wraps(fn)`.
-
-Try wrapping a function that adds two numbers.
-The check suite also verifies that the wrapped function is called only once.
+A cache remembers a result so repeating the same request can reuse it.
+Dictionary keys must be **hashable**, meaning their hash stays stable while they are used as keys.
+Integers, strings, and tuples of hashable values can be keys; lists and dictionaries cannot.
+Convert keyword pairs to `tuple(sorted(options.items()))` when keyword order should not matter.
+A cached `None` or `False` is still a result: use membership to distinguish a missing entry from a falsy stored value.
+Assign a result to the cache only after the wrapped call succeeds.

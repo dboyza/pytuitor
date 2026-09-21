@@ -135,6 +135,8 @@ ObservedApp(Path(sys.argv[1])).run()
             wait_for("console", focused="results-scroll", delivered=True)
         os.write(master, b"\x14")
         wait_for("lesson", focused="reading-panel")
+        os.write(master, b"\x1bOS")  # F4 through the xterm terminal protocol.
+        wait_for("editor", focused="exercise-scroll")
         os.write(master, b"\x11")  # Ctrl+Q.
         deadline = time.monotonic() + 5
         while process.poll() is None and time.monotonic() < deadline:

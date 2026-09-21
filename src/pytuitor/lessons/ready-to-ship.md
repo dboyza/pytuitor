@@ -36,16 +36,6 @@ else:
 ```
 
 
-## Exercise
-
-Implement `parse_count(text: str) -> int` to accept nonnegative integers with optional surrounding whitespace.
-Use `int(text)` to convert text to an integer; it already accepts surrounding whitespace and raises `ValueError` for non-integer text.
-Return `0` for `"0"` and `12` for `" 12 "`.
-Raise `ValueError` for negative values and non-integer text such as `"2.5"` or `"hello"`.
-
-Write assertions and exception checks in `test_parse_count()` for zero, whitespace, and invalid input.
-Check runs your test against your implementation and deliberately broken versions to see whether it detects mistakes.
-
 ## Use the idea in a project
 
 Keep calculation separate from command-line input and output so it can be tested independently.

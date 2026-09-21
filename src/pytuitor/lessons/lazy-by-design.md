@@ -43,11 +43,3 @@ Generator expressions use parentheses, as in `(n * 2 for n in values)`.
 
 Generators are consumed once, and their work, including possible errors, happens as values are requested.
 They are useful for large or infinite streams because they do not need to build a complete output list.
-
-## Exercise
-
-Write `def positive_squares(numbers):` as a generator that yields the square of each strictly positive number in order.
-Skip zero and negative numbers.
-Accept any iterable, including another generator, and do not convert the input or output to a list inside the function.
-
-Check uses both finite input and the first few results from an infinite stream.

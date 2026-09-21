@@ -12,8 +12,11 @@ New authoring should provide both stage contracts when Build and Repair need dif
 
 Keep each Repair solvable with concepts already taught, behavior-based, and meaningfully different from its Build scenario.
 
-The remaining 40 beginner units use `BUILD_INSTRUCTIONS` and `REPAIR_STAGES` in `src/pytuitor/beginner_stage_refresh.py`.
+The remaining 40 beginner units keep `BUILD_INSTRUCTIONS` and `REPAIR_STAGES` in the `src/pytuitor/content/beginner_*.py` chapter modules, assembled by `beginner_stage_refresh.py`.
 Their Build references and checks remain in `beginner_course.py` and `beginner_extensions.py`; the course assembly projects active contracts into the compatibility fields.
+
+The 41 experienced units keep Build records, complete instructions, independent Repairs, and boundary probes together in `src/pytuitor/content/experienced_*.py`.
+`experienced_course.py` and `experienced_stages.py` assemble those records; `experienced_authoring.py` contains the small shared constructors.
 
 Lesson Markdown keeps teaching and worked examples; stage requirements, starters, references, checks, and hints belong to the stage contracts.
 Instructions render as Markdown: use code spans for names, explicit input/output examples, and separate paragraphs for distinct requirements.
@@ -35,3 +38,19 @@ Old drafts and historical completion stay preserved, but an old checked revision
 Use each stage's `reference_files` in journeys and exports; the legacy `lesson.solution` describes Build only.
 
 Run the catalog tests and `scripts/smoke_installed.py` after changing a stage contract.
+
+
+## Teaching and visual review
+
+Apply the [chapter-specific challenge criteria](teaching-criteria.md) to both stages.
+Keep any new prerequisite explanation before the exercise needs it.
+`checkpoints.py` authors optional predictions; attach these before catalog assembly so reorganization preserves authored contracts.
+
+The active exercise uses a bounded Markdown viewport with a persistent stage heading.
+Test short and long requirements with the editor visible, including F4 focus and keyboard scrolling.
+The reference comparison uses a read-only snapshot and must remain usable at 80 × 24.
+
+Reviewed SVG baselines live in `tests/visuals/`.
+Regenerate them deliberately with `PYTUITOR_UPDATE_VISUALS=1 uv run pytest tests/test_integrated_visuals.py`, render the results, and inspect both terminal sizes before accepting changes.
+Ordinary test runs compare against the accepted files and write differing actual images only under `.artifacts/`.
+Never regenerate baselines merely to silence an unexplained failure.

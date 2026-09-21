@@ -11,16 +11,17 @@ import contextlib
 import os
 import re
 import shutil
-import signal
 import sys
 import tempfile
 import unicodedata
 from pathlib import Path, PurePosixPath
 
+from pytuitor.execution_policy import OUTPUT_BYTES, clean_environment, terminate_group
+
 MAX_FILES = 32
 MAX_FILE_BYTES = 256 * 1024
 MAX_WORKSPACE_BYTES = 1024 * 1024
-MAX_COMMAND_OUTPUT = 64 * 1024
+MAX_COMMAND_OUTPUT = OUTPUT_BYTES
 COMMAND_TIMEOUT = 180.0
 _RESERVED = {".git", ".venv", "__pycache__"}
 _REQUIREMENT = re.compile(
@@ -125,13 +126,7 @@ def environment_python(path: Path) -> Path:
 
 
 async def _run_command(*arguments: str, timeout: float = COMMAND_TIMEOUT) -> str:
-    # Do not forward credentials, Python path overrides, or pip configuration.
-    environment = {
-        "PATH": os.defpath,
-        "HOME": tempfile.gettempdir(),
-        "PYTHONIOENCODING": "utf-8",
-        "PIP_CONFIG_FILE": os.devnull,
-    }
+    environment = clean_environment(tempfile.gettempdir())
     process = await asyncio.create_subprocess_exec(
         *arguments,
         stdin=asyncio.subprocess.DEVNULL,
@@ -156,10 +151,7 @@ async def _run_command(*arguments: str, timeout: float = COMMAND_TIMEOUT) -> str
     except TimeoutError as error:
         raise WorkspaceError("The environment command timed out. You can try again.") from error
     finally:
-        # Also stop children if the parent exited before a cancellation/output limit.
-        with contextlib.suppress(ProcessLookupError):
-            os.killpg(process.pid, signal.SIGKILL)
-        await process.wait()
+        await terminate_group(process)
 
 
 async def create_environment(path: Path) -> Path:

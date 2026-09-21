@@ -32,20 +32,10 @@ For example, `setattr(job, "_label", "new")` stores a separate attribute from `j
 A name beginning with one underscore marks an implementation detail by convention; Python does not make it inaccessible.
 In `__set_name__`, save a name such as `"_" + name` on the descriptor, then use that name to read and write each owner instance's own value.
 
-## Build
+## Before controlling attribute access
 
-Define the descriptor class `NonNegative` and a `Counter` class with `value = NonNegative()`.
-Reading an unset Counter value returns zero.
-All supplied values are finite real numbers.
-Writing a nonnegative number stores it for that Counter only.
-Writing a negative number raises ValueError without replacing an earlier valid value.
-Class access, `Counter.value`, returns the descriptor itself.
-Use `__set_name__` to derive a private storage name, allowing the descriptor pattern to work under other attribute names too.
-For two new counters, setting one's value to six must leave the other's value at zero.
-No printing is required.
-
-## Repair
-
-Repair stores state on the descriptor, accidentally sharing it across counters, and omits validation.
-
-See the [data model reference](https://docs.python.org/3.11/reference/datamodel.html#implementing-descriptors) for lookup details.
+Review Your first class, Practical object protocols, and Separate instances, classes, and helpers before this chapter if instances, properties, or inheritance are unfamiliar.
+Ordinary instance attributes live in `instance.__dict__`; a class attribute can instead hold a shared object that manages access.
+`getattr(object, name, default)` reads a named attribute with a fallback, and `setattr(object, name, value)` assigns it.
+A descriptor must distinguish the shared manager from each instance's stored value.
+Class access has no instance, so returning the descriptor itself lets callers inspect the manager without reading an instance value.

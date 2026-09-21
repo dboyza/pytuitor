@@ -144,3 +144,14 @@ def test_explicit_empty_stage_values_do_not_fall_back_to_build_defaults():
     )
     assert explicit.stage_contract("repair").hints == ()
     assert default_input(explicit, "repair") == ""
+
+
+def test_every_chapter_has_an_optional_conceptual_checkpoint():
+    for chapter in CHAPTERS:
+        questions = [
+            lesson for lesson in LESSONS if lesson.chapter_id == chapter.id and lesson.choices
+        ]
+        assert questions, chapter.id
+        for lesson in questions:
+            assert lesson.prediction and lesson.explanation
+            assert 0 <= lesson.answer < len(lesson.choices)

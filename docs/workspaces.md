@@ -56,3 +56,6 @@ Export a project to a new folder when you want to continue in your own terminal 
 Create a new environment there and install only the dependencies the project actually uses.
 Keep dependency declarations in a project file and record versions for reproducibility.
 Do not copy an existing virtual environment to a new location; recreate it because its executable scripts contain environment-specific paths.
+
+Use the **Execution and privacy** command for the local execution and network-access contract.
+Reference comparison is read-only and compares the selected stage file with a snapshot of your own draft.

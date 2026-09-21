@@ -4,7 +4,6 @@ import asyncio
 import codecs
 import json
 import os
-import signal
 import stat
 import sys
 import tempfile
@@ -13,9 +12,17 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from pytuitor.execution_policy import (
+    EXECUTION_SECONDS,
+    OUTPUT_BYTES,
+    WORKER_LIMITS,
+    clean_environment,
+    terminate_group,
+)
 from pytuitor.models import Lesson, StageContract
+from pytuitor.progress_types import CheckEvent, check_event
 
-MAX_OUTPUT = 64 * 1024
+MAX_OUTPUT = OUTPUT_BYTES
 
 
 class ConsoleSession:
@@ -52,13 +59,17 @@ class ConsoleSession:
 class RunResult:
     output: str = ""
     error: str = ""
-    checks: list[dict] = field(default_factory=list)
+    checks: list[CheckEvent] = field(default_factory=list)
     files: dict[str, str] = field(default_factory=dict)
     files_notice: str = ""
 
     @property
     def passed(self) -> bool:
-        return not self.error and bool(self.checks) and all(c["passed"] for c in self.checks)
+        return (
+            not self.error
+            and bool(self.checks)
+            and all(c.get("passed", False) for c in self.checks)
+        )
 
 
 def _collect_run_files(directory: Path) -> tuple[dict[str, str], str]:
@@ -149,9 +160,9 @@ async def execute(
     stdin: str | None = None,
     *,
     check: bool = True,
-    timeout: float = 5.0,
+    timeout: float = EXECUTION_SECONDS,
     console: ConsoleSession | None = None,
-    on_check: Callable[[dict], None] | None = None,
+    on_check: Callable[[CheckEvent], None] | None = None,
     files: dict[str, str] | None = None,
     python: Path | None = None,
     stage: StageContract | None = None,
@@ -170,6 +181,7 @@ async def execute(
         (root / "request.json").write_text(
             json.dumps(
                 {
+                    "limits": WORKER_LIMITS,
                     "checks": [asdict(c) for c in contract.checks] if check else [],
                     "stdin": stdin,
                     "interactive": console is not None,
@@ -196,8 +208,11 @@ async def execute(
                     for line in stream:
                         if not line.endswith("\n"):
                             break
-                        on_check(json.loads(line))
                         check_offset += len(line.encode())
+                        try:
+                            on_check(check_event(json.loads(line)))
+                        except (ValueError, TypeError):
+                            continue
 
         try:
             with output_path.open("wb") as output:
@@ -211,12 +226,7 @@ async def execute(
                     stdout=output,
                     stderr=output,
                     start_new_session=True,
-                    env={
-                        "PATH": os.defpath,
-                        "HOME": folder,
-                        "TMPDIR": folder,
-                        "PYTHONIOENCODING": "utf-8",
-                    },
+                    env=clean_environment(folder, temporary=True),
                 )
                 if console:
                     console.process = process
@@ -250,12 +260,7 @@ async def execute(
                     await asyncio.sleep(0.025)
         finally:
             if process is not None:
-                # Kill descendants too, including after a parent exits normally.
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-                await process.wait()
+                await terminate_group(process)
             if console:
                 console.process = None
                 console.set_waiting(False)
@@ -271,7 +276,7 @@ async def execute(
                 console.on_output(remaining)
         run_files, files_notice = _collect_run_files(root / "workspace") if not check else ({}, "")
 
-        def finish(error: str = "", checks: list[dict] | None = None) -> RunResult:
+        def finish(error: str = "", checks: list[CheckEvent] | None = None) -> RunResult:
             return RunResult(output_text, error, checks or [], run_files, files_notice)
 
         if reason:
@@ -282,6 +287,11 @@ async def execute(
             return finish("Python exited before finishing. Check for exit() or a resource limit.")
         try:
             result = json.loads(result_path.read_text())
-            return finish(result["error"], result["checks"])
-        except (ValueError, KeyError):
+            if not isinstance(result["error"], str) or not isinstance(result["checks"], list):
+                raise ValueError("Invalid execution result")
+            checks = [check_event(case) for case in result["checks"]]
+            if any(case["status"] != "finished" for case in checks):
+                raise ValueError("Incomplete final check result")
+            return finish(result["error"], checks)
+        except (ValueError, KeyError, TypeError):
             return finish("Python could not return its results. Try running again.")

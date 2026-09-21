@@ -2,11 +2,8 @@
 
 ## Keep this document useful
 
-Keep durable decisions and recurring pitfalls here, not a chronological work log.
-After meaningful changes, update the relevant section, merge duplicates, and remove superseded guidance.
-Stay below roughly 100 lines and 1,000 words; put details in `docs/`.
-Do not record temporary paths, screenshots, test counts, speculative plans, or secrets.
-Verify implementation details against code.
+Keep verified, durable decisions here; update existing guidance instead of appending a work log.
+Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or temporary artifacts.
 
 ## Product direction
 
@@ -15,12 +12,12 @@ Verify implementation details against code.
 - The v1 candidate has 75 lessons and 12 chapter projects.
 - One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
-- Welcome offers Start learning or Browse syllabus; Known topics is a category-grouped checklist.
-- Batch onboarding screen changes so the dashboard stays behind the destination without flashing.
+- Welcome offers Start learning or Browse syllabus; Known topics groups concepts by category.
+- Batch onboarding transitions to avoid dashboard flashes.
 - Known topics are skipped by Continue but remain accessible; project concepts describe their relevant preparation.
 - Dashboard browses all chapters; Continue resumes the active chapter, then the core sequence or explicitly selected optional section.
 - Every course unit has blank Build followed by broken Repair, with separate saved drafts and both required for new completion.
-- Prerequisites advise without blocking; reference solutions require explicit reveal and never replace drafts.
+- Prerequisites advise without blocking; references require explicit reveal and never replace drafts.
 - Learner studies are user-run; automated tests do not establish teaching effectiveness.
 
 ## Teaching standards
@@ -58,13 +55,14 @@ Verify implementation details against code.
 
 - `models.py` defines contracts; `beginner_course.py`, `beginner_extensions.py`, and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
-- Stage-specific authoring uses `StageContract`; see [the authoring guide](docs/authoring.md).
+- Stage contracts live in `content/` chapter modules and the six Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
 - `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
 - `course_map.py` defines section/chapter order and project preparation; `syllabus.py` renders it.
 - `state.py` owns version 3 profiles, atomic writes, migration backups and locks.
+- Save profiles with file and directory sync; a post-replacement sync warning must not revert committed in-memory state.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
-- `runner.py` launches `_worker.py` with isolated Python; worker must remain standard-library-only.
+- `runner.py` launches standard-library-only `_worker.py`; `execution_policy.py` shares subprocess rules, and `progress_types.py` defines validated draft/check boundaries.
 - Checks receive fresh namespaces, local imports, working directories, and supplied stdin.
 - Compare the entire file snapshot before marking an asynchronous check successful.
 - Input-wait time must not consume execution timeout; kill descendant processes during cancellation.
@@ -87,15 +85,7 @@ Verify implementation details against code.
 - Use `env -u NO_COLOR TERM=xterm-256color COLORTERM=truecolor` for visual checks; temporary artifacts belong in `.artifacts/`.
 - Build with `uv build`; run `scripts/smoke_installed.py` against the installed wheel with isolated Python.
 - See [release checks](docs/release-checklist.md) and [learner study](docs/learner-study.md); report only validation actually performed.
-- Never use em dashes, add agent co-authors, or manually edit changelogs/generated files.
-- Put each full sentence on its own physical line in long Markdown.
-- Use subagents only when explicitly requested for the current task.
+- Never use em dashes, agent co-authors, or manual changelog/generated-file edits.
+- Long Markdown uses one sentence per line; subagents need per-task permission.
 - Make local commits when Git metadata exists; only push or publish when instructed.
 - Suggest a concrete next step after major work.
-
-## Maintaining this file
-
-Keep this file for knowledge useful to almost every future agent session in this project.
-Do not repeat what the codebase already shows; point to the authoritative file or command instead.
-Prefer rewriting or pruning existing entries over appending new ones.
-When updating this file, preserve this bar for all agents and keep entries concise.

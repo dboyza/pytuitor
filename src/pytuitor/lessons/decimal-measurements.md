@@ -38,19 +38,8 @@ For example, `0.1 + 0.2` may display as `0.30000000000000004`.
 Formatting helps present a measurement, but does not make the underlying arithmetic exact.
 For money, use whole-number cents when exact cent arithmetic is needed.
 
-## Build
+## Practice in the workspace
 
-Read one line containing a valid nonnegative measurement in centimeters, including decimal values.
-You may choose any input prompt.
-Store the converted number in `centimeters` and the measurement divided by `100` in `meters`.
-Keep the unrounded calculated value in `meters`.
-Print exactly one line containing the meters value with two decimal places followed by ` m`.
-For input `234.56`, `meters` is approximately `2.3456` and the output is `2.35 m`.
-For input `0`, print `0.00 m`; for `100`, print `1.00 m`.
-Checks allow tiny floating-point differences in the calculated value and require the specified display text.
-
-## Repair
-
-Repair uses a Fahrenheit-to-Celsius temperature display.
-Calculate `(fahrenheit - 32) / 1.8` without rounding the stored value, then print one decimal place followed by ` C`.
-The checks include freezing, boiling, a decimal temperature, and a negative value.
+Use the active exercise panel beside the editor for the current task requirements and examples.
+Use Run to try both fractional input and values that should display trailing zeroes.
+Use Check to compare the stored number separately from its formatted text.

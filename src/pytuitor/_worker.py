@@ -93,14 +93,15 @@ def cli_check(fn, text):
 
 
 class Tee:
-    def __init__(self, target):
+    def __init__(self, target, limit):
         self.target = target
+        self.limit = limit
         self.captured = ""
 
     def write(self, text):
         self.target.write(text)
         self.target.flush()
-        self.captured = (self.captured + text)[:65536]
+        self.captured = (self.captured + text)[: self.limit]
         return len(text)
 
     def flush(self):
@@ -142,12 +143,13 @@ class KeyboardInput:
 
 
 def main():
-    resource.setrlimit(resource.RLIMIT_CPU, (4, 4))
-    resource.setrlimit(resource.RLIMIT_FSIZE, (1024 * 1024, 1024 * 1024))
-    if sys.platform == "linux":
-        resource.setrlimit(resource.RLIMIT_AS, (512 * 1024 * 1024, 512 * 1024 * 1024))
     root = Path(sys.argv[1])
     request = json.loads((root / "request.json").read_text())
+    limits = request["limits"]
+    resource.setrlimit(resource.RLIMIT_CPU, (limits["cpu_seconds"],) * 2)
+    resource.setrlimit(resource.RLIMIT_FSIZE, (limits["file_bytes"],) * 2)
+    if sys.platform == "linux":
+        resource.setrlimit(resource.RLIMIT_AS, (limits["memory_bytes"],) * 2)
     result = {"error": "", "checks": []}
 
     workspace = root / "workspace"
@@ -209,7 +211,7 @@ def main():
             else io.StringIO(request["stdin"])
         )
         try:
-            with contextlib.redirect_stdout(Tee(sys.stdout)):
+            with contextlib.redirect_stdout(Tee(sys.stdout, limits["output_bytes"])):
                 exec(program(), namespace())
         except BaseException as exc:
             result["error"] = describe_error(exc)
@@ -234,7 +236,7 @@ def main():
                     "status": "running",
                 }
                 emit(case)
-                capture = Tee(sys.stdout)
+                capture = Tee(sys.stdout, limits["output_bytes"])
                 expected = check["expected"]
                 prepare()
                 scope = namespace()
@@ -261,7 +263,7 @@ def main():
                         result["error"] = case["actual"]
                 case.update(
                     status="finished",
-                    output=capture.captured[:65536],
+                    output=capture.captured[: limits["output_bytes"]],
                     expected=repr(expected)[:1000],
                 )
                 result["checks"].append(case)

@@ -37,18 +37,10 @@ class Writer(ABC):
         pass
 ```
 
-## Build
+## Alternate constructors can validate configuration
 
-Define abstract `Renderer` with required instance method `render(self, text)`.
-Define `PrefixRenderer(Renderer)` as a subclass implementing that method.
-Its constructor must store the supplied string prefix, and its `render` method must prepend that prefix to string text.
-Provide static helper `valid_prefix(value)` returning whether a string contains any non-whitespace character.
-Provide class method `from_text(text)` stripping surrounding whitespace and rejecting blank prefixes with `ValueError`.
-The factory must return an instance of the class it was called on, including subclasses that inherit the constructor.
-`Renderer` and subclasses that omit `render` must not be instantiable.
-Do not print or read input.
-
-## Repair
-
-The base class does not enforce its interface, the factory ignores subclasses and whitespace, and rendering uses the wrong order.
-Restore each contract.
+A class factory can convert text into the configuration stored by an instance.
+For example, `int("101", 2)` interprets the text as a base-two integer and returns `5`, while `int("ff", 16)` returns `255`.
+The optional second argument is the numeric base.
+A decoder can validate a base once during construction and reuse it for several conversions.
+Keep the static validity predicate separate from conversion, so callers can also check already-converted values.

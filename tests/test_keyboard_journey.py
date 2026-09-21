@@ -47,9 +47,7 @@ async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size)
         await pilot.press("escape", "f5")
         await pilot.pause()
         assert isinstance(app.screen, LessonScreen)
-        await pilot.press(
-            "ctrl+t", "ctrl+a", *'print("Welcome, explorer!")', "enter", *"print(8 + 5)"
-        )
+        await pilot.press("ctrl+t", "ctrl+a", *'print("Hello, world!")', "enter", *"print(8 + 5)")
         await pilot.press("f5")
         await until(pilot, lambda: not app.screen.running)
         assert "BUILD PASSED" in str(app.screen.query_one("#results", Static).content)
@@ -59,11 +57,11 @@ async def test_beginner_can_complete_lessons_using_only_keyboard(tmp_path, size)
         await pilot.press(
             "ctrl+n",
             "ctrl+a",
-            *'print("Scoreboard")',
+            *'print("Today\'s plan")',
             "enter",
-            *"print(4 + 3)",
+            *'print("Bring water")',
             "enter",
-            *"print(4 + 3 + 2)",
+            *'print("Start at 9")',
         )
         await pilot.press("f5")
         await until(pilot, lambda: not app.screen.running)

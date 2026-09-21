@@ -34,7 +34,7 @@ async def test_beginner_journey_and_resume(tmp_path):
         assert "Expected" in str(screen.query_one("#results", Static).content)
         editor.focus()
         await pilot.press("ctrl+a")
-        await pilot.press(*'print("Welcome, explorer!")', "enter", *"print(8 + 5)")
+        await pilot.press(*'print("Hello, world!")', "enter", *"print(8 + 5)")
         await pilot.press("f5")
         await wait_for_run(pilot, screen)
         assert "BUILD PASSED" in str(screen.query_one("#results", Static).content)

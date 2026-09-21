@@ -41,21 +41,8 @@ The instructions belonging to that branch begin four spaces farther to the right
 This is called **indentation**, and it tells Python which instructions belong together.
 The editor inserts spaces when you press Tab.
 
-## Exercise
+## Practice in the workspace
 
-Start your program with `key = input("Which key? ")` to ask for a key and store the answer.
-Set the variable `destination` to:
-
-- `"treasure"` when `key` is `"gold"`;
-- `"garden"` when `key` is `"green"`;
-- `"locked"` for any other answer.
-
-Use `if`, `elif`, and `else`, then print `destination` after the whole chain.
-That last print should have no indentation because it runs whichever branch was chosen.
-
-Run the program once with `gold`, once with `green`, and once with `blue`.
-Check tries those cases for you as well.
-
-After Build passes, Repair classifies a parcel by its integer item count.
-It must distinguish zero, the inclusive small range from 1 through 3, and counts above 3.
-The equality boundaries are part of the practice.
+Use the active exercise panel beside the editor for the current task requirements and cases.
+Run the program with an answer from each branch and with an answer that matches no named case.
+Check includes boundary cases so you can see whether each comparison includes or excludes equality.

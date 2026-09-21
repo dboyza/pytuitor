@@ -55,12 +55,3 @@ print(original["tags"])
 This displays `['python', 'cli']` because the nested list is shared.
 `from copy import deepcopy` imports a standard-library function that copies nested objects too.
 Use it when the new structure must be independent of the original.
-
-## Exercise
-
-Write `def add_tag(record, tag):` so it returns an independent copy with `tag` appended to its `"tags"` list.
-Preserve every other field, and do not change the original record or its nested contents.
-Assume the record contains ordinary dictionaries, lists, strings, and numbers.
-
-Add a small example below your function and use Run to inspect both the original and the returned value.
-Check also tests nested metadata, so copying only the tags list is not sufficient for this contract.

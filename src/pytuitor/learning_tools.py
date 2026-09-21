@@ -1,5 +1,6 @@
 """Opt-in learning aids and project environment controls."""
 
+from difflib import unified_diff
 from pathlib import Path
 
 from textual import on, work
@@ -21,16 +22,27 @@ from pytuitor.workspace import (
 class SolutionDialog(ModalScreen):
     BINDINGS = [Binding("escape", "close", "Close")]
 
-    def __init__(self, lesson: Lesson, contract: StageContract):
+    def __init__(
+        self, lesson: Lesson, contract: StageContract, drafts: dict[str, str] | None = None
+    ):
         super().__init__()
         self.lesson = lesson
+        self.drafts = dict(drafts or {})
+        self.comparing = False
         self.files = contract.reference_files or {lesson.entrypoint: lesson.solution}
+
+    def on_mount(self) -> None:
+        self.set_class(self.size.height < 32, "compact")
+
+    def on_resize(self) -> None:
+        self.set_class(self.size.height < 32, "compact")
 
     def compose(self) -> ComposeResult:
         with Vertical(classes="dialog", id="solution-dialog"):
             yield Static("Reference solution", classes="title")
             yield Static(
-                "One correct approach. Compare the reasoning with yours; your draft stays saved."
+                "One correct approach. Compare the reasoning with yours; your draft stays saved.",
+                id="solution-intro",
             )
             yield Select(
                 [(name, name) for name in self.files],
@@ -45,12 +57,44 @@ class SolutionDialog(ModalScreen):
                 read_only=True,
                 id="solution-code",
             )
-            yield Button("Back to my work", id="close-solution")
+            yield Static(
+                "Explain one difference: what input exposes it, and why does the result change?",
+                id="compare-prompt",
+            )
+            with Horizontal(id="solution-actions"):
+                yield Button("Compare with my draft", id="compare-solution")
+                yield Button("Back to my work", id="close-solution")
 
     @on(Select.Changed, "#solution-file")
     def change_file(self, event: Select.Changed) -> None:
         if event.value in self.files:
-            self.query_one("#solution-code", TextArea).load_text(self.files[event.value])
+            self.show_file(event.value)
+
+    def show_file(self, name: str) -> None:
+        reference = self.files[name]
+        if self.comparing:
+            reference = (
+                "".join(
+                    unified_diff(
+                        self.drafts.get(name, "").splitlines(keepends=True),
+                        reference.splitlines(keepends=True),
+                        fromfile="Your draft: " + name,
+                        tofile="One reference: " + name,
+                    )
+                )
+                or "No textual differences. Explain why your approach meets the contract."
+            )
+        editor = self.query_one("#solution-code", TextArea)
+        editor.language = None if self.comparing else "python"
+        editor.load_text(reference)
+
+    @on(Button.Pressed, "#compare-solution")
+    def compare(self) -> None:
+        self.comparing = not self.comparing
+        self.query_one("#compare-solution", Button).label = (
+            "Show reference" if self.comparing else "Compare with my draft"
+        )
+        self.show_file(self.query_one("#solution-file", Select).value)
 
     @on(Button.Pressed, "#close-solution")
     def action_close(self) -> None:

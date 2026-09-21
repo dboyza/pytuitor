@@ -21,7 +21,7 @@ Using a function this way is called **calling** it; a value you pass to it is an
 By default, `print()` moves to a new line after displaying its value.
 
 ```python
-print("Hello")
+print("Hello, world!")
 print(7)
 print(2 + 3)
 ```
@@ -29,7 +29,7 @@ print(2 + 3)
 This program displays:
 
 ```text
-Hello
+Hello, world!
 7
 5
 ```
@@ -69,14 +69,10 @@ Run the corrected program again: it should display `Hello`.
 Make one correction at a time, then check whether the output matches what you expected.
 Errors are clues you can use, not a sign that you cannot program.
 
-## Exercise
+## Practice in the workspace
 
-Build displays `Welcome, explorer!` on the first line and the result of `8 + 5` on the second line.
-Keep the greeting in quotes and write the calculation without quotes.
-
-The **editor** is the area where you write code; the **console** shows output and accepts answers when a program asks for input.
-Press **Ctrl+T** to move from the lesson to the editor, then type your changes.
-Press **Ctrl+R** to run the program and see its output in the console.
-Press **F5** to check the exercise requirements.
-After Build passes, Repair asks you to investigate a three-line scoreboard with an order and arithmetic mistake.
-The short question below is optional practice.
+The editor is where you write code, and the console shows output and accepts answers when a program asks for input.
+Press **Ctrl+T** to move between the lesson, editor, and console.
+The active exercise panel beside the editor contains the current requirements.
+Press **Ctrl+R** to run the program and **F5** to check it.
+When a check fails, read the output and error message before making one small change.

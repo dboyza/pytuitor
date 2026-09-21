@@ -9,6 +9,7 @@ from pathlib import Path
 from platformdirs import user_data_path
 
 from pytuitor.curriculum import BY_ID, CHAPTERS, CONCEPTS, SECTIONS, Lesson, chapter_lessons
+from pytuitor.progress_types import LessonProgress
 
 
 class ProfileError(Exception):
@@ -39,6 +40,7 @@ class Store:
             self._lock.close()
             raise ProfileError("This profile is already open in another Pytuitor window.") from exc
         self._migration_original = None
+        self.durability_warning = ""
         self.data = fresh_profile()
         if self.path.exists():
             try:
@@ -86,6 +88,13 @@ class Store:
             if not isinstance(repair, dict):
                 raise ValueError("Invalid repair progress")
             for stage_data in (entry, repair):
+                for key in ("revision", "checked_revision", "completed_revision"):
+                    if key in stage_data and (
+                        type(stage_data[key]) is not int or stage_data[key] < 1
+                    ):
+                        raise ValueError("Invalid exercise revision")
+                if "solution_seen" in stage_data and type(stage_data["solution_seen"]) is not bool:
+                    raise ValueError("Invalid reference state")
                 for files_key in ("files", "checked_files"):
                     if files_key in stage_data:
                         from pytuitor.workspace import validate_files
@@ -131,11 +140,14 @@ class Store:
             raise
 
     def save(self) -> None:
+        self.durability_warning = ""
         if self._migration_original is not None:
             backup = self.directory / "profile-before-v3.json"
             try:
                 with backup.open("xb") as stream:
                     stream.write(self._migration_original)
+                    stream.flush()
+                    os.fsync(stream.fileno())
             except FileExistsError:
                 pass
             self._migration_original = None
@@ -146,10 +158,22 @@ class Store:
                 stream.flush()
                 os.fsync(stream.fileno())
             os.replace(temporary, self.path)
+            # The rename is committed. A sync failure is a durability warning,
+            # not a failed transaction that should restore stale in-memory data.
+            try:
+                descriptor = os.open(self.directory, os.O_RDONLY | os.O_DIRECTORY)
+                try:
+                    os.fsync(descriptor)
+                finally:
+                    os.close(descriptor)
+            except OSError as error:
+                self.durability_warning = (
+                    "Progress was written, but its directory could not be synced: " + str(error)
+                )
         finally:
             Path(temporary).unlink(missing_ok=True)
 
-    def entry(self, lesson: Lesson) -> dict:
+    def entry(self, lesson: Lesson) -> LessonProgress:
         return self.data["lessons"].setdefault(lesson.id, {})
 
     def status(self, lesson: Lesson) -> str:
