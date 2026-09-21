@@ -548,13 +548,12 @@ REPAIR_STAGES = {
                 Path("inbox/note.txt").write_text("skip")
                 Path("inbox/b.md").write_text("B")
                 Path("inbox/a.md").write_text("A")
-                Path("inbox/link.md").symlink_to("a.md")
-                Path("inbox/broken.md").symlink_to("missing")
-                result = [
-                    eligible_md("inbox"),
-                    archive_markdown("inbox", "archive"),
-                    Path("archive").exists(),
-                ]
+                with __symlink_fixtures__({"inbox/link.md": "a.md", "inbox/broken.md": "missing"}):
+                    result = [
+                        eligible_md("inbox"),
+                        archive_markdown("inbox", "archive"),
+                        Path("archive").exists(),
+                    ]
                 """,
                 [["a.md", "b.md"], {"planned": ["a.md", "b.md"], "skipped": []}, False],
                 description=(
@@ -584,12 +583,12 @@ REPAIR_STAGES = {
                 Path("inbox").mkdir()
                 Path("archive").mkdir()
                 Path("inbox/a.md").write_text("new")
-                Path("archive/a.md").symlink_to("missing")
-                result = [
-                    archive_markdown("inbox", "archive", dry_run=False),
-                    Path("archive/a.md").is_symlink(),
-                    Path("archive/missing").exists(),
-                ]
+                with __symlink_fixtures__({"archive/a.md": "missing"}):
+                    result = [
+                        archive_markdown("inbox", "archive", dry_run=False),
+                        Path("archive/a.md").is_symlink(),
+                        Path("archive/missing").exists(),
+                    ]
                 """,
                 [{"planned": [], "skipped": ["a.md"]}, True, False],
                 description=(

@@ -4,6 +4,7 @@ import json
 import os
 import stat
 
+import pytest
 from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
@@ -25,12 +26,16 @@ async def test_learner_save_syncs_file_then_directory(tmp_path, monkeypatch):
         monkeypatch.setattr(os, "fsync", observe)
         app.screen.query_one("#editor", TextArea).load_text("# retained draft\n")
         app.screen.save_draft()
-        assert calls[-2:] == ["file", "directory"]
+        if os.name == "nt":
+            assert calls and set(calls) == {"file"}
+        else:
+            assert calls[-2:] == ["file", "directory"]
         assert json.loads(app.store.path.read_text())["lessons"][LESSONS[0].id]["code"] == (
             "# retained draft\n"
         )
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows uses write-through replacement")
 def test_directory_sync_failure_does_not_undo_a_committed_reset(tmp_path, monkeypatch):
     from pytuitor.state import Store
 

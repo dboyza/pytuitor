@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 
+from pytuitor.beginner_authoring import _scenario_check
 from pytuitor.beginner_extensions import INSERT_AFTER
 from pytuitor.beginner_extensions import LESSONS as EXTRA_LESSONS
 from pytuitor.beginner_stage_refresh import BUILD_INSTRUCTIONS, REPAIR_STAGES
@@ -1435,16 +1436,20 @@ add(
             "(__import__('pathlib').Path('inbox').mkdir(), archive_notes('inbox', 'archive'))[1]",
             [],
         ),
-        case(
+        _scenario_check(
             "Select only immediate lowercase text files",
-            (
-                "(__import__('pathlib').Path('inbox').mkdir(), __import__('pathlib"
-                "').Path('inbox/folder.txt').mkdir(), __import__('pathlib').Path('"
-                "inbox/CAPS.TXT').write_text('skip'), __import__('pathlib').Path('"
-                "inbox/note.txt').write_text('keep'), __import__('pathlib').Path('"
-                "inbox/link.txt').symlink_to('note.txt'), eligible('inbox'))[5]"
-            ),
+            """
+            from pathlib import Path
+            Path('inbox').mkdir()
+            Path('inbox/folder.txt').mkdir()
+            Path('inbox/CAPS.TXT').write_text('skip')
+            Path('inbox/note.txt').write_text('keep')
+            with __symlink_fixtures__({'inbox/link.txt': 'note.txt'}):
+                result = eligible('inbox')
+            """,
             ["note.txt"],
+            description="Select immediate lowercase text files, excluding directories and links.",
+            nudge="Check file type, symbolic links, and suffix before including a name.",
         ),
     ),
     (

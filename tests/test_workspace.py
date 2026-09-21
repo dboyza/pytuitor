@@ -1,5 +1,4 @@
 import asyncio
-import os
 import sys
 
 import pytest
@@ -57,10 +56,10 @@ def test_bounds_use_utf8_bytes_and_total_workspace_size():
 def test_exports_nested_files_without_replacing_existing_content(tmp_path):
     files = {"main.py": "from helpers.maths import double\n", "helpers/maths.py": "🐍\n"}
     destination = export_workspace(tmp_path / "project", files)
-    assert (destination / "helpers/maths.py").read_text() == "🐍\n"
+    assert (destination / "helpers/maths.py").read_text(encoding="utf-8") == "🐍\n"
     with pytest.raises(WorkspaceError, match="already exists"):
         export_workspace(destination, {"main.py": "overwritten"})
-    assert (destination / "main.py").read_text() == files["main.py"]
+    assert (destination / "main.py").read_text(encoding="utf-8") == files["main.py"]
     assert sorted(path.name for path in tmp_path.iterdir()) == ["project"]
 
 
@@ -139,7 +138,7 @@ async def test_cancellation_removes_partial_environment(tmp_path, monkeypatch):
     assert not destination.exists()
 
 
-async def test_cancellation_kills_real_subprocess(tmp_path):
+async def test_cancellation_kills_real_subprocess(tmp_path, process_is_running):
     pid_file = tmp_path / "pid"
     source = (
         "import os, pathlib, time; pathlib.Path(%r).write_text(str(os.getpid())); time.sleep(20)"
@@ -148,9 +147,8 @@ async def test_cancellation_kills_real_subprocess(tmp_path):
     async with asyncio.timeout(5):
         while not pid_file.exists():
             await asyncio.sleep(0.02)
-    pid = int(pid_file.read_text())
+    pid = int(pid_file.read_text(encoding="utf-8"))
     task.cancel()
     with pytest.raises(asyncio.CancelledError):
         await task
-    with pytest.raises(ProcessLookupError):
-        os.kill(pid, 0)
+    assert not process_is_running(pid)

@@ -28,12 +28,12 @@ async def capture(app, pilot, name):
     target = BASELINES / f"{name}.svg"
     if os.environ.get("PYTUITOR_UPDATE_VISUALS") == "1":
         BASELINES.mkdir(exist_ok=True)
-        target.write_text(screenshot)
+        target.write_text(screenshot, encoding="utf-8")
     assert target.exists(), "Generate and inspect the visual baseline before accepting it."
-    if target.read_text() != screenshot:
+    if target.read_text(encoding="utf-8") != screenshot:
         actual = Path(".artifacts") / f"{name}-actual.svg"
         actual.parent.mkdir(exist_ok=True)
-        actual.write_text(screenshot)
+        actual.write_text(screenshot, encoding="utf-8")
         pytest.fail(f"Visual changed: compare {target} with {actual}")
 
 

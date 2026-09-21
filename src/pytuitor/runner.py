@@ -3,11 +3,8 @@
 import asyncio
 import codecs
 import json
-import os
-import stat
 import sys
 import tempfile
-from collections import Counter
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -17,10 +14,12 @@ from pytuitor.execution_policy import (
     OUTPUT_BYTES,
     WORKER_LIMITS,
     clean_environment,
+    start_process,
     terminate_group,
 )
 from pytuitor.models import Lesson, StageContract
 from pytuitor.progress_types import CheckEvent, check_event
+from pytuitor.run_files import collect_run_files as _collect_run_files
 
 MAX_OUTPUT = OUTPUT_BYTES
 
@@ -72,88 +71,6 @@ class RunResult:
         )
 
 
-def _collect_run_files(directory: Path) -> tuple[dict[str, str], str]:
-    """Read a bounded text snapshot without following links or special files."""
-    from pytuitor.workspace import MAX_FILE_BYTES, MAX_FILES, WorkspaceError, validate_files
-
-    snapshot: dict[str, str] = {}
-    skipped: Counter[str] = Counter()
-    inspected = 0
-    directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
-
-    def scan(descriptor: int, prefix: str = "", depth: int = 0) -> None:
-        nonlocal inspected
-        if depth > 16:
-            skipped["deep folders"] += 1
-            return
-        with os.scandir(descriptor) as entries:
-            for entry in entries:
-                inspected += 1
-                if inspected > 512:
-                    skipped["scan limit"] += 1
-                    return
-                if entry.name == "__pycache__":
-                    continue
-                name = prefix + entry.name
-                try:
-                    if entry.is_symlink():
-                        skipped["symbolic links"] += 1
-                        continue
-                    validate_files({name: ""})
-                    if entry.is_dir(follow_symlinks=False):
-                        child = os.open(entry.name, directory_flags, dir_fd=descriptor)
-                        try:
-                            scan(child, name + "/", depth + 1)
-                        finally:
-                            os.close(child)
-                        continue
-                    if len(snapshot) >= MAX_FILES:
-                        skipped["file-count limit"] += 1
-                        continue
-                    child = os.open(
-                        entry.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor
-                    )
-                    with os.fdopen(child, "rb") as stream:
-                        information = os.fstat(stream.fileno())
-                        if not stat.S_ISREG(information.st_mode):
-                            skipped["non-text file types"] += 1
-                            continue
-                        if information.st_size > MAX_FILE_BYTES:
-                            skipped["oversized files"] += 1
-                            continue
-                        content = stream.read(MAX_FILE_BYTES + 1)
-                    if len(content) > MAX_FILE_BYTES:
-                        skipped["oversized files"] += 1
-                        continue
-                    if b"\0" in content:
-                        skipped["binary files"] += 1
-                        continue
-                    source = content.decode("utf-8")
-                    validate_files({**snapshot, name: source})
-                    snapshot[name] = source
-                except UnicodeDecodeError:
-                    skipped["binary files"] += 1
-                except WorkspaceError:
-                    skipped["invalid names or workspace limits"] += 1
-                except OSError:
-                    skipped["unreadable files or folders"] += 1
-
-    try:
-        descriptor = os.open(directory, directory_flags)
-    except FileNotFoundError:
-        return {}, ""
-    except OSError:
-        return {}, "Run files were unavailable or the workspace was replaced with a symbolic link."
-    try:
-        scan(descriptor)
-    except OSError:
-        skipped["unreadable folders"] += 1
-    finally:
-        os.close(descriptor)
-    notice = "Some run files were omitted: " + ", ".join(sorted(skipped)) + "." if skipped else ""
-    return snapshot, notice
-
-
 async def execute(
     lesson: Lesson,
     source: str,
@@ -203,7 +120,7 @@ async def execute(
             nonlocal check_offset
             path = root / "checks.jsonl"
             if on_check and path.exists():
-                with path.open() as stream:
+                with path.open(encoding="utf-8", newline="") as stream:
                     stream.seek(check_offset)
                     for line in stream:
                         if not line.endswith("\n"):
@@ -216,7 +133,7 @@ async def execute(
 
         try:
             with output_path.open("wb") as output:
-                process = await asyncio.create_subprocess_exec(
+                process = await start_process(
                     str(python or sys.executable),
                     "-I",
                     str(Path(__file__).with_name("_worker.py")),
@@ -225,7 +142,7 @@ async def execute(
                     stdin=asyncio.subprocess.PIPE if console else asyncio.subprocess.DEVNULL,
                     stdout=output,
                     stderr=output,
-                    start_new_session=True,
+                    limits=WORKER_LIMITS,
                     env=clean_environment(folder, temporary=True),
                 )
                 if console:

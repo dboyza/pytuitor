@@ -1,6 +1,5 @@
 """Versioned local profiles with atomic writes and a single-writer lock."""
 
-import fcntl
 import json
 import os
 import tempfile
@@ -9,6 +8,7 @@ from pathlib import Path
 from platformdirs import user_data_path
 
 from pytuitor.curriculum import BY_ID, CHAPTERS, CONCEPTS, SECTIONS, Lesson, chapter_lessons
+from pytuitor.platform_files import lock_profile, replace_profile, sync_directory
 from pytuitor.progress_types import LessonProgress
 
 
@@ -33,10 +33,10 @@ class Store:
         )
         self.directory.mkdir(parents=True, exist_ok=True)
         self.path = self.directory / "profile.json"
-        self._lock = (self.directory / "profile.lock").open("a+")
+        self._lock = (self.directory / "profile.lock").open("a+b")
         try:
-            fcntl.flock(self._lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as exc:
+            lock_profile(self._lock)
+        except OSError as exc:
             self._lock.close()
             raise ProfileError("This profile is already open in another Pytuitor window.") from exc
         self._migration_original = None
@@ -44,7 +44,7 @@ class Store:
         self.data = fresh_profile()
         if self.path.exists():
             try:
-                data = json.loads(self.path.read_text())
+                data = json.loads(self.path.read_text(encoding="utf-8"))
                 self._validate(data)
                 if data["version"] < 3:
                     self._migration_original = self.path.read_bytes()
@@ -153,19 +153,15 @@ class Store:
             self._migration_original = None
         fd, temporary = tempfile.mkstemp(prefix=".profile-", dir=self.directory)
         try:
-            with os.fdopen(fd, "w") as stream:
+            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as stream:
                 json.dump(self.data, stream, indent=2)
                 stream.flush()
                 os.fsync(stream.fileno())
-            os.replace(temporary, self.path)
+            replace_profile(temporary, self.path)
             # The rename is committed. A sync failure is a durability warning,
             # not a failed transaction that should restore stale in-memory data.
             try:
-                descriptor = os.open(self.directory, os.O_RDONLY | os.O_DIRECTORY)
-                try:
-                    os.fsync(descriptor)
-                finally:
-                    os.close(descriptor)
+                sync_directory(self.directory)
             except OSError as error:
                 self.durability_warning = (
                     "Progress was written, but its directory could not be synced: " + str(error)

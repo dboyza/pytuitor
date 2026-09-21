@@ -6,11 +6,59 @@ import importlib
 import io
 import json
 import os
-import resource
 import shutil
 import sys
 import traceback
 from pathlib import Path
+
+
+@contextlib.contextmanager
+def symlink_fixtures(links):
+    """Check link behavior without requiring Windows Developer Mode or elevation.
+
+    Prefer real links. If the OS denies their creation, use ordinary entries and
+    scoped Path probes matching their link, existence, and file-kind behavior.
+    The fallback affects authored checks only, never a learner's Run operation.
+    """
+    from unittest.mock import patch
+
+    simulated = {}
+    for name, target in links.items():
+        path = Path(name)
+        try:
+            path.symlink_to(target)
+        except PermissionError:
+            path.touch(exist_ok=False)
+            simulated[path.absolute()] = (path.parent / target).absolute()
+    original_link, original_exists, original_file = Path.is_symlink, Path.exists, Path.is_file
+    with contextlib.ExitStack() as stack:
+        if simulated:
+            stack.enter_context(
+                patch.object(
+                    Path,
+                    "is_symlink",
+                    lambda path: path.absolute() in simulated or original_link(path),
+                )
+            )
+            stack.enter_context(
+                patch.object(
+                    Path,
+                    "exists",
+                    lambda path, **kwargs: original_exists(
+                        simulated.get(path.absolute(), path), **kwargs
+                    ),
+                )
+            )
+            stack.enter_context(
+                patch.object(
+                    Path,
+                    "is_file",
+                    lambda path, **kwargs: original_file(
+                        simulated.get(path.absolute(), path), **kwargs
+                    ),
+                )
+            )
+        yield
 
 
 def session_check(factory, fail):
@@ -143,13 +191,18 @@ class KeyboardInput:
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+    sys.stderr.reconfigure(encoding="utf-8", newline="\n")
     root = Path(sys.argv[1])
     request = json.loads((root / "request.json").read_text())
     limits = request["limits"]
-    resource.setrlimit(resource.RLIMIT_CPU, (limits["cpu_seconds"],) * 2)
-    resource.setrlimit(resource.RLIMIT_FSIZE, (limits["file_bytes"],) * 2)
-    if sys.platform == "linux":
-        resource.setrlimit(resource.RLIMIT_AS, (limits["memory_bytes"],) * 2)
+    if os.name != "nt":
+        import resource
+
+        resource.setrlimit(resource.RLIMIT_CPU, (limits["cpu_seconds"],) * 2)
+        resource.setrlimit(resource.RLIMIT_FSIZE, (limits["file_bytes"],) * 2)
+        if sys.platform == "linux":
+            resource.setrlimit(resource.RLIMIT_AS, (limits["memory_bytes"],) * 2)
     result = {"error": "", "checks": []}
 
     workspace = root / "workspace"
@@ -197,6 +250,7 @@ def main():
             "__name__": "__main__",
             "__file__": str(workspace / entrypoint),
             "__session_check__": session_check,
+            "__symlink_fixtures__": symlink_fixtures,
             "__raises_value_error__": raises_value_error,
             "__mutation_check__": mutation_check,
             "__cli_check__": cli_check,
@@ -216,7 +270,7 @@ def main():
         except BaseException as exc:
             result["error"] = describe_error(exc)
     else:
-        with (root / "checks.jsonl").open("w") as events:
+        with (root / "checks.jsonl").open("w", encoding="utf-8", newline="\n") as events:
 
             def emit(event):
                 events.write(json.dumps(event) + "\n")

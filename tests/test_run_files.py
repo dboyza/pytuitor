@@ -65,7 +65,7 @@ async def test_run_omits_binary_oversized_and_special_files():
         "from pathlib import Path\nimport os\n"
         "Path('binary.dat').write_bytes(b'\\xff\\x00\\x01')\n"
         f"Path('large.txt').write_text('x' * {MAX_FILE_BYTES + 1})\n"
-        "os.mkfifo('pipe')\n"
+        "if hasattr(os, 'mkfifo'): os.mkfifo('pipe')\n"
         "Path('report.txt').write_text('This file remains available')\n"
     )
     result = await execute(LESSONS[0], source, check=False)
@@ -73,7 +73,10 @@ async def test_run_omits_binary_oversized_and_special_files():
     assert set(result.files) == {"lesson.py", "report.txt"}
     assert "binary files" in result.files_notice
     assert "oversized files" in result.files_notice
-    assert "non-text file types" in result.files_notice
+    import os
+
+    if hasattr(os, "mkfifo"):
+        assert "non-text file types" in result.files_notice
 
 
 async def test_run_snapshot_obeys_file_count_and_total_bytes():

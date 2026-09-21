@@ -1,19 +1,20 @@
 """Exercise real terminal bytes, not Pilot's synthetic key events."""
 
-import fcntl
 import json
 import os
-import pty
 import select
 import struct
 import subprocess
 import sys
-import termios
 import time
 
 import pytest
 
 from pytuitor.state import Store
+
+fcntl = pytest.importorskip("fcntl", reason="Unix PTY coverage; Windows uses ConPTY tests")
+pty = pytest.importorskip("pty")
+termios = pytest.importorskip("termios")
 
 
 @pytest.mark.parametrize("size", [(80, 24), (140, 44)])

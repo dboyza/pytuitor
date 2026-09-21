@@ -16,7 +16,13 @@ import tempfile
 import unicodedata
 from pathlib import Path, PurePosixPath
 
-from pytuitor.execution_policy import OUTPUT_BYTES, clean_environment, terminate_group
+from pytuitor.execution_policy import (
+    OUTPUT_BYTES,
+    clean_environment,
+    start_process,
+    terminate_group,
+)
+from pytuitor.platform_files import is_link
 
 MAX_FILES = 32
 MAX_FILE_BYTES = 256 * 1024
@@ -56,10 +62,16 @@ def validate_files(files: dict[str, str]) -> dict[str, str]:
             or name_size > 240
             or PurePosixPath(name).is_absolute()
             or "\\" in name
-            or ":" in name
+            or any(char in name for char in '<>:"|?*')
             or any(ord(char) < 32 or ord(char) == 127 for char in name)
             or any(part in {"", ".", ".."} or part.endswith((" ", ".")) for part in parts)
             or any(part.casefold() in _RESERVED for part in parts)
+            or any(
+                re.fullmatch(
+                    r"(?i:con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])", part.split(".")[0].rstrip()
+                )
+                for part in parts
+            )
         ):
             raise WorkspaceError(f"Use a relative project file name without traversal: {name!r}.")
         folded = unicodedata.normalize("NFC", name).casefold()
@@ -84,7 +96,7 @@ def validate_files(files: dict[str, str]) -> dict[str, str]:
 
 def _destination(path: Path) -> Path:
     path = Path(os.path.abspath(path.expanduser()))
-    if any(parent.is_symlink() for parent in (path, *path.parents)):
+    if any(is_link(parent) for parent in (path, *path.parents)):
         raise WorkspaceError("Choose a destination without symbolic-link directories.")
     if path.exists():
         raise WorkspaceError(f"Destination already exists: {path.name}.")
@@ -107,9 +119,13 @@ def export_workspace(destination: Path, files: dict[str, str]) -> Path:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(source, encoding="utf-8")
         # Exclusive reservation prevents replacing a directory another export created.
-        path.mkdir(mode=0o700)
-        reserved = True
-        staging.replace(path)
+        if os.name == "nt":
+            # Windows rename fails if *any* destination exists, including an empty folder.
+            staging.rename(path)
+        else:
+            path.mkdir(mode=0o700)
+            reserved = True
+            staging.replace(path)
         return path
     except OSError as error:
         if reserved:
@@ -127,13 +143,12 @@ def environment_python(path: Path) -> Path:
 
 async def _run_command(*arguments: str, timeout: float = COMMAND_TIMEOUT) -> str:
     environment = clean_environment(tempfile.gettempdir())
-    process = await asyncio.create_subprocess_exec(
+    process = await start_process(
         *arguments,
         stdin=asyncio.subprocess.DEVNULL,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
         env=environment,
-        start_new_session=True,
     )
     output = bytearray()
     try:
