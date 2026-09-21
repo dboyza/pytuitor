@@ -22,9 +22,9 @@ To retain larger or binary outputs, export the workspace and run it in a folder 
 ## Files and boundaries
 
 Use relative names such as `main.py`, `helpers.py`, or `data/settings.json`.
-The tutor rejects absolute paths, `..`, ambiguous names, case-only duplicates, reserved internal directories, and file/directory collisions.
+The tutor rejects absolute paths, `..`, ambiguous names, case-only duplicates, reserved internal directories, Windows device names such as `CON.py`, and file/directory collisions.
 A workspace permits 32 files, 256 KiB per file, and 1 MiB in total, measured as UTF-8 text.
-Exports reject symbolic-link destinations and ancestors.
+Exports reject symbolic-link destinations and ancestors, including Windows junctions.
 Keep binary data and large datasets outside the editor.
 
 These checks protect file management from accidental traversal or replacement.
@@ -47,7 +47,7 @@ Packages are third-party executable code even when distributed as wheels.
 All authored lessons can be completed with the standard library, without installing third-party packages.
 
 Environment commands have a time limit and an output limit.
-Cancelling an operation stops its subprocess group.
+Cancelling an operation stops its subprocess tree, using a process group on Unix or a kill-on-close Job Object on Windows.
 An interrupted package installation can leave some dependencies installed; recreating the environment is the clean recovery when its state is uncertain.
 
 ## Working outside the tutor
@@ -59,3 +59,18 @@ Do not copy an existing virtual environment to a new location; recreate it becau
 
 Use the **Execution and privacy** command for the local execution and network-access contract.
 Reference comparison is read-only and compares the selected stage file with a snapshot of your own draft.
+
+## Platform guarantees
+
+Tutor-owned text and learner subprocess I/O use UTF-8 on every platform, independent of the PowerShell code page.
+Run-file previews normalize text line endings for the editor.
+Windows run-file reads refuse reparse points and hold directory handles that prevent renaming while a snapshot is read.
+
+Profiles use an operating-system lock that is released when the application closes or crashes.
+Saving flushes the new file before replacement, then syncs the directory on Unix or requests write-through replacement on Windows.
+Storage hardware and filesystem behavior still determine durability during a sudden power loss.
+
+Every platform enforces execution time and captured-output limits.
+Unix also applies CPU and file-size resource limits, with address-space limits on Linux; Windows applies CPU and job-memory limits through Job Objects.
+Windows has no equivalent per-file `RLIMIT_FSIZE` here, so code can still write large files outside the preview limits.
+These are accidental-run protections, not a filesystem or network security sandbox.

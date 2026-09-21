@@ -28,6 +28,9 @@ class ObservedApp(TutorApp):
             "code": screen.query_one("#editor", TextArea).text if lesson else "",
             "transcript": screen.transcript if lesson else "",
             "passed": screen.stage_passed(screen.stage) if lesson else False,
+            "running": screen.running if lesson else False,
+            "waiting": bool(lesson and screen.console and screen.console.waiting),
+            "size": [self.size.width, self.size.height],
         }
         target = Path(sys.argv[2])
         temporary = target.with_suffix(".tmp")

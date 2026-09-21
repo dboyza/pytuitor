@@ -1,5 +1,6 @@
 """Versioned local profiles with atomic writes and a single-writer lock."""
 
+import errno
 import json
 import os
 import tempfile
@@ -38,7 +39,11 @@ class Store:
             lock_profile(self._lock)
         except OSError as exc:
             self._lock.close()
-            raise ProfileError("This profile is already open in another Pytuitor window.") from exc
+            if exc.errno in (errno.EACCES, errno.EAGAIN, errno.EDEADLK):
+                raise ProfileError(
+                    "This profile is already open in another Pytuitor window."
+                ) from exc
+            raise ProfileError(f"Could not lock the profile at {self.directory}: {exc}") from exc
         self._migration_original = None
         self.durability_warning = ""
         self.data = fresh_profile()

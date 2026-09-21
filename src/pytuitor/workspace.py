@@ -68,7 +68,8 @@ def validate_files(files: dict[str, str]) -> dict[str, str]:
             or any(part.casefold() in _RESERVED for part in parts)
             or any(
                 re.fullmatch(
-                    r"(?i:con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])", part.split(".")[0].rstrip()
+                    r"(?i:con|conin\$|conout\$|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])",
+                    part.split(".")[0].rstrip(),
                 )
                 for part in parts
             )

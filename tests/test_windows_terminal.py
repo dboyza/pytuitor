@@ -86,6 +86,40 @@ def test_powershell_learning_journey(tmp_path, shell, size):
         wait_for(pane="console", focus="results-scroll")
         terminal.write("\x14")
         wait_for(pane="lesson", focus="reading-panel")
+        terminal.write("\x14")
+        wait_for(pane="editor", focus="editor")
+
+        def replace_code(source):
+            terminal.write("\x01")  # Ctrl+A
+            terminal.write("\x1b[200~" + source + "\x1b[201~")
+            wait_for(code=source)
+
+        replace_code("print(input('Name: '))\n")
+        terminal.write("\x12")  # Ctrl+R Run
+        wait_for(waiting=True, focus="console-input")
+        terminal.write("Zoë\r")
+        observed = wait_for(running=False, waiting=False)
+        assert "Zoë" in observed["transcript"]
+        assert "Program finished" in observed["transcript"]
+        terminal.write("\x14\x14")
+        wait_for(pane="editor", focus="editor")
+        replace_code("import sys\nprint(sys.stdin.read())\n")
+        terminal.write("\x12")
+        wait_for(waiting=True, focus="console-input")
+        terminal.write("\x04")  # Ctrl+D is the tutor's explicit EOF on Windows too.
+        observed = wait_for(running=False, waiting=False)
+        assert "[end of input]" in observed["transcript"]
+        assert "Program finished" in observed["transcript"]
+        terminal.write("\x14\x14")
+        wait_for(pane="editor", focus="editor")
+        replace_code("while True:\n    pass\n")
+        terminal.write("\x12")
+        wait_for(running=True)
+        terminal.write("\x1b[19~")  # F8 Stop
+        wait_for(running=False)
+        resized = (140, 44) if size == (80, 24) else (80, 24)
+        terminal.setwinsize(resized[1], resized[0])
+        wait_for(size=list(resized))
         terminal.write("\x11")
         deadline = time.monotonic() + 10
         while terminal.isalive() and time.monotonic() < deadline:
@@ -97,4 +131,7 @@ def test_powershell_learning_journey(tmp_path, shell, size):
         assert restored.entry(LESSONS[0])["stage"] == "repair"
         restored.close()
     finally:
+        artifacts = Path(".artifacts")
+        artifacts.mkdir(exist_ok=True)
+        (artifacts / f"windows-{shell}-{size[0]}.txt").write_text(output, encoding="utf-8")
         terminal.close(force=True)

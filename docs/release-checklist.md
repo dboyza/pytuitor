@@ -28,8 +28,10 @@ uv build
 
 Inspect the wheel to confirm all authored Markdown resources are included.
 Install that wheel into a fresh isolated environment outside the checkout, launch it, and complete an onboarding-to-lesson journey.
-Run macOS and Linux CI on the supported Python versions and record the actual job links and outcomes.
+Run Windows, macOS, and Linux CI on the supported Python versions and record the actual job links and outcomes.
 Verify real terminal control-key behavior in addition to synthetic Textual key events.
+Run the native ConPTY journeys with Windows PowerShell 5.1 and PowerShell 7.
+Hosted Windows Server runners cover the native APIs; before a Windows desktop release, also record a Windows 10/11 Windows Terminal smoke check for installation, display, keyboard input, resizing, and upgrades.
 Inspect 80 × 24 and 140 × 44 layouts, including errors, dialogs, multi-file controls, the console, and reference comparison.
 Run the reviewed visual baseline tests without update mode.
 Exercise interrupted execution, EOF, infinite loops, excessive output, cancelled environment creation, failed package installation, and full progress reset.

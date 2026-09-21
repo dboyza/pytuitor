@@ -37,10 +37,10 @@ A shared service that accepts untrusted code would require a separate OS isolati
 
 ## Profile and release integrity
 
-Save a complete temporary profile, flush and sync it, atomically replace the destination, then sync the containing directory.
+Save a complete temporary profile, flush and sync it, atomically replace the destination, then sync the containing directory on Unix or request write-through replacement on Windows.
 If directory synchronization fails after replacement, report a durability warning without pretending the committed write was rolled back.
 Preserve migration backups, historical completion, and both stage drafts; a changed exercise revision invalidates only its old checked-pass evidence.
 
-Release requires evidence from the configured macOS/Linux Python matrix, installed-wheel checks, an upgrade journey, and explicit publication authorization.
+Release requires evidence from the configured Windows/macOS/Linux Python matrix, installed-wheel checks, an upgrade journey, and explicit publication authorization.
 Local validation is not a substitute for a missing Linux job, and a configured workflow is not evidence that it passed.
 Keep branch-push authorization separate from package publication authorization.

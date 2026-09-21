@@ -16,8 +16,9 @@ Offline, with no account required.</p>
 
 ## Start learning
 
-For macOS and Linux, with [uv](https://docs.astral.sh/uv/getting-started/installation/) installed and a terminal at least **80 × 24**.
+For Windows 10/11, macOS, and Linux, with [uv](https://docs.astral.sh/uv/getting-started/installation/) installed and a terminal at least **80 × 24**.
 Initial setup may download Python 3.11+ and dependencies; learning works offline afterward.
+On Windows, use Windows Terminal with Windows PowerShell 5.1 or PowerShell 7; the commands below work in both.
 
 ```sh
 git clone https://github.com/dboyza/pytuitor.git

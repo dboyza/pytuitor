@@ -18,6 +18,8 @@ from pytuitor.workspace import WorkspaceError, _run_command, export_workspace, v
     "name",
     [
         "CON.py",
+        "CONIN$",
+        "CONOUT$.txt",
         "aux",
         "NUL.txt",
         "Com1/data.py",

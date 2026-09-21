@@ -60,9 +60,9 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
 - `course_map.py` defines section/chapter order and project preparation; `syllabus.py` renders it.
 - `state.py` owns version 3 profiles, atomic writes, migration backups and locks.
-- Save profiles with file and directory sync; a post-replacement sync warning must not revert committed in-memory state.
+- Save with file sync and Unix directory sync or Windows write-through replacement; never roll back memory after a committed rename.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
-- `runner.py` launches standard-library-only `_worker.py`; `execution_policy.py` shares subprocess rules, and `progress_types.py` defines validated draft/check boundaries.
+- `runner.py` launches standard-library-only `_worker.py`; `execution_policy.py` owns process rules, `_windows.py` owns Win32 jobs and handles, and `run_files.py` reads bounded snapshots.
 - Checks receive fresh namespaces, local imports, working directories, and supplied stdin.
 - Compare the entire file snapshot before marking an asynchronous check successful.
 - Input-wait time must not consume execution timeout; kill descendant processes during cancellation.
@@ -80,7 +80,8 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Use scratch `--data-dir` profiles; never test against the user's progress.
 - Keep the checkout's Python interpreter in a persistent installation, never a temporary directory; virtual environments depend on that base interpreter remaining intact.
 - Run `uv sync --locked`, `uv run pytest`, `uv run ruff check .`, and `uv run ruff format --check .`.
-- Use Textual Pilot for journeys and real PTY input for terminal shortcut compatibility.
+- Use Textual Pilot plus real Unix PTY and Windows ConPTY journeys; test Windows PowerShell 5.1/7, Unicode paths, EOF, cancellation, and resizing.
+- Windows support uses Job Objects, byte-range profile locks, and reparse-point-safe reads; do not substitute Unix APIs or require symlink privileges.
 - Inspect 80 × 24 and 140 × 44 screenshots; fix clipping, wrapping, focus ambiguity, lint failures, and flakiness.
 - Use `env -u NO_COLOR TERM=xterm-256color COLORTERM=truecolor` for visual checks; temporary artifacts belong in `.artifacts/`.
 - Build with `uv build`; run `scripts/smoke_installed.py` against the installed wheel with isolated Python.
