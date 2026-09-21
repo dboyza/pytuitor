@@ -17,6 +17,7 @@ pytuitor = "pytuitor.__main__:main"
 dev = [
     "pytest>=8,<9",
     "pytest-asyncio>=1,<2",
+    "pytest-timeout>=2,<3",
     "pywinpty>=3,<4 ; sys_platform == 'win32'",
     "ruff>=0.12,<1",
 ]
@@ -24,6 +25,8 @@ dev = [
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+timeout = 120
+timeout_method = "thread"
 
 [tool.ruff]
 line-length = 100

@@ -56,12 +56,18 @@ def test_powershell_learning_journey(tmp_path, shell, size):
         backend=0,
     )
     output = ""
+    control_tail = ""
 
     def drain():
-        nonlocal output
+        nonlocal output, control_tail
         if select.select([terminal.fileobj], [], [], 0.05)[0]:
             try:
-                output = (output + terminal.read(65536))[-12000:]
+                chunk = terminal.read(65536)
+                output = (output + chunk)[-12000:]
+                controls = control_tail + chunk
+                for _ in range(controls.count("\x1b[6n")):
+                    terminal.write("\x1b[1;1R")
+                control_tail = controls[-3:]
             except EOFError:
                 pass
 
