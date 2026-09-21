@@ -15,7 +15,6 @@ from pytuitor.execution_policy import (
     WORKER_LIMITS,
     clean_environment,
     start_process,
-    terminate_group,
 )
 from pytuitor.models import Lesson, StageContract
 from pytuitor.progress_types import CheckEvent, check_event
@@ -110,6 +109,7 @@ async def execute(
         output_path = root / "output.txt"
         result_path = root / "result.json"
         process = None
+        tree = None
         reason = ""
         waiting_path = root / "waiting-for-input"
         offset = 0
@@ -133,7 +133,7 @@ async def execute(
 
         try:
             with output_path.open("wb") as output:
-                process = await start_process(
+                tree = await start_process(
                     str(python or sys.executable),
                     "-I",
                     str(Path(__file__).with_name("_worker.py")),
@@ -145,6 +145,7 @@ async def execute(
                     limits=WORKER_LIMITS,
                     env=clean_environment(folder, temporary=True),
                 )
+                process = tree.process
                 if console:
                     console.process = process
                 previous = asyncio.get_running_loop().time()
@@ -176,8 +177,8 @@ async def execute(
                         break
                     await asyncio.sleep(0.025)
         finally:
-            if process is not None:
-                await terminate_group(process)
+            if tree is not None:
+                await tree.close()
             if console:
                 console.process = None
                 console.set_waiting(False)

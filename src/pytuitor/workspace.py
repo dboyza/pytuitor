@@ -20,7 +20,6 @@ from pytuitor.execution_policy import (
     OUTPUT_BYTES,
     clean_environment,
     start_process,
-    terminate_group,
 )
 from pytuitor.platform_files import is_link
 
@@ -144,13 +143,14 @@ def environment_python(path: Path) -> Path:
 
 async def _run_command(*arguments: str, timeout: float = COMMAND_TIMEOUT) -> str:
     environment = clean_environment(tempfile.gettempdir())
-    process = await start_process(
+    tree = await start_process(
         *arguments,
         stdin=asyncio.subprocess.DEVNULL,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
         env=environment,
     )
+    process = tree.process
     output = bytearray()
     try:
         async with asyncio.timeout(timeout):
@@ -167,7 +167,7 @@ async def _run_command(*arguments: str, timeout: float = COMMAND_TIMEOUT) -> str
     except TimeoutError as error:
         raise WorkspaceError("The environment command timed out. You can try again.") from error
     finally:
-        await terminate_group(process)
+        await tree.close()
 
 
 async def create_environment(path: Path) -> Path:

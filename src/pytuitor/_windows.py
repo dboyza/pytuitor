@@ -1,14 +1,14 @@
 """Standard-library Win32 operations, imported only on Windows.
 
-The launcher joins a kill-on-close job before starting any requested program.
-Its non-inheritable job handle also closes when the launcher is forcibly stopped.
+The tutor owns the kill-on-close job; the launcher joins before starting user code.
+This also covers interpreters reached through Windows virtual-environment redirectors.
 """
 
 import ctypes
-import json
 import os
 import subprocess
 import sys
+import uuid
 from contextlib import contextmanager
 from ctypes import wintypes
 from pathlib import Path
@@ -30,6 +30,14 @@ _set_job = _function(
     "SetInformationJobObject", [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
 )
 _assign_job = _function("AssignProcessToJobObject", [wintypes.HANDLE, wintypes.HANDLE])
+_open_job = _function(
+    "OpenJobObjectW", [wintypes.DWORD, wintypes.BOOL, wintypes.LPCWSTR], wintypes.HANDLE
+)
+_terminate_job = _function("TerminateJobObject", [wintypes.HANDLE, wintypes.UINT])
+_query_job = _function(
+    "QueryInformationJobObject",
+    [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD, ctypes.c_void_p],
+)
 _current_process = _function("GetCurrentProcess", [], wintypes.HANDLE)
 _move = _function("MoveFileExW", [wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD])
 _create_file = _function(
@@ -130,31 +138,68 @@ def open_path(path: Path, *, directory: bool = False):
             _close(handle)
 
 
+class Accounting(ctypes.Structure):
+    _fields_ = [
+        ("times", ctypes.c_int64 * 4),
+        ("page_faults", wintypes.DWORD),
+        ("total_processes", wintypes.DWORD),
+        ("active_processes", wintypes.DWORD),
+        ("terminated_processes", wintypes.DWORD),
+    ]
+
+
+class Job:
+    """A controller-owned process tree, independent of interpreter launcher PIDs."""
+
+    def __init__(self, limits=None):
+        self.name = "Local\\Pytuitor-" + uuid.uuid4().hex
+        self.handle = _create_job(None, self.name)
+        if not self.handle:
+            raise ctypes.WinError(ctypes.get_last_error())
+        information = ExtendedLimits()
+        information.basic.flags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        if limits:
+            information.basic.flags |= 0x2 | 0x200  # CPU time and job memory.
+            information.basic.process_time = limits["cpu_seconds"] * 10_000_000
+            information.job_memory = limits["memory_bytes"]
+        if not _set_job(self.handle, 9, ctypes.byref(information), ctypes.sizeof(information)):
+            error = ctypes.get_last_error()
+            self.close()
+            raise ctypes.WinError(error)
+
+    def terminate(self):
+        if not _terminate_job(self.handle, 1):
+            raise ctypes.WinError(ctypes.get_last_error())
+
+    def empty(self):
+        information = Accounting()
+        if not _query_job(
+            self.handle, 1, ctypes.byref(information), ctypes.sizeof(information), None
+        ):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return information.active_processes == 0
+
+    def close(self):
+        if self.handle is not None:
+            _close(self.handle)
+            self.handle = None
+
+
 def launch() -> None:
-    limits = json.loads(sys.argv[1])
-    job = _create_job(None, None)
+    job = _open_job(0x1, False, sys.argv[1])  # JOB_OBJECT_ASSIGN_PROCESS
     if not job:
         raise ctypes.WinError(ctypes.get_last_error())
-    information = ExtendedLimits()
-    information.basic.flags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-    if limits:
-        information.basic.flags |= 0x2 | 0x200  # Per-process CPU and total job memory.
-        information.basic.process_time = limits["cpu_seconds"] * 10_000_000
-        information.job_memory = limits["memory_bytes"]
-    if not _set_job(job, 9, ctypes.byref(information), ctypes.sizeof(information)):
-        error = ctypes.get_last_error()
+    try:
+        if not _assign_job(job, _current_process()):
+            raise ctypes.WinError(ctypes.get_last_error())
+    finally:
+        # Only the tutor retains ownership. If it exits, no child can keep the
+        # job alive; a controller crash during this handshake cannot run code.
         _close(job)
-        raise ctypes.WinError(error)
-    if not _assign_job(job, _current_process()):
-        error = ctypes.get_last_error()
-        _close(job)
-        raise ctypes.WinError(error)
-    # Keep job alive until process exit. Closing it explicitly would kill this
-    # launcher too, before it could return the child's exit status.
     code = subprocess.call(sys.argv[2:])
     sys.stdout.flush()
     sys.stderr.flush()
-    os._exit(code)
+    os._exit(ctypes.c_int(code).value)
 
 
 if __name__ == "__main__":

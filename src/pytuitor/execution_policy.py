@@ -2,10 +2,14 @@
 
 import asyncio
 import contextlib
-import json
 import os
 import signal
+from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytuitor._windows import Job
 
 OUTPUT_BYTES = 64 * 1024
 EXECUTION_SECONDS = 5.0
@@ -37,31 +41,58 @@ def clean_environment(home: str, *, temporary: bool = False) -> dict[str, str]:
     return environment
 
 
-async def terminate_group(process: asyncio.subprocess.Process) -> None:
-    """Join the parent and kill descendants even if the parent already exited."""
-    if process.stdin is not None:
-        process.stdin.close()
-    with contextlib.suppress(ProcessLookupError):
-        if os.name == "nt":
-            process.kill()  # Closing the launcher job kills its descendants too.
-        else:
-            os.killpg(process.pid, signal.SIGKILL)
-    await process.wait()
+@dataclass
+class ProcessTree:
+    process: asyncio.subprocess.Process
+    job: "Job | None" = None
+
+    async def close(self) -> None:
+        process = self.process
+        if process.stdin is not None:
+            process.stdin.close()
+        try:
+            if self.job is not None:
+                self.job.terminate()
+            with contextlib.suppress(ProcessLookupError):
+                if os.name == "nt":
+                    process.kill()  # Also stop an outer venv redirector, if present.
+                else:
+                    os.killpg(process.pid, signal.SIGKILL)
+            if self.job is not None:
+                async with asyncio.timeout(5):
+                    while not self.job.empty():
+                        await asyncio.sleep(0.01)
+                    await process.wait()
+            else:
+                await process.wait()
+        finally:
+            if self.job is not None:
+                self.job.close()
 
 
-async def start_process(*arguments: str, limits: dict | None = None, **options):
-    """Start a process tree with cleanup installed before user code can run."""
+async def start_process(*arguments: str, limits: dict | None = None, **options) -> ProcessTree:
+    """Install cleanup before a launcher can start any requested Python code."""
     arguments = (arguments[0], "-X", "utf8", *arguments[1:])
+    job = None
     if os.name == "nt":
+        from pytuitor._windows import Job
+
+        job = Job(limits)
         arguments = (
             arguments[0],
             "-I",
             "-X",
             "utf8",
             str(Path(__file__).with_name("_windows.py")),
-            json.dumps(limits or {}),
+            job.name,
             *arguments,
         )
-    return await asyncio.create_subprocess_exec(
-        *arguments, start_new_session=os.name != "nt", **options
-    )
+    try:
+        process = await asyncio.create_subprocess_exec(
+            *arguments, start_new_session=os.name != "nt", **options
+        )
+        return ProcessTree(process, job)
+    except BaseException:
+        if job is not None:
+            job.close()
+        raise

@@ -20,6 +20,7 @@ def test_powershell_learning_journey(tmp_path, shell, size):
     from winpty import PtyProcess
 
     import pytuitor
+    from pytuitor._windows import Job
     from pytuitor.curriculum import LESSONS
     from pytuitor.state import Store
 
@@ -40,12 +41,13 @@ def test_powershell_learning_journey(tmp_path, shell, size):
     command = "& " + " ".join("'" + arg.replace("'", "''") + "'" for arg in arguments)
     command += "; exit $LASTEXITCODE"
     encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
+    job = Job()
     terminal = PtyProcess.spawn(
         [
             sys.executable,
             "-I",
             str(Path(pytuitor.__file__).with_name("_windows.py")),
-            "{}",
+            job.name,
             executable,
             "-NoLogo",
             "-NoProfile",
@@ -151,4 +153,6 @@ def test_powershell_learning_journey(tmp_path, shell, size):
         artifacts = Path(".artifacts")
         artifacts.mkdir(exist_ok=True)
         (artifacts / f"windows-{shell}-{size[0]}.txt").write_text(output, encoding="utf-8")
+        job.terminate()
+        job.close()
         terminal.close(force=True)

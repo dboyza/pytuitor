@@ -158,3 +158,30 @@ def test_windows_junctions_are_not_export_destinations_or_run_files(tmp_path):
         assert "symbolic links" in notice
     finally:
         junction.rmdir()
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Controller-owned Windows Job Objects")
+async def test_windows_controller_crash_stops_its_worker(tmp_path, process_is_running):
+    pid_file = tmp_path / "worker.pid"
+    worker = (
+        "import os, pathlib, time; "
+        f"pathlib.Path({str(pid_file)!r}).write_text(str(os.getpid())); time.sleep(60)"
+    )
+    controller = (
+        "import asyncio, os, sys\n"
+        "from pathlib import Path\n"
+        "from pytuitor.workspace import _run_command\n"
+        "async def main():\n"
+        f"    asyncio.create_task(_run_command(sys.executable, '-c', {worker!r}))\n"
+        f"    while not Path({str(pid_file)!r}).exists():\n"
+        "        await asyncio.sleep(.01)\n"
+        "    os._exit(7)\n"
+        "asyncio.run(main())\n"
+    )
+    process = await asyncio.create_subprocess_exec(sys.executable, "-c", controller)
+    async with asyncio.timeout(15):
+        await process.wait()
+        assert process.returncode == 7
+        pid = int(pid_file.read_text())
+        while process_is_running(pid):
+            await asyncio.sleep(0.02)
