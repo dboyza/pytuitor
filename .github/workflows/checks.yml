@@ -34,8 +34,11 @@ jobs:
         run: uv sync --locked
       - name: Verify CLI startup
         run: uv run --locked --python ${{ matrix.python }} pytuitor --help
+      - name: Verify native PowerShell terminals
+        if: runner.os == 'Windows'
+        run: uv run --locked --python ${{ matrix.python }} pytest tests/test_windows_terminal.py -o faulthandler_timeout=60
       - name: Run tests
-        run: uv run --locked --python ${{ matrix.python }} pytest
+        run: uv run --locked --python ${{ matrix.python }} pytest --ignore=tests/test_windows_terminal.py -o faulthandler_timeout=60 --durations=20
       - name: Check lint
         run: uv run --locked --python ${{ matrix.python }} ruff check .
       - name: Check formatting

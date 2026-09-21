@@ -19,6 +19,7 @@ pytestmark = pytest.mark.skipif(os.name != "nt", reason="Requires native Windows
 def test_powershell_learning_journey(tmp_path, shell, size):
     from winpty import PtyProcess
 
+    import pytuitor
     from pytuitor.curriculum import LESSONS
     from pytuitor.state import Store
 
@@ -40,7 +41,17 @@ def test_powershell_learning_journey(tmp_path, shell, size):
     command += "; exit $LASTEXITCODE"
     encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
     terminal = PtyProcess.spawn(
-        [executable, "-NoLogo", "-NoProfile", "-EncodedCommand", encoded],
+        [
+            sys.executable,
+            "-I",
+            str(Path(pytuitor.__file__).with_name("_windows.py")),
+            "{}",
+            executable,
+            "-NoLogo",
+            "-NoProfile",
+            "-EncodedCommand",
+            encoded,
+        ],
         dimensions=(size[1], size[0]),
         backend=0,
     )
