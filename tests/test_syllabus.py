@@ -45,7 +45,7 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
         scroll = app.screen.query_one("#syllabus-scroll", VerticalScroll)
         scroll.focus()
         await pilot.press("end")
-        await pilot.pause()
+        await pilot.wait_for_scheduled_animations()
         assert scroll.scroll_y == scroll.max_scroll_y
         assert scroll.max_scroll_x == 0
         assert app.store.data == before
