@@ -21,7 +21,9 @@ def test_upgrade_lookup_is_explicit_read_only(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "payload", [b"not json", b"x" * (1024 * 1024 + 1), b'{"info":{"version":"bad\\nversion"}}']
+    "payload",
+    [b"not json", b"x" * (1024 * 1024 + 1), b'{"info":{"version":"bad\\nversion"}}'],
+    ids=["invalid-json", "oversized-response", "invalid-version"],
 )
 def test_bad_release_response_is_rejected(monkeypatch, payload):
     monkeypatch.setattr(release, "urlopen", lambda *args, **kwargs: io.BytesIO(payload))
