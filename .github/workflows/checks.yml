@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test:
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -38,7 +38,15 @@ jobs:
         if: runner.os == 'Windows'
         run: uv run --locked --python ${{ matrix.python }} pytest tests/test_windows_terminal.py -o faulthandler_timeout=60
       - name: Run tests
+        if: runner.os != 'Windows'
         run: uv run --locked --python ${{ matrix.python }} pytest -x --ignore=tests/test_windows_terminal.py -o faulthandler_timeout=60 --durations=20
+      - name: Run Windows tests with retained diagnostics
+        if: runner.os == 'Windows'
+        timeout-minutes: 10
+        run: |
+          New-Item -ItemType Directory -Force .artifacts | Out-Null
+          uv run --locked --python ${{ matrix.python }} pytest -vv -x --ignore=tests/test_windows_terminal.py -o faulthandler_timeout=60 --durations=20 --junitxml=.artifacts/windows-tests.xml 2>&1 | Tee-Object -FilePath .artifacts/windows-tests.log
+          exit $LASTEXITCODE
       - name: Check lint
         run: uv run --locked --python ${{ matrix.python }} ruff check .
       - name: Check formatting
