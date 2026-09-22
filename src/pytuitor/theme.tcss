@@ -100,14 +100,16 @@ Dashboard.narrow #dashboard-bottom { height: 1; margin-top: 0; }
 #lesson-name { width: 1fr; padding: 1 2 0 2; }
 #save-status { width: 15; padding-top: 1; }
 #lesson-body { height: 1fr; padding: 1 3; }
-#toggle-files { min-width: 7; margin-left: 1; padding: 0 1; }
-#file-sidebar { width: 20; margin-right: 1; background: #1c1f22; }
-#files-heading { height: 2; padding: 0 1; color: #a2aaa9; text-style: bold; }
+#toggle-files { display: none; min-width: 7; padding: 0 1; }
+#editor-workspace { height: 1fr; min-height: 5; }
+#file-sidebar { display: none; width: 20; margin-right: 1; background: #1c1f22; }
+LessonScreen.multi-file #file-sidebar,
+LessonScreen.multi-file #toggle-files { display: block; }
+#files-heading { height: 1; padding: 0 1; color: #a2aaa9; text-style: bold; }
 #file-tree { height: 1fr; padding: 0; border: solid transparent; scrollbar-size: 1 1; background: #1c1f22; }
 #file-tree:focus { border: solid #3776ab; }
 #file-tree > .tree--cursor { background: #353b3e; color: #dddcd7; text-style: none; }
 #file-tree > .tree--highlight { background: #33393c; text-style: none; }
-#file-sidebar #add-file { width: 100%; height: 1; }
 LessonScreen.files-hidden #file-sidebar { display: none; }
 #reading-panel { width: 2fr; padding: 0 2 1 2; }
 #lesson-content { height: auto; padding: 0 2 0 0; }
@@ -120,7 +122,7 @@ LessonScreen.files-hidden #file-sidebar { display: none; }
 #hint { margin-top: 1; }
 #workbench { width: 3fr; background: #1c1f22; }
 .file-label { height: 2; margin: 0; padding: 0 2; content-align: left middle; }
-#editor { height: 1fr; min-height: 5; border: none; background: #1c1f22; }
+#editor { width: 1fr; height: 1fr; min-height: 5; border: none; background: #1c1f22; }
 #editor:focus { border: none; }
 #execution-actions { height: 3; background: #151719; }
 #execution-actions Button { margin-right: 1; min-width: 8; }
@@ -143,7 +145,7 @@ LessonScreen.narrow.show-lesson #reading-panel { display: block; }
 LessonScreen.narrow.show-editor #workbench,
 LessonScreen.narrow.show-console #workbench { display: block; }
 LessonScreen.narrow.show-editor #console-pane { display: none; }
-LessonScreen.narrow.show-console #editor,
+LessonScreen.narrow.show-console #editor-workspace,
 LessonScreen.narrow.show-console .file-label { display: none; }
 LessonScreen.narrow.show-console #console-pane { height: 1fr; }
 ModalScreen { align: center middle; background: #000000 60%; }

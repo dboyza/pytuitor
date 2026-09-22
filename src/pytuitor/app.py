@@ -152,14 +152,15 @@ class TutorApp(App):
                 "Start over", "Erase progress and return to onboarding", self.action_restart
             )
         if isinstance(screen, LessonScreen):
-            yield SystemCommand(
-                "Focus files", "Show the workspace explorer", screen.action_focus_files
-            )
-            yield SystemCommand(
-                "Toggle file explorer",
-                "Show or hide the compact sidebar",
-                screen.action_toggle_files,
-            )
+            if len(screen.project_files()) > 1:
+                yield SystemCommand(
+                    "Focus files", "Show the workspace explorer", screen.action_focus_files
+                )
+                yield SystemCommand(
+                    "Toggle file explorer",
+                    "Show or hide the compact sidebar",
+                    screen.action_toggle_files,
+                )
             yield SystemCommand(
                 "Project environment",
                 "Create a venv or explicitly install a package",

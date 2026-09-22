@@ -10,6 +10,7 @@ import time
 
 import pytest
 
+from pytuitor.curriculum import BY_ID
 from pytuitor.state import Store
 
 fcntl = pytest.importorskip("fcntl", reason="Unix PTY coverage; Windows uses ConPTY tests")
@@ -22,6 +23,7 @@ termios = pytest.importorskip("termios")
 def test_ctrl_t_cycles_through_terminal_input(tmp_path, size, delay_editor_focus):
     store = Store(tmp_path / "profile")
     store.data["onboarded"] = True
+    store.entry(BY_ID["first-light"])["files"] = {"lesson.py": "", "helpers.py": ""}
     store.save()
     store.close()
     state = tmp_path / "terminal-state"

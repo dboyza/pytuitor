@@ -115,13 +115,10 @@ async def test_small_terminal_and_visual_artifacts(tmp_path):
         app.save_screenshot("reading-80.svg", str(artifacts))
         await pilot.press("ctrl+t")
         await pilot.pause()
-        assert app.screen.query_one("#editor").region.width >= 50
+        assert app.screen.query_one("#editor").region.width >= 70
         assert app.screen.query_one("#editor").region.height >= 5
         app.save_screenshot("lesson-80.svg", str(artifacts))
-        await pilot.click("#toggle-files")
-        await pilot.pause()
-        assert app.screen.query_one("#editor").region.width >= 70
-        await pilot.press("ctrl+e")
+        assert not app.screen.query_one("#file-sidebar").display
         await pilot.press("ctrl+t", "ctrl+t")
         await pilot.pause()
         assert app.screen.query_one("#reading-panel").display

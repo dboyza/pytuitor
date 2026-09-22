@@ -80,7 +80,6 @@ class LessonScreen(TutorScreen):
         yield brand(self.lesson.title.upper())
         with Horizontal(id="lesson-toolbar"):
             yield Button("← Dashboard", id="back")
-            yield Button("Files", id="toggle-files")
             yield Static(self.lesson.title, id="lesson-name", classes="title")
             yield Static("Saved locally", id="save-status", classes="muted")
         with Horizontal(id="stage-navigation"):
@@ -96,10 +95,6 @@ class LessonScreen(TutorScreen):
                 variant="primary" if self.stage == "repair" else "default",
             )
         with Horizontal(id="lesson-body"):
-            with Vertical(id="file-sidebar"):
-                yield Static("EXPLORER", id="files-heading")
-                yield FileTree()
-                yield Button("+ File", id="add-file")
             with VerticalScroll(id="reading-panel"):
                 with Vertical(id="lesson-content"):
                     yield Static(
@@ -151,14 +146,20 @@ class LessonScreen(TutorScreen):
                     with VerticalScroll(id="exercise-scroll"):
                         yield Markdown(id="stage-instructions", classes="stage-instructions")
                 with Horizontal(id="file-toolbar", classes="file-label"):
+                    yield Button("Files", id="toggle-files")
                     yield Static(self.active_file, id="active-file", markup=False)
+                    yield Button("+ File", id="add-file")
                     yield Button("Environment", id="environment")
-                yield CodeEditor.code_editor(
-                    sources[self.active_file],
-                    language="python",
-                    theme="vscode_dark",
-                    id="editor",
-                )
+                with Horizontal(id="editor-workspace"):
+                    with Vertical(id="file-sidebar"):
+                        yield Static("EXPLORER", id="files-heading")
+                        yield FileTree()
+                    yield CodeEditor.code_editor(
+                        sources[self.active_file],
+                        language="python",
+                        theme="vscode_dark",
+                        id="editor",
+                    )
                 with Horizontal(id="execution-actions"):
                     yield Button("Run", id="run")
                     yield Button("Check  →", id="check", variant="primary")
@@ -236,6 +237,7 @@ class LessonScreen(TutorScreen):
         self.active_file = self.lesson.entrypoint
         self.query_one(FileTree).set_files(sources, self.active_file)
         self.load_active_file()
+        self.apply_layout()
 
     def load_active_file(self) -> None:
         label = self.query_one("#active-file", Static)
@@ -262,6 +264,8 @@ class LessonScreen(TutorScreen):
 
     @on(Button.Pressed, "#toggle-files")
     def action_toggle_files(self) -> None:
+        if len(self.project_files()) < 2:
+            return
         sidebar = self.query_one("#file-sidebar")
         if not sidebar.display:
             self.action_focus_files()
@@ -272,6 +276,9 @@ class LessonScreen(TutorScreen):
             self.select_pane("editor")
 
     def action_focus_files(self) -> None:
+        if len(self.project_files()) < 2:
+            self.select_pane("editor")
+            return
         self.remove_class("files-hidden")
         self.active_pane = "editor"
         self.apply_layout()
@@ -427,7 +434,9 @@ class LessonScreen(TutorScreen):
         self.apply_layout()
 
     def apply_layout(self) -> None:
-        self.set_class(self.size.width < 120, "narrow")
+        multi_file = len(self.project_files()) > 1
+        self.set_class(multi_file, "multi-file")
+        self.set_class(self.size.width < (120 if multi_file else 100), "narrow")
         for pane in self.PANES:
             self.set_class(self.active_pane == pane, f"show-{pane}")
 

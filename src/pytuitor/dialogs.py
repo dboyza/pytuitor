@@ -41,7 +41,7 @@ class KeyboardHelp(ModalScreen):
                 "F7                  Focus the lesson question\n"
                 "Ctrl+N              Next lesson after completion\n"
                 "F8                  Stop the running program\n\n"
-                "IN THE FILE EXPLORER\n"
+                "IN MULTI-FILE LESSONS / PROJECTS\n"
                 "Ctrl+E              Show and focus files\n"
                 "↑ ↓                 Move through files and folders\n"
                 "← / →               Collapse / expand a folder\n"

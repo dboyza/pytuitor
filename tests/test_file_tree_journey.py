@@ -19,7 +19,11 @@ async def test_explorer_files_folders_and_drafts(tmp_path, size):
         editor = screen.query_one(TextArea)
         tree = screen.query_one(FileTree)
         sidebar = screen.query_one("#file-sidebar")
-        assert sidebar.region.width == 20
+        assert not sidebar.display
+        assert not screen.query_one("#toggle-files").display
+        await pilot.press("ctrl+e")
+        assert not sidebar.display
+        assert editor.has_focus
         assert editor.region.width >= 50
         assert editor.region.height >= 5
         await pilot.press("#", "a")
@@ -29,6 +33,13 @@ async def test_explorer_files_folders_and_drafts(tmp_path, size):
         await pilot.press("enter")
         await pilot.pause()
         assert screen.active_file == "notes/résumé.txt"
+        assert sidebar.display
+        assert sidebar.region.width == 20
+        assert sidebar.parent.id == "editor-workspace"
+        assert sidebar.region.right <= editor.region.x
+        assert sidebar.region.y == editor.region.y
+        if size[0] == 140:
+            assert screen.query_one("#reading-panel").region.right <= sidebar.region.x
         assert editor.language is None
         await pilot.press("h", "i")
         await pilot.press("ctrl+e", "left")
@@ -61,6 +72,8 @@ async def test_explorer_files_folders_and_drafts(tmp_path, size):
         await pilot.pause()
         assert "notes/résumé.txt" not in tree.files
         assert "notes" not in tree.folders
+        assert not sidebar.display
+        assert not screen.query_one("#toggle-files").display
         assert screen.active_file == lesson.entrypoint
         assert editor.text == "#a"
         assert editor.language == "python"
@@ -84,7 +97,7 @@ async def test_explorer_mouse_selection_resizing_and_hidden_focus(tmp_path):
         await pilot.press("ctrl+t")
         assert screen.active_pane == "console"
         assert not screen.query_one("#file-sidebar").display
-        await pilot.click("#toggle-files")
+        await pilot.press("ctrl+e")
         await pilot.pause()
         assert tree.has_focus
         assert screen.query_one("#file-sidebar").display

@@ -38,7 +38,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Ctrl+T cycles lesson/editor/console, displayed `^t`; avoid Ctrl+number in legacy terminals.
 - Footer order is numbered function keys, Ctrl shortcuts, then other keys.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
-- The compact left explorer shows stage files; Ctrl+E focuses it, Files toggles it, and narrow layouts show it only beside the editor.
+- Show the compact explorer only for stages with multiple files, inside the workbench directly left of the editor; Ctrl+E focuses it and Files toggles it.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
 - Legacy track, practice, and study-note profile fields remain loadable but inert.
