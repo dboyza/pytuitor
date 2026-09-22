@@ -153,6 +153,14 @@ class TutorApp(App):
             )
         if isinstance(screen, LessonScreen):
             yield SystemCommand(
+                "Focus files", "Show the workspace explorer", screen.action_focus_files
+            )
+            yield SystemCommand(
+                "Toggle file explorer",
+                "Show or hide the compact sidebar",
+                screen.action_toggle_files,
+            )
+            yield SystemCommand(
                 "Project environment",
                 "Create a venv or explicitly install a package",
                 screen.action_environment,

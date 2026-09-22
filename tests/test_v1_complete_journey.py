@@ -1,12 +1,14 @@
-from textual.widgets import Select, TextArea
+from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import BY_ID
+from pytuitor.file_tree import FileTree
 
 
 async def fill_workspace(screen, pilot, files):
     for name, source in files.items():
-        screen.query_one("#project-file", Select).value = name
+        tree = screen.query_one(FileTree)
+        tree.select_node(tree.files[name])
         await pilot.pause()
         screen.query_one("#editor", TextArea).load_text(source)
         await pilot.pause()

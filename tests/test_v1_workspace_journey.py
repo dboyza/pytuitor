@@ -1,10 +1,11 @@
 from dataclasses import replace
 
 import pytest
-from textual.widgets import Select, TextArea
+from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import LESSONS
+from pytuitor.file_tree import FileTree
 from pytuitor.lesson_screen import LessonScreen
 from pytuitor.models import Check
 from pytuitor.runner import execute
@@ -43,7 +44,8 @@ async def test_multi_file_stage_drafts_checks_and_export(tmp_path):
         assert editor.text == ""
         editor.load_text(lesson.solution)
         await pilot.pause()
-        screen.query_one("#project-file", Select).value = "helpers.py"
+        tree = screen.query_one(FileTree)
+        tree.select_node(tree.files["helpers.py"])
         await pilot.pause()
         assert editor.text == ""
         editor.load_text(lesson.solution_files["helpers.py"])

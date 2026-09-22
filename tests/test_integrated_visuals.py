@@ -13,6 +13,25 @@ from pytuitor.curriculum import BY_ID
 BASELINES = Path(__file__).with_name("visuals")
 
 
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)])
+async def test_explorer_visuals(tmp_path, monkeypatch, size):
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setenv("TERM", "xterm-256color")
+    monkeypatch.setenv("COLORTERM", "truecolor")
+    app = TutorApp(tmp_path)
+    lesson = BY_ID["first-light"]
+    app.store.data.update(onboarded=True, last_lesson=lesson.id)
+    app.store.entry(lesson)["files"] = {
+        lesson.entrypoint: "print('Hello, world')\nprint(8 + 5)\n",
+        "helpers/messages.py": "",
+        "helpers/formatting.py": "",
+        "notes.txt": "",
+    }
+    async with app.run_test(size=size) as pilot:
+        await pilot.press("c", "ctrl+e")
+        await capture(app, pilot, f"{size[0]}-explorer")
+
+
 async def capture(app, pilot, name):
     for editor in app.screen.query(TextArea):
         editor.cursor_blink = False

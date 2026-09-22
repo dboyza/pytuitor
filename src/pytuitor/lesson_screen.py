@@ -8,11 +8,12 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.events import DescendantFocus, Resize
-from textual.widgets import Button, Footer, Input, Markdown, OptionList, Select, Static, TextArea
+from textual.widgets import Button, Footer, Input, Markdown, OptionList, Static, TextArea, Tree
 from textual.widgets.option_list import Option
 
 from pytuitor.curriculum import BY_ID, Lesson, default_input
 from pytuitor.dialogs import ConfirmReset
+from pytuitor.file_tree import FileTree
 from pytuitor.learning_tools import (
     DeleteFileDialog,
     EnvironmentDialog,
@@ -48,6 +49,7 @@ class LessonScreen(TutorScreen):
         Binding("f7", "question", "Question", priority=True, show=False),
         Binding("ctrl+n", "next", "Next lesson", priority=True, show=False),
         Binding("f8", "stop", "Stop", priority=True, show=False),
+        Binding("ctrl+e", "focus_files", "Files", priority=True, show=False),
     ]
     PANES = ("lesson", "editor", "console")
 
@@ -78,6 +80,7 @@ class LessonScreen(TutorScreen):
         yield brand(self.lesson.title.upper())
         with Horizontal(id="lesson-toolbar"):
             yield Button("← Dashboard", id="back")
+            yield Button("Files", id="toggle-files")
             yield Static(self.lesson.title, id="lesson-name", classes="title")
             yield Static("Saved locally", id="save-status", classes="muted")
         with Horizontal(id="stage-navigation"):
@@ -93,6 +96,10 @@ class LessonScreen(TutorScreen):
                 variant="primary" if self.stage == "repair" else "default",
             )
         with Horizontal(id="lesson-body"):
+            with Vertical(id="file-sidebar"):
+                yield Static("EXPLORER", id="files-heading")
+                yield FileTree()
+                yield Button("+ File", id="add-file")
             with VerticalScroll(id="reading-panel"):
                 with Vertical(id="lesson-content"):
                     yield Static(
@@ -144,13 +151,7 @@ class LessonScreen(TutorScreen):
                     with VerticalScroll(id="exercise-scroll"):
                         yield Markdown(id="stage-instructions", classes="stage-instructions")
                 with Horizontal(id="file-toolbar", classes="file-label"):
-                    yield Select(
-                        [(name, name) for name in sources],
-                        value=self.active_file,
-                        allow_blank=False,
-                        id="project-file",
-                    )
-                    yield Button("+ File", id="add-file")
+                    yield Static(self.active_file, id="active-file", markup=False)
                     yield Button("Environment", id="environment")
                 yield CodeEditor.code_editor(
                     sources[self.active_file],
@@ -187,6 +188,7 @@ class LessonScreen(TutorScreen):
         yield Footer(show_command_palette=False)
 
     def on_mount(self) -> None:
+        self.query_one(FileTree).set_files(self.project_files(), self.active_file)
         self.query_one("#run-files").display = False
         if not self.lesson.choices:
             for selector in (
@@ -232,20 +234,48 @@ class LessonScreen(TutorScreen):
     def load_project(self) -> None:
         sources = self.project_files()
         self.active_file = self.lesson.entrypoint
-        select = self.query_one("#project-file", Select)
-        select.set_options([(name, name) for name in sources])
-        select.value = self.active_file
-        self.query_one("#editor", TextArea).load_text(sources[self.active_file])
+        self.query_one(FileTree).set_files(sources, self.active_file)
+        self.load_active_file()
 
-    @on(Select.Changed, "#project-file")
-    def change_file(self, event: Select.Changed) -> None:
-        if event.value == self.active_file or event.value not in self.project_files():
-            return
-        self.save_draft()
-        self.active_file = str(event.value)
+    def load_active_file(self) -> None:
+        label = self.query_one("#active-file", Static)
+        label.update(Text(self.active_file))
+        label.tooltip = self.active_file
         editor = self.query_one("#editor", TextArea)
         editor.language = "python" if self.active_file.endswith(".py") else None
         editor.load_text(self.project_files()[self.active_file])
+
+    @on(Tree.NodeSelected, "#file-tree")
+    def change_file(self, event: Tree.NodeSelected[str]) -> None:
+        if event.node.allow_expand or event.node.data not in self.project_files():
+            return
+        self.open_file(event.node.data)
+        self.select_pane("editor")
+
+    def open_file(self, name: str) -> None:
+        if name == self.active_file:
+            return
+        self.save_draft()
+        self.active_file = name
+        self.load_active_file()
+        self.query_one(FileTree).mark_active(name)
+
+    @on(Button.Pressed, "#toggle-files")
+    def action_toggle_files(self) -> None:
+        sidebar = self.query_one("#file-sidebar")
+        if not sidebar.display:
+            self.action_focus_files()
+            return
+        focused = sidebar.has_focus_within
+        self.add_class("files-hidden")
+        if focused:
+            self.select_pane("editor")
+
+    def action_focus_files(self) -> None:
+        self.remove_class("files-hidden")
+        self.active_pane = "editor"
+        self.apply_layout()
+        self.query_one(FileTree).focus()
 
     @on(Button.Pressed, "#add-file")
     def action_add_file(self) -> None:
@@ -257,7 +287,8 @@ class LessonScreen(TutorScreen):
         self.save_draft()
         sources = self.project_files()
         if name in sources:
-            self.notify("This file already exists. Choose it from the file menu.")
+            self.open_file(name)
+            self.select_pane("editor")
             return
         try:
             validate_files({**sources, name: ""})
@@ -265,8 +296,9 @@ class LessonScreen(TutorScreen):
             self.notify(str(exc), severity="error")
             return
         sources[name] = ""
-        self.query_one("#project-file", Select).set_options([(key, key) for key in sources])
-        self.query_one("#project-file", Select).value = name
+        self.query_one(FileTree).set_files(sources, self.active_file)
+        self.open_file(name)
+        self.select_pane("editor")
         self.tutor.persist()
 
     def action_remove_file(self) -> None:
@@ -395,7 +427,7 @@ class LessonScreen(TutorScreen):
         self.apply_layout()
 
     def apply_layout(self) -> None:
-        self.set_class(self.size.width < 100, "narrow")
+        self.set_class(self.size.width < 120, "narrow")
         for pane in self.PANES:
             self.set_class(self.active_pane == pane, f"show-{pane}")
 
@@ -421,6 +453,7 @@ class LessonScreen(TutorScreen):
         for widget_id, pane in (
             ("reading-panel", "lesson"),
             ("editor", "editor"),
+            ("file-sidebar", "editor"),
             ("console-pane", "console"),
         ):
             if widget_id in ids:

@@ -38,6 +38,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Ctrl+T cycles lesson/editor/console, displayed `^t`; avoid Ctrl+number in legacy terminals.
 - Footer order is numbered function keys, Ctrl shortcuts, then other keys.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
+- The compact left explorer shows stage files; Ctrl+E focuses it, Files toggles it, and narrow layouts show it only beside the editor.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
 - Legacy track, practice, and study-note profile fields remain loadable but inert.
@@ -56,7 +57,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - `models.py` defines contracts; `beginner_course.py`, `beginner_extensions.py`, and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
 - Stage contracts live in `content/` chapter modules and the six Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
-- `lesson_screen.py` owns stage/editor/console execution; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
+- `lesson_screen.py` owns stage/editor/console execution; `file_tree.py` renders workspace files; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
 - `course_map.py` defines section/chapter order and project preparation; `syllabus.py` renders it.
 - `state.py` owns version 3 profiles, atomic writes, migration backups and locks.

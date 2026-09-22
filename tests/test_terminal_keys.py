@@ -138,6 +138,10 @@ ObservedApp(Path(sys.argv[1])).run()
         wait_for("lesson", focused="reading-panel")
         os.write(master, b"\x1bOS")  # F4 through the xterm terminal protocol.
         wait_for("editor", focused="exercise-scroll")
+        os.write(master, b"\x05")  # Ctrl+E opens the file explorer.
+        wait_for("editor", focused="file-tree")
+        os.write(master, b"\r")  # Enter opens the selected file in the editor.
+        wait_for("editor", focused="editor")
         os.write(master, b"\x11")  # Ctrl+Q.
         deadline = time.monotonic() + 5
         while process.poll() is None and time.monotonic() < deadline:

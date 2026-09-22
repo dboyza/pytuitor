@@ -278,12 +278,12 @@ class DeleteFileDialog(ModalScreen[bool]):
 
     def __init__(self, name: str):
         super().__init__()
-        self.name = name
+        self.file_name = name
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(classes="dialog"):
             yield Static("Remove this file?", classes="title")
-            yield Static(self.name, markup=False)
+            yield Static(self.file_name, markup=False)
             yield Static("The complete workspace will be backed up in exports first.")
             with Horizontal(classes="actions"):
                 yield Button("Keep file", id="keep-file", variant="primary")

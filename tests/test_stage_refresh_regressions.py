@@ -3,10 +3,11 @@
 import ast
 
 import pytest
-from textual.widgets import Button, Select, Static, TextArea
+from textual.widgets import Button, Static, TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import BY_ID, default_input
+from pytuitor.file_tree import FileTree
 from pytuitor.runner import execute
 
 
@@ -73,7 +74,8 @@ async def test_refreshed_projects_through_both_editors_and_saved_stages(tmp_path
                 await app.workers.wait_for_complete()
                 assert not screen.stage_passed(name)
             for filename, source in contract.reference_files.items():
-                screen.query_one("#project-file", Select).value = filename
+                tree = screen.query_one(FileTree)
+                tree.select_node(tree.files[filename])
                 await pilot.pause()
                 screen.query_one("#editor", TextArea).load_text(source)
             await pilot.press("f5")
