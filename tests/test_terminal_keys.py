@@ -3,6 +3,7 @@
 import json
 import os
 import select
+import signal
 import struct
 import subprocess
 import sys
@@ -76,6 +77,10 @@ class ObservedApp(TutorApp):
             "focused": self.focused.id if self.focused else None,
             "pending": getattr(screen, "delayed_focus", None) is not None,
             "delivered": getattr(screen, "focus_delivered", False),
+            "width": self.size.width,
+            "compact": screen.has_class("compact"),
+            "lesson_scroll": screen.query_one("#lesson-list").max_scroll_y
+                if screen.query("#lesson-list") else None,
         }
         target = Path(sys.argv[2])
         temporary = target.with_suffix(".tmp")
@@ -144,6 +149,12 @@ ObservedApp(Path(sys.argv[1])).run()
         wait_for("editor", focused="file-tree")
         os.write(master, b"\r")  # Enter opens the selected file in the editor.
         wait_for("editor", focused="editor")
+        os.write(master, b"\x02")  # Ctrl+B returns to the dashboard.
+        wait_for("dashboard")
+        for width, height, compact in ((120, 30, True), (180, 49, False), (80, 24, True)):
+            fcntl.ioctl(master, termios.TIOCSWINSZ, struct.pack("HHHH", height, width, 0, 0))
+            os.kill(process.pid, signal.SIGWINCH)
+            wait_for("dashboard", width=width, compact=compact, lesson_scroll=0)
         os.write(master, b"\x11")  # Ctrl+Q.
         deadline = time.monotonic() + 5
         while process.poll() is None and time.monotonic() < deadline:

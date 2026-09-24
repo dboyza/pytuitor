@@ -13,6 +13,21 @@ from pytuitor.curriculum import BY_ID
 BASELINES = Path(__file__).with_name("visuals")
 
 
+@pytest.mark.parametrize(
+    "size", [(80, 24), (120, 30), (140, 44), (180, 49)], ids=["small", "macos", "wide", "large"]
+)
+async def test_dashboard_visuals(tmp_path, monkeypatch, size):
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setenv("TERM", "xterm-256color")
+    monkeypatch.setenv("COLORTERM", "truecolor")
+    app = TutorApp(tmp_path)
+    app.store.data.update(onboarded=True, last_lesson="decimal-measurements")
+    for identifier in ("first-light", "names-and-voices", "numbers-from-input"):
+        app.store.entry(BY_ID[identifier])["completed"] = True
+    async with app.run_test(size=size) as pilot:
+        await capture(app, pilot, f"{size[0]}-dashboard")
+
+
 @pytest.mark.parametrize("size", [(80, 24), (140, 44)])
 async def test_explorer_visuals(tmp_path, monkeypatch, size):
     monkeypatch.delenv("NO_COLOR", raising=False)

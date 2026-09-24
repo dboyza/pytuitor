@@ -6,6 +6,31 @@ from pytuitor.curriculum import CHAPTERS, LESSONS, chapter_lessons
 from pytuitor.screens import Dashboard
 
 
+@pytest.mark.parametrize("size", [(80, 24), (120, 30)], ids=["small", "macos"])
+async def test_dashboard_uses_available_rows_in_normal_macos_terminal(tmp_path, size):
+    app = TutorApp(tmp_path)
+    app.store.data.update(onboarded=True, last_lesson="decimal-measurements")
+    for lesson in LESSONS[:3]:
+        app.store.entry(lesson)["completed"] = True
+    async with app.run_test(size=size) as pilot:
+        await pilot.pause()
+        listing = app.screen.query_one("#lesson-list", OptionList)
+        assert listing.highlighted == 3
+        assert listing.max_scroll_y == 0
+        assert listing.region.height >= 6
+        await pilot.press("home", "end")
+        assert listing.highlighted == 5
+        await pilot.resize_terminal(180, 49)
+        await pilot.pause()
+        assert listing.highlighted == 5
+        await pilot.resize_terminal(120, 30)
+        await pilot.pause()
+        assert listing.highlighted == 5
+        assert listing.max_scroll_y == 0
+        await pilot.press("enter")
+        assert app.screen.lesson.id == "ticket-desk"
+
+
 @pytest.mark.parametrize("legacy_track", ["beginner", "experienced", "custom"])
 async def test_dashboard_has_one_curriculum_regardless_of_legacy_path(tmp_path, legacy_track):
     app = TutorApp(tmp_path)

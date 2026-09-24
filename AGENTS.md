@@ -41,6 +41,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Show the compact explorer only for stages with multiple files, inside the workbench directly left of the editor; Ctrl+E focuses it and Files toggles it.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
+- Compact the dashboard for short as well as narrow terminals; at 120 × 30 keep the first chapter visible without resizing the user's window.
 - Legacy track, practice, and study-note profile fields remain loadable but inert.
 - Syllabus groups chapters by section with collapsed details and advisory prerequisites; only opening a lesson changes the resume anchor.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.

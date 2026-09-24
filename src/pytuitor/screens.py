@@ -81,6 +81,7 @@ class Dashboard(TutorScreen):
         yield Footer(show_command_palette=False)
 
     def on_mount(self) -> None:
+        self.apply_layout()
         self.refresh_dashboard()
         self.query_one("#lesson-list", OptionList).focus()
 
@@ -89,9 +90,12 @@ class Dashboard(TutorScreen):
             self.refresh_dashboard()
 
     def on_resize(self, event: Resize) -> None:
-        self.set_class(event.size.width < 100, "narrow")
+        self.apply_layout()
         if self.is_mounted and self.query("#lesson-list"):
             self.show_course()
+
+    def apply_layout(self) -> None:
+        self.set_class(self.size.width < 100 or self.size.height < 36, "compact")
 
     def refresh_dashboard(self) -> None:
         last_lesson = self.store.data.get("last_lesson")
@@ -172,7 +176,8 @@ class Dashboard(TutorScreen):
                 if detail:
                     text.append(f" · {detail}", style="#8f999c")
             else:
-                text.append(f"\n       {kind}{lesson.minutes} min · {label}", style="#8f999c")
+                separator = " · " if self.has_class("compact") else "\n       "
+                text.append(f"{separator}{kind}{lesson.minutes} min · {label}", style="#8f999c")
             listing.add_option(Option(text, id=lesson.id))
         selected = next((i for i, lesson in enumerate(lessons) if lesson.id == selected_id), 0)
         listing.highlighted = selected

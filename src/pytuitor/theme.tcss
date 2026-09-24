@@ -89,13 +89,14 @@ Syllabus.narrow #syllabus-header { height: 2; }
 #dashboard-bottom Static { width: 1fr; }
 #restart { height: 1; padding: 0 1; background: transparent; color: #9ba3a5; }
 #restart:focus, #restart:hover { background: #384044; color: #eee9e0; }
-Dashboard.narrow .topbar { height: 2; }
-Dashboard.narrow #dashboard-body { padding: 0 2; }
-Dashboard.narrow #path-header { height: 2; }
-Dashboard.narrow #resume-card { height: 3; }
-Dashboard.narrow #course-heading { margin: 0; }
-Dashboard.narrow #lesson-list-help { margin-top: 0; }
-Dashboard.narrow #dashboard-bottom { height: 1; margin-top: 0; }
+Dashboard.compact .topbar { height: 2; }
+Dashboard.compact #dashboard-body { padding: 0 2; }
+Dashboard.compact #path-header { height: 2; }
+Dashboard.compact #resume-card { height: 3; }
+Dashboard.compact #course-heading { margin: 0; }
+Dashboard.compact #lesson-list { padding: 0 1; }
+Dashboard.compact #lesson-list-help { margin-top: 0; }
+Dashboard.compact #dashboard-bottom { height: 1; margin-top: 0; }
 #lesson-toolbar { height: 3; margin: 1 3 0 3; align-vertical: middle; }
 #lesson-name { width: 1fr; padding: 1 2 0 2; }
 #save-status { width: 15; padding-top: 1; }
