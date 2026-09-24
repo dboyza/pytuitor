@@ -31,6 +31,18 @@ No administrator privileges or downloaded shell installer is required for Pytuit
 Before installing a downloaded release, compare its SHA-256 checksum against the manifest obtained from the trusted release page.
 A checksum detects changed bytes; it does not establish the identity of an untrusted publisher.
 
+## Terminal window size
+
+When launched interactively in a local macOS Terminal or iTerm2 window, Pytuitor requests at least 120 columns by 30 rows.
+Windows already at or above that size stay unchanged, and neither dimension is ever reduced by the request.
+The request runs only at launch, so you can resize the window freely afterward.
+The terminal may ignore the request or limit the result to the available screen space.
+The app keeps adapting to the actual window size, including 80 × 24.
+
+Use `pytuitor --no-resize` to keep your window size unchanged.
+Other terminal hosts, remote SSH sessions, tmux/screen panes, CI, and redirected input or output do not receive resize requests.
+Help, version, and upgrade-check commands also leave the window alone.
+
 ## Windows Terminal and PowerShell
 
 Use Windows Terminal with Windows PowerShell 5.1 or PowerShell 7 and a window at least 80 columns by 24 rows.

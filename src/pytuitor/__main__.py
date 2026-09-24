@@ -5,6 +5,11 @@ from pathlib import Path
 def main() -> None:
     parser = argparse.ArgumentParser(description="Your offline Python apprenticeship")
     parser.add_argument("--data-dir", type=Path, help="Use a separate local learning profile")
+    parser.add_argument(
+        "--no-resize",
+        action="store_true",
+        help="Keep the terminal window size unchanged at launch",
+    )
     from pytuitor.release import check_upgrade, installed_version
 
     parser.add_argument("--version", action="version", version=installed_version())
@@ -22,12 +27,15 @@ def main() -> None:
         return
     from pytuitor.app import TutorApp
     from pytuitor.state import ProfileError
+    from pytuitor.terminal_size import resize_terminal_if_needed
 
     try:
         app = TutorApp(data_dir=args.data_dir)
     except (ProfileError, OSError) as exc:
         parser.exit(1, f"pytuitor: {exc}\n")
     try:
+        if not args.no_resize:
+            resize_terminal_if_needed()
         app.run()
     finally:
         app.store.close()
