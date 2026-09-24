@@ -39,6 +39,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Footer order is numbered function keys, Ctrl shortcuts, then other keys.
 - Thin blue outlines track actual focus, including mouse and Tab; omit pane tabs.
 - Show the compact explorer only for stages with multiple files, inside the workbench directly left of the editor; Ctrl+E focuses it and Files toggles it.
+- Mark required files and the Run starting file; keep the active file's role and Run target visible even with the explorer hidden, and refresh roles per stage.
 - Dashboard single-click selects; double-click or Enter opens.
 - Label the dashboard chapter selector and its lesson list explicitly; use odd-height Continue buttons so their labels center on terminal rows.
 - Compact the dashboard for short as well as narrow terminals; at 120 × 30 keep the first chapter visible without resizing the user's window.

@@ -150,10 +150,12 @@ class LessonScreen(TutorScreen):
                     yield Static(self.active_file, id="active-file", markup=False)
                     yield Button("+ File", id="add-file")
                     yield Button("Environment", id="environment")
+                yield Static(id="file-context", markup=False)
                 with Horizontal(id="editor-workspace"):
                     with Vertical(id="file-sidebar"):
                         yield Static("EXPLORER", id="files-heading")
                         yield FileTree()
+                        yield Static("▶ Run  * Required", id="file-legend", markup=False)
                     yield CodeEditor.code_editor(
                         sources[self.active_file],
                         language="python",
@@ -189,7 +191,7 @@ class LessonScreen(TutorScreen):
         yield Footer(show_command_palette=False)
 
     def on_mount(self) -> None:
-        self.query_one(FileTree).set_files(self.project_files(), self.active_file)
+        self.refresh_file_tree()
         self.query_one("#run-files").display = False
         if not self.lesson.choices:
             for selector in (
@@ -233,11 +235,31 @@ class LessonScreen(TutorScreen):
         return dict(sources)
 
     def load_project(self) -> None:
-        sources = self.project_files()
         self.active_file = self.lesson.entrypoint
-        self.query_one(FileTree).set_files(sources, self.active_file)
+        self.refresh_file_tree()
         self.load_active_file()
         self.apply_layout()
+
+    def refresh_file_tree(self) -> None:
+        self.query_one(FileTree).set_files(
+            self.project_files(),
+            self.active_file,
+            required_files=self.stage_contract().files,
+            entrypoint=self.lesson.entrypoint,
+        )
+        self.update_file_context()
+
+    def update_file_context(self) -> None:
+        required = (
+            self.active_file == self.lesson.entrypoint
+            or self.active_file in self.stage_contract().files
+        )
+        context = Text("Required file" if required else "Extra file")
+        context.append(" · Run starts in ")
+        context.append(self.lesson.entrypoint, style="#86bde8")
+        label = self.query_one("#file-context", Static)
+        label.update(context)
+        label.tooltip = context.plain
 
     def load_active_file(self) -> None:
         label = self.query_one("#active-file", Static)
@@ -246,6 +268,7 @@ class LessonScreen(TutorScreen):
         editor = self.query_one("#editor", TextArea)
         editor.language = "python" if self.active_file.endswith(".py") else None
         editor.load_text(self.project_files()[self.active_file])
+        self.update_file_context()
 
     @on(Tree.NodeSelected, "#file-tree")
     def change_file(self, event: Tree.NodeSelected[str]) -> None:
@@ -303,13 +326,16 @@ class LessonScreen(TutorScreen):
             self.notify(str(exc), severity="error")
             return
         sources[name] = ""
-        self.query_one(FileTree).set_files(sources, self.active_file)
+        self.refresh_file_tree()
         self.open_file(name)
         self.select_pane("editor")
         self.tutor.persist()
 
     def action_remove_file(self) -> None:
-        if self.active_file in self.stage_contract().files:
+        if (
+            self.active_file == self.lesson.entrypoint
+            or self.active_file in self.stage_contract().files
+        ):
             self.notify(
                 "This file is required by the exercise. You can clear its contents in the editor."
             )

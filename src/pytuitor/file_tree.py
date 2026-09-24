@@ -23,8 +23,19 @@ class FileTree(Tree[str]):
         self.files: dict[str, TreeNode[str]] = {}
         self.folders: dict[str, TreeNode[str]] = {}
         self.active_file = ""
+        self.required_files: set[str] = set()
+        self.entrypoint = ""
 
-    def set_files(self, paths: Iterable[str], active_file: str) -> None:
+    def set_files(
+        self,
+        paths: Iterable[str],
+        active_file: str,
+        *,
+        required_files: Iterable[str],
+        entrypoint: str,
+    ) -> None:
+        self.required_files = {*required_files, entrypoint}
+        self.entrypoint = entrypoint
         collapsed = {path for path, node in self.folders.items() if not node.is_expanded}
         self.clear()
         self.files.clear()
@@ -58,9 +69,10 @@ class FileTree(Tree[str]):
     def mark_active(self, path: str) -> None:
         self.active_file = path
         for name, node in self.files.items():
-            node.set_label(
-                Text(name.rsplit("/", 1)[-1], style="bold #ffd343" if name == path else "")
+            marker = (
+                "▶ " if name == self.entrypoint else "* " if name in self.required_files else "  "
             )
+            node.set_label(Text(marker + name.rsplit("/", 1)[-1]))
         node = self.files[path]
         parent = node.parent
         while parent is not None:

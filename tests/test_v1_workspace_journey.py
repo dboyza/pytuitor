@@ -1,7 +1,7 @@
 from dataclasses import replace
 
 import pytest
-from textual.widgets import TextArea
+from textual.widgets import Static, TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import LESSONS
@@ -67,6 +67,69 @@ async def test_multi_file_stage_drafts_checks_and_export(tmp_path):
     restored = TutorApp(tmp_path)
     assert restored.store.entry(lesson)["files"] == lesson.solution_files
     restored.store.close()
+
+
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)], ids=["compact", "wide"])
+async def test_file_roles_explain_run_and_follow_stage_requirements(tmp_path, size):
+    lesson = project()
+    repair = lesson.stage_contract("repair")
+    lesson = replace(
+        lesson,
+        repair_stage=replace(
+            repair,
+            files=(*repair.files, "notes.txt"),
+            starter_files={**repair.starter_files, "notes.txt": "Required repair notes"},
+        ),
+    )
+    app = TutorApp(tmp_path)
+    app.store.data["onboarded"] = True
+    app.store.entry(lesson)["files"] = {
+        **lesson.solution_files,
+        "main.py": lesson.solution + "print(answer)\n",
+        "notes.txt": "My extra notes",
+    }
+    async with app.run_test(size=size) as pilot:
+        await app.push_screen(LessonScreen(lesson))
+        await pilot.pause()
+        screen = app.screen
+        tree = screen.query_one(FileTree)
+        context = screen.query_one("#file-context", Static)
+        assert tree.files["main.py"].label.plain == "▶ main.py"
+        assert tree.files["helpers.py"].label.plain == "* helpers.py"
+        assert tree.files["notes.txt"].label.plain == "  notes.txt"
+        await pilot.press("ctrl+e", "up", "enter")
+        assert screen.active_file == "helpers.py"
+        assert str(context.content) == "Required file · Run starts in main.py"
+        await pilot.click("#toggle-files")
+        assert not screen.query_one("#file-sidebar").display
+        assert context.display
+        await pilot.press("ctrl+r")
+        await app.workers.wait_for_complete()
+        assert screen.transcript.startswith("42\n")
+        assert context.display
+        assert screen.active_file == "helpers.py"
+        await pilot.press("f5")
+        await app.workers.wait_for_complete()
+        assert screen.stage_passed("build")
+        await pilot.press("ctrl+e", "down", "down", "enter")
+        assert screen.active_file == "notes.txt"
+        assert str(context.content) == "Extra file · Run starts in main.py"
+        await pilot.press("ctrl+n")
+        await pilot.pause()
+        assert screen.stage == "repair"
+        assert tree.files["notes.txt"].label.plain == "* notes.txt"
+        await pilot.press("ctrl+e", "down", "enter")
+        assert str(context.content) == "Required file · Run starts in main.py"
+        screen.action_remove_file()
+        await pilot.pause()
+        assert app.screen is screen
+        assert screen.project_files()["notes.txt"] == "Required repair notes"
+        assert screen.query_one("#editor").region.height >= 5
+        assert screen.query_one("#execution-actions").region.bottom <= size[1] - 1
+        await pilot.click("#stage-build")
+        await pilot.press("ctrl+e", "down", "enter")
+        assert str(context.content) == "Extra file · Run starts in main.py"
+        assert screen.query_one(TextArea).text == "My extra notes"
 
 
 async def test_checks_reset_imports_files_and_working_directory():

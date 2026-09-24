@@ -107,6 +107,9 @@ Dashboard.compact #dashboard-bottom { height: 1; margin-top: 0; }
 LessonScreen.multi-file #file-sidebar,
 LessonScreen.multi-file #toggle-files { display: block; }
 #files-heading { height: 1; padding: 0 1; color: #a2aaa9; text-style: bold; }
+#file-legend { height: 1; color: #a2aaa9; padding: 0 1; }
+#file-context { display: none; height: auto; max-height: 2; padding: 0 1; color: #a2aaa9; }
+LessonScreen.multi-file #file-context { display: block; }
 #file-tree { height: 1fr; padding: 0; border: solid transparent; scrollbar-size: 1 1; background: #1c1f22; }
 #file-tree:focus { border: solid #3776ab; }
 #file-tree > .tree--cursor { background: #353b3e; color: #dddcd7; text-style: none; }
