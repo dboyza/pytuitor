@@ -84,16 +84,20 @@ ASYNC_CHECKS = CONTEXT_CHECKS + (
                 values = await asyncio.wait_for(scout_all(["a", "b", "c"], probe, 2), 1)
                 events = [event async for event in scout_events(["forest", "ridge"])]
                 return (
-                    values == ["A", "B", "C"]
-                    and peak == 2
-                    and active == 0
-                    and events == ["Scout: forest", "Scout: ridge"]
+                    __expect__("values", values, ["A", "B", "C"], "==")
+                    and __expect__("peak", peak, 2, "==")
+                    and __expect__("active", active, 0, "==")
+                    and __expect__(
+                        "events", events, ["Scout: forest", "Scout: ridge"], "=="
+                    )
                 )
 
 
-            result = (
-                asyncio.run(exercise())
-                and step(new_game(), "scouts") == "forest clear, ridge clear"
+            result = asyncio.run(exercise()) and __expect__(
+                "step(new_game(), 'scouts')",
+                step(new_game(), "scouts"),
+                "forest clear, ridge clear",
+                "==",
             )
         """,
         "Create owned tasks under a TaskGroup and acquire a semaphore before starting each probe.",
@@ -101,30 +105,39 @@ ASYNC_CHECKS = CONTEXT_CHECKS + (
     scenario(
         "Cancellation joins scouts and closes their station",
         """
-        import asyncio
-        async def exercise():
-            started = asyncio.Event()
-            finished = []
-            log = []
-            async def probe(site):
-                started.set()
+            import asyncio
+
+
+            async def exercise():
+                started = asyncio.Event()
+                finished = []
+                log = []
+
+                async def probe(site):
+                    started.set()
+                    try:
+                        await asyncio.Event().wait()
+                    finally:
+                        finished.append(site)
+
+                async def operation():
+                    async with scout_station(log):
+                        return await scout_all(["forest", "ridge"], probe, 1)
+
+                task = asyncio.create_task(operation())
+                await started.wait()
+                task.cancel()
                 try:
-                    await asyncio.Event().wait()
-                finally:
-                    finished.append(site)
-            async def operation():
-                async with scout_station(log):
-                    return await scout_all(["forest", "ridge"], probe, 1)
-            task = asyncio.create_task(operation())
-            await started.wait()
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
-            return finished == ["forest"] and log == ["open", "closed"]
-        result = asyncio.run(exercise())
-    """,
+                    await task
+                except asyncio.CancelledError:
+                    pass
+                return __expect__(
+                    "finished", finished, ["forest"], "=="
+                ) and __expect__("log", log, ["open", "closed"], "==")
+
+
+            result = asyncio.run(exercise())
+        """,
         "Cancellation must finish child cleanup before the parent scope exits.",
     ),
 )
@@ -180,26 +193,28 @@ M19 = milestone(
         scenario(
             "A failed delivery joins the waiting sibling",
             """
-        import asyncio
-        async def exercise():
-            gate = asyncio.Event()
-            closed = []
-            async def deliver(item):
-                if item == "fail":
-                    await gate.wait()
-                    raise ValueError("blocked trail")
-                gate.set()
-                try:
-                    await asyncio.Event().wait()
-                finally:
-                    closed.append(item)
-            try:
-                await deliver_all(["fail", "wait"], deliver)
-            except (ValueError, ExceptionGroup):
-                return closed == ["wait"]
-            return False
-        result = asyncio.run(exercise())
-    """,
+                import asyncio
+
+                async def exercise():
+                    gate = asyncio.Event()
+                    closed = []
+
+                    async def deliver(item):
+                        if item == 'fail':
+                            await gate.wait()
+                            raise ValueError('blocked trail')
+                        gate.set()
+                        try:
+                            await asyncio.Event().wait()
+                        finally:
+                            closed.append(item)
+                    try:
+                        await deliver_all(['fail', 'wait'], deliver)
+                    except (ValueError, ExceptionGroup):
+                        return __expect__('closed', closed, ['wait'], '==')
+                    return False
+                result = asyncio.run(exercise())
+            """,
             (
                 "A list of tasks alone does not provide failure cleanup; use "
                 "structured task ownership."
@@ -292,20 +307,39 @@ PACKAGE_CHECKS = ARCHIVE_CHECKS + (
     scenario(
         "Package metadata and quiet reusable entrypoints",
         """
-        import contextlib, importlib, io, tomllib
-        from pathlib import Path
-        metadata = tomllib.loads(Path("pyproject.toml").read_text())
-        capture = io.StringIO()
-        with contextlib.redirect_stdout(capture):
-            importlib.import_module("lantern_reach")
-            cli = importlib.import_module("lantern_reach.cli")
-        Path("story space.txt").write_text("The beacon shines.", encoding="utf-8")
-        with contextlib.redirect_stdout(capture):
-            status = cli.main(["--story", "story space.txt"])
-        result = (metadata["project"]["scripts"]["lantern-reach"] == "lantern_reach.cli:main"
-            and metadata["project"]["requires-python"] == ">=3.11"
-            and status == 0 and capture.getvalue() == "The beacon shines.\\n")
-    """,
+            import contextlib, importlib, io, tomllib
+            from pathlib import Path
+
+            metadata = tomllib.loads(Path("pyproject.toml").read_text())
+            capture = io.StringIO()
+            with contextlib.redirect_stdout(capture):
+                importlib.import_module("lantern_reach")
+                cli = importlib.import_module("lantern_reach.cli")
+            Path("story space.txt").write_text("The beacon shines.", encoding="utf-8")
+            with contextlib.redirect_stdout(capture):
+                status = cli.main(["--story", "story space.txt"])
+            result = (
+                __expect__(
+                    "metadata['project']['scripts']['lantern-reach']",
+                    metadata["project"]["scripts"]["lantern-reach"],
+                    "lantern_reach.cli:main",
+                    "==",
+                )
+                and __expect__(
+                    "metadata['project']['requires-python']",
+                    metadata["project"]["requires-python"],
+                    ">=3.11",
+                    "==",
+                )
+                and __expect__("status", status, 0, "==")
+                and __expect__(
+                    "capture.getvalue()",
+                    capture.getvalue(),
+                    "The beacon shines.\\n",
+                    "==",
+                )
+            )
+        """,
         (
             "Keep imports quiet, declare the CLI entrypoint, and read the explicit "
             "path supplied by the caller."
@@ -331,7 +365,7 @@ PACKAGE_CHECKS = ARCHIVE_CHECKS + (
                         cli_main(args)
                     except SystemExit as error:
                         codes.append(error.code)
-            result = codes == [0, 2, 1]
+            result = __expect__("codes", codes, [0, 2, 1], "==")
         """,
         "Use argparse's help/error behavior and a distinct nonzero status for missing files.",
     ),
@@ -401,18 +435,26 @@ M20 = milestone(
         scenario(
             "Parser failures and option order",
             """
-        import io, contextlib
-        capture = io.StringIO()
-        codes = []
-        with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(io.StringIO()):
-            ok = main(["--label", "ridge", "--count", "2"])
-            for args in ([], ["--count", "bad"]):
-                try:
-                    main(args)
-                except SystemExit as error:
-                    codes.append(error.code)
-        result = ok == 0 and capture.getvalue().startswith("ridge: 2\\n") and codes == [2, 2]
-    """,
+                import io, contextlib
+
+                capture = io.StringIO()
+                codes = []
+                with (
+                    contextlib.redirect_stdout(capture),
+                    contextlib.redirect_stderr(io.StringIO()),
+                ):
+                    ok = main(["--label", "ridge", "--count", "2"])
+                    for args in ([], ["--count", "bad"]):
+                        try:
+                            main(args)
+                        except SystemExit as error:
+                            codes.append(error.code)
+                result = (
+                    __expect__("ok", ok, 0, "==")
+                    and capture.getvalue().startswith("ridge: 2\\n")
+                    and __expect__("codes", codes, [2, 2], "==")
+                )
+            """,
             "Declare required and integer constraints on the parser; do not swallow SystemExit.",
         ),
     ),
@@ -492,23 +534,44 @@ FORMAT_CHECKS = STORE_CHECKS + (
     scenario(
         "Per-instance descriptor validation and cooperative formatting",
         """
-        left, right = TrailFormatter(), TrailFormatter()
-        message = left.render("home")
-        rejected = False
-        try:
-            left.uses = -1
-        except ValueError:
-            rejected = True
-        class Loud(Formatter):
-            def render(self, text):
-                return super().render(text.upper())
-        class LoudTrail(TrailPrefix, Loud):
-            pass
-        result = (message == "Trail: home" and left.uses == 1 and right.uses == 0
-            and rejected and isinstance(Formatter.uses, Nonnegative)
-            and LoudTrail().render("home") == "Trail: HOME"
-            and step(new_game(), "formatters") == "Trail: The beacon shines.")
-    """,
+            left, right = (TrailFormatter(), TrailFormatter())
+            message = left.render("home")
+            rejected = False
+            try:
+                left.uses = -1
+            except ValueError:
+                rejected = True
+
+
+            class Loud(Formatter):
+                def render(self, text):
+                    return super().render(text.upper())
+
+
+            class LoudTrail(TrailPrefix, Loud):
+                pass
+
+
+            result = (
+                __expect__("message", message, "Trail: home", "==")
+                and __expect__("left.uses", left.uses, 1, "==")
+                and __expect__("right.uses", right.uses, 0, "==")
+                and rejected
+                and isinstance(Formatter.uses, Nonnegative)
+                and __expect__(
+                    "LoudTrail().render('home')",
+                    LoudTrail().render("home"),
+                    "Trail: HOME",
+                    "==",
+                )
+                and __expect__(
+                    "step(new_game(), 'formatters')",
+                    step(new_game(), "formatters"),
+                    "Trail: The beacon shines.",
+                    "==",
+                )
+            )
+        """,
         (
             "Store descriptor values on the instance and use super so the current "
             "MRO determines the next method."
@@ -525,7 +588,9 @@ FORMAT_CHECKS = STORE_CHECKS + (
                     format_name = "plain"
             except ValueError:
                 duplicate = True
-            preserved = FormatterMeta.registry == before
+            preserved = __expect__(
+                "FormatterMeta.registry", FormatterMeta.registry, before, "=="
+            )
 
 
             class Brackets(Formatter):
@@ -540,9 +605,14 @@ FORMAT_CHECKS = STORE_CHECKS + (
             result = (
                 duplicate
                 and preserved
-                and render_with("brackets", "home") == "[home]"
-                and parameters == ["text"]
-                and instance.uses == 0
+                and __expect__(
+                    "render_with('brackets', 'home')",
+                    render_with("brackets", "home"),
+                    "[home]",
+                    "==",
+                )
+                and __expect__("parameters", parameters, ["text"], "==")
+                and __expect__("instance.uses", instance.uses, 0, "==")
             )
         """,
         (
@@ -617,7 +687,7 @@ M21 = milestone(
         scenario(
             "Descriptor ownership and class access",
             """
-                left, right = Cache(), Cache()
+                left, right = (Cache(), Cache())
                 left.count = 3
                 rejected = 0
                 for value in (-1, True):
@@ -626,9 +696,9 @@ M21 = milestone(
                     except ValueError:
                         rejected += 1
                 result = (
-                    left.count == 3
-                    and right.count == 0
-                    and rejected == 2
+                    __expect__("left.count", left.count, 3, "==")
+                    and __expect__("right.count", right.count, 0, "==")
+                    and __expect__("rejected", rejected, 2, "==")
                     and isinstance(Cache.count, PositiveCount)
                 )
             """,

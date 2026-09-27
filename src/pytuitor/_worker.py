@@ -245,6 +245,34 @@ def main():
             )
         return message
 
+    observations = []
+
+    def expect(label, actual, expected, comparison="=="):
+        """Capture an authored assertion without rerunning the learner's operation."""
+        import operator
+
+        operations = {
+            "==": operator.eq,
+            "!=": operator.ne,
+            "<": operator.lt,
+            "<=": operator.le,
+            ">": operator.gt,
+            ">=": operator.ge,
+        }
+        passed = bool(operations[comparison](actual, expected))
+        observation = {
+            "label": str(label)[:240],
+            "actual": repr(actual)[:1000],
+            "expected": repr(expected)[:1000],
+            "comparison": comparison,
+            "passed": passed,
+        }
+        if len(observations) < 16:
+            observations.append(observation)
+        elif not passed and all(item["passed"] for item in observations):
+            observations[-1] = observation
+        return passed
+
     def namespace():
         return {
             "__name__": "__main__",
@@ -255,6 +283,7 @@ def main():
             "__mutation_check__": mutation_check,
             "__cli_check__": cli_check,
             "__concurrency_check__": concurrency_check,
+            "__expect__": expect,
         }
 
     if not request["checks"]:
@@ -277,6 +306,7 @@ def main():
                 events.flush()
 
             for index, check in enumerate(request["checks"], 1):
+                observations.clear()
                 supplied = check.get("stdin")
                 supplied = request["stdin"] if supplied is None else supplied
                 case = {
@@ -317,6 +347,7 @@ def main():
                         result["error"] = case["actual"]
                 case.update(
                     status="finished",
+                    observations=list(observations),
                     output=capture.captured[: limits["output_bytes"]],
                     expected=repr(expected)[:1000],
                 )

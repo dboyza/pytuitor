@@ -27,7 +27,12 @@ class KeyboardHelp(ModalScreen):
                 "C                   Continue learning\n"
                 "P                   Known topics\n"
                 "S                   Browse syllabus\n\n"
-                "G                   Your growing game\n\n"
+                "G                   Your growing game\n"
+                "R                   Optional mixed review\n\n"
+                "IN A REVIEW\n"
+                "F5                  Check the current task\n"
+                "Ctrl+N              Next task or finish\n"
+                "Escape              Return to reviews\n\n"
                 "IN THE SYLLABUS\n"
                 "↑ ↓ / PageUp / PageDown   Scroll the outline\n"
                 "Home / End          Start / end of the outline\n"
@@ -76,7 +81,7 @@ class ConfirmRestart(ModalScreen[bool]):
             yield Static("Erase progress and start over?", classes="title")
             yield Static(
                 "This erases all saved lesson and game drafts, "
-                "completions, checkpoint history, hints, and checked topics "
+                "completions, checkpoint history, reviews, notes, hints, and checked topics "
                 "in this profile, then returns to the welcome screen.\n\n"
                 "This cannot be undone. Python files you already exported are separate and remain.",
                 classes="muted",

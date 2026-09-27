@@ -9,6 +9,9 @@ Each chapter ends with Extend and independent Repair for the growing [Lantern Re
 Existing standalone project IDs, drafts, and achievements remain available as optional practice in the syllabus.
 See [topic coverage](coverage.md) for the mapping to Pythonlings and the boundaries of that comparison.
 
+Optional mixed review adds one three-task session per chapter without changing required completion.
+See [returning, checking, and reviewing](learning-experience.md) for resume behavior, feedback controls, and local review scheduling.
+
 ## Foundations
 
 Start here: values, decisions, collections, and reusable functions.

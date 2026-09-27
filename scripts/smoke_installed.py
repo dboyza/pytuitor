@@ -9,6 +9,7 @@ from pathlib import Path
 from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
+from pytuitor.content.reviews import REVIEWS
 from pytuitor.curriculum import CHAPTERS, LESSONS, SECTIONS, default_input
 from pytuitor.project_catalog import MILESTONES
 from pytuitor.project_workspace import ProjectWorkspace
@@ -37,6 +38,11 @@ async def main():
                 stage=contract,
             )
             assert result.passed, (lesson.id, stage_name, result.error, result.checks)
+    for tasks in REVIEWS.values():
+        for task in tasks:
+            if task.kind != "predict":
+                result = await execute(task.lesson(), task.reference)
+                assert result.passed, (task.id, result.error, result.checks)
     with tempfile.TemporaryDirectory() as directory:
         app = TutorApp(Path(directory))
         async with app.run_test(size=(80, 24)) as pilot:
@@ -78,7 +84,8 @@ async def main():
         reopened.close()
     print(
         f"Pytuitor {version('pytuitor')}: installed content and all "
-        f"{len(units) * 2} stage references passed; game continuation, reopen, and export passed."
+        f"{len(units) * 2} stage references and 42 review references passed; "
+        "game continuation, reopen, and export passed."
     )
 
 

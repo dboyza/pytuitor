@@ -47,7 +47,9 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Legacy track, practice, and study-note profile fields remain loadable but inert.
 - Syllabus groups chapters by section with collapsed details and advisory prerequisites; only opening a lesson changes the resume anchor.
 - Run streams output and accepts console answers; Enter submits and Ctrl+D ends input.
-- Check reports each operation, input, expected/actual result, printed output, and running/pass/fail status.
+- Check selects the first failure; Checks and Details retain full evidence, including bounded authored observations without repeating learner operations.
+- Restore per-stage file positions and check selection; saved reports require matching revision and source to describe current work.
+- Optional mixed reviews use separate drafts and local scheduling; suggestions never block Continue or change the course resume anchor.
 - Reset exercise backs up the complete current stage before restoring blank Build or broken Repair.
 - Preserve drafts across curriculum updates, including renamed or additional required files.
 - Start over is discoverable and confirmed; stop execution/autosave before clearing active progress.
@@ -65,6 +67,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` separates optional practice.
 - `project_workspace.py` owns immutable checkpoints and continuation; keep extra inherited capability checks via its active contract and never replace learner source silently.
 - `project_screen.py` owns game history, explicit supplied bases, restoration, temporary checkpoint play, and portable exports.
+- `review_screen.py` and `review_progress.py` own optional review; `content/reviews/` authors 21 mixed sessions.
 - `state.py` owns version 4 profiles, atomic writes, migration backups and locks.
 - Save with file sync and Unix directory sync or Windows write-through replacement; never roll back memory after a committed rename.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.

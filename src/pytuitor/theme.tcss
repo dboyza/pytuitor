@@ -87,8 +87,8 @@ Syllabus.narrow #syllabus-header { height: 2; }
 #lesson-list-help { height: auto; margin-top: 1; }
 #dashboard-bottom { height: 2; margin-top: 1; }
 #dashboard-bottom Static { width: 1fr; }
-#restart { height: 1; padding: 0 1; background: transparent; color: #9ba3a5; }
-#restart:focus, #restart:hover { background: #384044; color: #eee9e0; }
+#restart, #review { height: 1; padding: 0 1; background: transparent; color: #9ba3a5; }
+#restart:focus, #restart:hover, #review:focus, #review:hover { background: #384044; color: #eee9e0; }
 Dashboard.compact .topbar { height: 2; }
 Dashboard.compact #dashboard-body { padding: 0 2; }
 Dashboard.compact #path-header { height: 2; }
@@ -250,3 +250,48 @@ ProjectScreen.narrow #milestone-details Static { margin: 0; }
 #checkpoint-output { height: auto; }
 #checkpoint-input { height: 3; }
 #checkpoint-input:disabled { display: none; }
+
+/* Learning feedback and occasional tools */
+#check-actions { height: 1; padding: 0 1; }
+#check-actions Button { height: 1; min-width: 7; padding: 0 1; margin-right: 1; }
+#milestone-reward { height: auto; max-height: 2; margin: 0; padding: 0 1; }
+#workspace-tools { min-width: 8; }
+#workspace-tools-dialog { width: 64; padding: 1 2; }
+#workspace-tools-dialog Button { width: 100%; height: 1; margin-top: 1; }
+#resume-note-dialog { height: 18; padding: 1 2; }
+#resume-note-editor { height: 1fr; min-height: 4; border: solid transparent; }
+#resume-note-editor:focus { border: solid #3776ab; }
+#note-feedback { height: auto; color: #ffd343; }
+#check-chooser-dialog { height: 24; padding: 1 2; }
+#check-chooser { height: 1fr; border: solid transparent; padding: 0; }
+#check-chooser:focus { border: solid #3776ab; }
+#milestone-brief { padding: 0; background: transparent; }
+#milestone-brief MarkdownH2 { color: #ffd343; }
+
+#review-hub, #review-workbench { padding: 1 2; height: 1fr; }
+#review-hub { padding: 0 2; }
+#review-chapters { height: 1fr; margin: 1 0; padding: 0; }
+#review-info { height: 2; }
+#review-title { height: 1; }
+#review-prompt { height: auto; max-height: 9; min-height: 3; }
+#review-instructions { margin: 0; padding: 0; }
+#review-choices { height: 1fr; min-height: 4; }
+#review-editor { height: 1fr; min-height: 4; border: solid #34393e; }
+#review-editor:focus, #review-choices:focus, #review-chapters:focus { border: solid #86bde8; }
+#review-feedback-scroll { height: 5; }
+#review-feedback { height: auto; }
+#review-workbench .actions { height: 3; }
+
+#review { color: #86bde8; margin-right: 1; }
+#review-hub .hero { margin: 0; height: 2; }
+#review-hub > .muted { height: 2; }
+#review-hub .actions { margin: 0; height: 3; }
+#review-check-actions { height: 1; }
+#review-check-actions Button { height: 1; padding: 0 1; margin-right: 1; }
+ReviewScreen.compact .topbar { height: 2; }
+ReviewScreen.compact #review-workbench { padding: 0 1; }
+ReviewScreen.compact #review-prompt { max-height: 6; min-height: 3; }
+ReviewScreen.compact #review-workbench .actions { height: 1; margin: 0; }
+ReviewScreen.compact #review-workbench .actions Button { height: 1; padding: 0 1; margin-right: 1; }
+ReviewScreen.compact #review-editor { min-height: 5; }
+ReviewScreen.compact #review-feedback-scroll { height: 6; }

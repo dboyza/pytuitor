@@ -19,13 +19,14 @@ ARRIVAL = code("""
 ARRIVAL_CHECKS = (
     Check(
         "Enough food for the ridge",
-        (
-            "__stdout__.rstrip().endswith('Welcome to Lantern Reach, "
-            "Ada!\\nSupplies: 6 days\\nTrail: 2.5 km\\nTake the ridge.')"
-        ),
+        "__expect__('Final four lines', __stdout__.rstrip()[-77:], "
+        "'Welcome to Lantern Reach, Ada!\\nSupplies: 6 days\\nTrail: 2.5 "
+        "km\\nTake the ridge.')",
         True,
         "Two food packs are enough for the ridge.",
         stdin="Ada\n2\n2.5\nridge\n",
+        description="The final four lines welcome Ada, report supplies and "
+        "distance, and take the ridge.",
     ),
     Check(
         "The river is the safe fallback",
@@ -411,16 +412,24 @@ CORE_CHECKS = (
     scenario(
         "A complete delivery quest",
         """
-        state = new_game()
-        first = step(state, " FOREST ")
-        step(state, "gather")
-        step(state, "gather")
-        step(state, "outpost")
-        message = step(state, "deliver")
-        result = (first == "Location: forest" and state["quest"] == "done"
-                  and state["supplies"]["wood"] == 0 and state["turn"] == 5
-                  and message == "Mira repairs the beacon frame.")
-    """,
+            state = new_game()
+            first = step(state, " FOREST ")
+            step(state, "gather")
+            step(state, "gather")
+            step(state, "outpost")
+            message = step(state, "deliver")
+            result = (
+                __expect__("first", first, "Location: forest", "==")
+                and __expect__(
+                    "Mira's quest after delivery", state["quest"], "done", "=="
+                )
+                and __expect__("Wood remaining", state["supplies"]["wood"], 0, "==")
+                and __expect__("Turns used", state["turn"], 5, "==")
+                and __expect__(
+                    "message", message, "Mira repairs the beacon frame.", "=="
+                )
+            )
+        """,
         "Normalize commands and consume exactly two wood only for the first valid delivery.",
     ),
     scenario(
@@ -441,21 +450,29 @@ CORE_CHECKS = (
                 "nonsense",
             ):
                 step(state, command)
-            unchanged = state == original
+            unchanged = __expect__("state", state, original, "==")
             step(state, "eat 1")
-            result = unchanged and other == original and state["supplies"]["food"] == 1
+            result = (
+                unchanged
+                and __expect__("other", other, original, "==")
+                and __expect__(
+                    "state['supplies']['food']", state["supplies"]["food"], 1, "=="
+                )
+            )
         """,
         "Validate before updating state and create new nested collections for each game.",
     ),
     scenario(
         "Delivery cannot be claimed twice",
         """
-        state = new_game()
-        state["supplies"]["wood"] = 3
-        step(state, "deliver")
-        second = step(state, "deliver")
-        result = state["supplies"]["wood"] == 1 and second == "Mira already has her wood."
-    """,
+            state = new_game()
+            state["supplies"]["wood"] = 3
+            step(state, "deliver")
+            second = step(state, "deliver")
+            result = __expect__(
+                "Wood remaining", state["supplies"]["wood"], 1, "=="
+            ) and __expect__("second", second, "Mira already has her wood.", "==")
+        """,
         "Check completion before spending the supplies again.",
     ),
 )
@@ -528,10 +545,10 @@ M4 = milestone(
                 stock = {"food": 3}
                 replies = [transfer(stock, value) for value in ("bad", "0", "-2", "4")]
                 result = (
-                    replies == [False] * 4
-                    and stock == {"food": 3}
-                    and transfer(stock) is True
-                    and stock["food"] == 2
+                    __expect__("replies", replies, [False] * 4, "==")
+                    and __expect__("stock", stock, {"food": 3}, "==")
+                    and (transfer(stock) is True)
+                    and __expect__("stock['food']", stock["food"], 2, "==")
                 )
             """,
             "Finish validation before subtracting food; catch ValueError for invalid text.",

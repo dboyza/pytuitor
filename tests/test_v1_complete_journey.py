@@ -36,7 +36,8 @@ async def test_project_build_and_repair_keep_course_progress(tmp_path):
         next_course = app.store.next_lesson()
         await pilot.press("ctrl+b")
         await pilot.pause()
-        assert not app.screen.query("#review, #study-notes")
+        assert not app.screen.query("#study-notes")
+        assert app.screen.query("#review")
         assert app.store.next_lesson() == next_course
         assert app.store.data["last_lesson"] == lesson.id
         assert "reviews" not in app.store.data

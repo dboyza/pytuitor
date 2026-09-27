@@ -112,6 +112,12 @@ class TutorApp(App):
             self.push_screen(LessonScreen(lesson))
         return True
 
+    def action_review(self) -> None:
+        from pytuitor.review_screen import ReviewHub
+
+        if self.store.data["onboarded"] and not isinstance(self.screen, ReviewHub):
+            self.push_screen(ReviewHub())
+
     def action_game(self) -> None:
         from pytuitor.project_screen import ProjectScreen
 
@@ -133,6 +139,7 @@ class TutorApp(App):
         self.push_screen(ConfirmRestart(), self.restart_confirmed)
 
     def restart_confirmed(self, confirmed: bool) -> None:
+        from pytuitor.review_screen import ReviewScreen
         from pytuitor.screens import LessonScreen
         from pytuitor.setup import Onboarding
 
@@ -143,9 +150,15 @@ class TutorApp(App):
                 screen.stop()
                 if screen.save_timer:
                     screen.save_timer.stop()
+        for screen in self.screen_stack:
+            if isinstance(screen, ReviewScreen):
+                screen.stop_review()
         try:
             self.store.reset()
         except OSError as exc:
+            for screen in self.screen_stack:
+                if isinstance(screen, ReviewScreen):
+                    screen.suspend_saves = False
             self.notify(f"Could not reset progress: {exc}", severity="error")
             return
         for screen in self.screen_stack:
@@ -169,6 +182,9 @@ class TutorApp(App):
             "Dashboard", "Continue your chapter or revisit lessons", self.action_dashboard
         )
         if self.store.data["onboarded"]:
+            yield SystemCommand(
+                "Optional review", "Short mixed practice with saved drafts", self.action_review
+            )
             yield SystemCommand(
                 "Your game", "Lantern Reach milestones, checkpoints, and exports", self.action_game
             )
@@ -194,6 +210,16 @@ class TutorApp(App):
                     "Show or hide the compact sidebar",
                     screen.action_toggle_files,
                 )
+            yield SystemCommand(
+                "Note for next time",
+                "Keep a personal reminder for this activity",
+                screen.action_note,
+            )
+            yield SystemCommand(
+                "Workspace tools",
+                "Files, environment, export, reset, and notes",
+                screen.workspace_tools,
+            )
             yield SystemCommand(
                 "Project environment",
                 "Create a venv or explicitly install a package",

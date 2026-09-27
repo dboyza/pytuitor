@@ -224,7 +224,7 @@ def apply(lessons):
         refreshed.append(
             replace(
                 lesson,
-                revision=6,
+                revision=7 if lesson.id == "class-construction" else 6,
                 solution=build.reference_files[entrypoint],
                 repair=repair.starter_files[entrypoint],
                 checks=build.checks,

@@ -13,6 +13,7 @@ from textual.widgets import Button, Footer, Input, OptionList, Static
 from textual.widgets.option_list import Option
 
 from pytuitor.curriculum import BY_ID, CHAPTERS
+from pytuitor.learning_progress import progress_counts
 from pytuitor.models import ProjectMilestone
 from pytuitor.project_catalog import BY_MILESTONE, LANTERN_REACH, MILESTONES
 from pytuitor.project_workspace import ProjectWorkspace
@@ -329,13 +330,14 @@ class ProjectScreen(TutorScreen):
                 )
             )
         listing.highlighted = MILESTONES.index(self.selected)
-        complete = sum(self.store.status(item.lesson) == "completed" for item in MILESTONES)
+        core, optional = progress_counts(self.store, [item.lesson for item in MILESTONES])
         snapshots = self.workspace.data["checkpoints"]
         total_bytes = sum(item.get("bytes", 0) for item in snapshots)
         storage = f"{total_bytes} B" if total_bytes < 1024 else f"{total_bytes / 1024:.1f} KiB"
         versions = "working version" if len(snapshots) == 1 else "working versions"
         self.query_one("#game-summary", Static).update(
-            f"{complete}/21 milestones · {len(snapshots)} {versions} · {storage} history"
+            f"Core {core[0]}/{core[2]} · Optional {optional[0]}/{optional[2]} · "
+            f"{len(snapshots)} {versions} · {storage}"
         )
         self.query_one("#game-export", Button).disabled = not snapshots
         self.show_selected()
@@ -353,7 +355,11 @@ class ProjectScreen(TutorScreen):
     def show_selected(self) -> None:
         lesson = self.selected.lesson
         self.query_one("#milestone-title", Static).update(lesson.title)
-        self.query_one("#milestone-description", Static).update(lesson.subtitle)
+        from pytuitor.content.lantern.briefs import BRIEFS
+
+        self.query_one("#milestone-description", Static).update(
+            BRIEFS[lesson.id.removeprefix("reach-")].outcome
+        )
         entry = self.workspace.data["milestones"].get(lesson.id)
         compatible = self.workspace.compatible(self.selected)
         origin = (

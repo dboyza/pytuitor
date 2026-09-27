@@ -37,6 +37,7 @@ class CheckEvent(TypedDict):
     passed: NotRequired[bool]
     actual: NotRequired[str]
     output: NotRequired[str]
+    observations: NotRequired[list[dict]]
 
 
 def check_event(value: object) -> CheckEvent:
@@ -59,4 +60,18 @@ def check_event(value: object) -> CheckEvent:
             raise ValueError("Invalid check outcome")
         if not all(isinstance(value.get(key), str) for key in ("actual", "output")):
             raise ValueError("Invalid check result text")
+    observations = value.get("observations", [])
+    if not isinstance(observations, list) or len(observations) > 16:
+        raise ValueError("Invalid check observations")
+    for item in observations:
+        if not isinstance(item, dict) or type(item.get("passed")) is not bool:
+            raise ValueError("Invalid check observation")
+        if not all(
+            isinstance(item.get(key), str) for key in ("label", "actual", "expected", "comparison")
+        ):
+            raise ValueError("Invalid check observation text")
+        if any(len(item[key]) > 1000 for key in ("label", "actual", "expected")):
+            raise ValueError("Oversized check observation")
+        if item["comparison"] not in ("==", "!=", "<", "<=", ">", ">="):
+            raise ValueError("Invalid check comparison")
     return cast(CheckEvent, value)

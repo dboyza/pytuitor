@@ -44,9 +44,7 @@ async def test_dashboard_has_one_curriculum_regardless_of_legacy_path(tmp_path, 
         assert [listing.get_option_at_index(i).id for i in range(listing.option_count)] == [
             lesson.id for lesson in chapter_activities(CHAPTERS[0].id)
         ]
-        assert f"0 of {len(ACTIVITIES)}" in str(
-            app.screen.query_one("#dashboard-summary", Static).content
-        )
+        assert "Core 0/" in str(app.screen.query_one("#dashboard-summary", Static).content)
 
 
 async def test_known_topics_settings_remain_available(tmp_path):
@@ -83,7 +81,8 @@ async def test_dashboard_centers_continue_and_omits_retired_features(tmp_path, s
     app.store.data.update(onboarded=True)
     async with app.run_test(size=size) as pilot:
         await pilot.pause()
-        assert not app.screen.query("#review, #study-notes")
+        assert not app.screen.query("#study-notes")
+        assert app.screen.query("#review")
         button = app.screen.query_one("#continue")
         rows = [strip.text.strip() for strip in button.render_lines(button.size.region)]
         assert [index for index, text in enumerate(rows) if text] == [len(rows) // 2]

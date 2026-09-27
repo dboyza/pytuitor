@@ -73,16 +73,23 @@ async def test_two_stages_save_independently_and_report_every_case(tmp_path):
         await pilot.press("f5")
         await finish(pilot, screen)
         result = str(screen.query_one("#results", Static).content)
-        assert result.count("PASS ·") == len(lesson.stage_contract("build").checks)
-        for label in (
-            "Keyboard input:",
-            "Expected result:",
-            "Actual result:",
-            "Expected printed output:",
-            "Printed output:",
-        ):
-            assert result.count(label) == len(lesson.stage_contract("build").checks)
-        assert "Ada" in result and "Lin" in result and "Alex Chen" in result
+        assert result.count("PASS ·") == 1
+        assert "3/3 checks passed" in result
+        assert "Keyboard input:" not in result
+        screen.check_details = True
+        for number, name in enumerate(("Ada", "Lin", "Alex Chen"), 1):
+            screen.check_selected = number
+            screen.render_checks()
+            detail = str(screen.query_one("#results", Static).content)
+            for label in (
+                "Keyboard input:",
+                "Expected result:",
+                "Actual result:",
+                "Expected printed output:",
+                "Printed output:",
+            ):
+                assert label in detail
+            assert name in detail
         assert app.store.status(lesson) != "completed"
         await pilot.press("ctrl+n")
         assert screen.stage == "repair"

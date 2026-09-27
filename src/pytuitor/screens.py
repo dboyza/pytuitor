@@ -23,6 +23,7 @@ from pytuitor.curriculum import (
     Lesson,
     chapter_activities,
 )
+from pytuitor.learning_progress import progress_counts, resume_summary
 from pytuitor.lesson_screen import LessonScreen as LessonScreen
 from pytuitor.setup import Onboarding
 from pytuitor.ui import TutorScreen, brand
@@ -45,6 +46,7 @@ class Dashboard(TutorScreen):
         Binding("p", "preferences", "Known topics"),
         Binding("s", "syllabus", "Syllabus", show=False),
         Binding("g", "game", "Your game", show=False),
+        Binding("r", "app.review", "Review", show=False),
     ]
 
     def __init__(self):
@@ -79,8 +81,13 @@ class Dashboard(TutorScreen):
                 )
                 with Horizontal(id="dashboard-bottom"):
                     yield Static("Saved locally", classes="muted")
+                    yield Button("Review", id="review")
                     yield Button("Start over", id="restart")
         yield Footer(show_command_palette=False)
+
+    @on(Button.Pressed, "#review")
+    def open_review(self):
+        self.tutor.action_review()
 
     def on_mount(self) -> None:
         self.apply_layout()
@@ -106,20 +113,44 @@ class Dashboard(TutorScreen):
             self.current = BY_ID[last_lesson]
         self.seen_last_lesson = last_lesson
         lessons = ACTIVITIES
-        completed = sum(self.store.status(lesson) == "completed" for lesson in lessons)
-        familiar = sum(self.store.status(lesson) == "familiar" for lesson in lessons)
+        core, optional = progress_counts(self.store, lessons)
         self.query_one("#path-title", Static).update("Learning")
         self.query_one("#dashboard-summary", Static).update(
-            f"{completed} of {len(lessons)} completed"
-            + (f" · {familiar} already known" if familiar else "")
+            f"Core {core[0]}/{core[2]} completed"
+            + (f" · {core[1]} known" if core[1] else "")
+            + f" · Optional {optional[0]}/{optional[2]}"
+            + (f" · {optional[1]} known" if optional[1] else "")
         )
         next_lesson = self.store.next_lesson()
         self.query_one("#continue-summary", Static).update(
-            Text(f"UP NEXT\n{next_lesson.title} · {next_lesson.minutes} min")
+            Text(
+                f"UP NEXT · {next_lesson.minutes} min\n{next_lesson.title}\n"
+                f"{resume_summary(self.store, next_lesson)}"
+            )
             if next_lesson
             else Text("CHOOSE YOUR NEXT CHAPTER\nOpen the syllabus to explore more topics.")
         )
         self.query_one("#continue", Button).disabled = next_lesson is None
+        root = (
+            self.store.entry(next_lesson)
+            if next_lesson and self.store.status(next_lesson) == "in progress"
+            else {}
+        )
+        note = root.get("resume_note", "")
+        self.query_one("#continue-summary").tooltip = (
+            ("Your note: " + note) if isinstance(note, str) and note else None
+        )
+        from pytuitor.review_progress import suggested
+
+        suggestion = suggested(self.store)
+        self.query_one("#review", Button).label = "Review suggested" if suggestion else "Review"
+        if isinstance(note, str) and note:
+            self.query_one("#continue-summary", Static).update(
+                Text(
+                    f"UP NEXT · {next_lesson.title}\n"
+                    f"{resume_summary(self.store, next_lesson)}\nNote: {note[:90]}"
+                )
+            )
         chapters = CHAPTERS
         if self.chapter_id not in {chapter.id for chapter in chapters}:
             self.chapter_id = next_lesson.chapter_id if next_lesson else None

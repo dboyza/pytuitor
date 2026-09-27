@@ -147,3 +147,41 @@ async def test_growing_game_visuals(tmp_path, monkeypatch, size):
         await capture(app, pilot, f"{size[0]}-game-source")
         await pilot.press("f4", "ctrl+e")
         await capture(app, pilot, f"{size[0]}-game-workbench")
+
+
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)], ids=["small", "wide"])
+async def test_review_and_reward_visuals(tmp_path, monkeypatch, size):
+    from pytuitor.project_screen import CheckpointPlayer
+    from pytuitor.review_screen import ReviewScreen
+
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setenv("TERM", "xterm-256color")
+    monkeypatch.setenv("COLORTERM", "truecolor")
+    app = TutorApp(tmp_path)
+    app.store.data.update(onboarded=True, last_lesson="reach-arrival")
+    async with app.run_test(size=size) as pilot:
+        await pilot.press("r")
+        assert app.screen.query_one("#review-chapters").region.height >= 5
+        await capture(app, pilot, f"{size[0]}-review-hub")
+        await pilot.click("#review-open")
+        screen = app.screen
+        assert isinstance(screen, ReviewScreen)
+        await capture(app, pilot, f"{size[0]}-review-predict")
+        screen.index = 1
+        screen.load_task()
+        await pilot.pause()
+        assert screen.query_one("#review-editor").region.height >= 4
+        await pilot.press("f5")
+        await app.workers.wait_for_complete()
+        await capture(app, pilot, f"{size[0]}-review-debug")
+        await pilot.press("ctrl+b", "c")
+        screen = app.screen
+        screen.query_one("#editor", TextArea).load_text(screen.lesson.solution)
+        await pilot.press("f5")
+        await app.workers.wait_for_complete()
+        assert screen.stage_passed("build")
+        assert screen.query_one("#play-checkpoint").display
+        await capture(app, pilot, f"{size[0]}-game-reward")
+        await pilot.click("#play-checkpoint")
+        assert isinstance(app.screen, CheckpointPlayer)
+        await pilot.press("escape")

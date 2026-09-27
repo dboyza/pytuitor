@@ -95,42 +95,49 @@ SAVE_CHECKS = CORE_CHECKS + (
     scenario(
         "JSON round trip and rejected corrupt save",
         """
-        from pathlib import Path
-        state = new_game()
-        step(state, "forest")
-        save_game(state, "journey.json")
-        restored = load_game("journey.json")
-        Path("bad.json").write_text('{"location": "forest"}', encoding="utf-8")
-        rejected = False
-        try:
-            load_game("bad.json")
-        except ValueError:
-            rejected = True
-        result = restored == state and restored is not state and rejected
-    """,
+            from pathlib import Path
+
+            state = new_game()
+            step(state, "forest")
+            save_game(state, "journey.json")
+            restored = load_game("journey.json")
+            Path("bad.json").write_text('{"location": "forest"}', encoding="utf-8")
+            rejected = False
+            try:
+                load_game("bad.json")
+            except ValueError:
+                rejected = True
+            result = (
+                __expect__("restored", restored, state, "==")
+                and restored is not state
+                and rejected
+            )
+        """,
         "Validate loaded fields before making the loaded dictionary the active game.",
     ),
     scenario(
         "CSV uses quoted fields and an explicit header",
         """
-        supplies = {"wood, dry": 3, "rope": 1}
-        export_supplies(supplies, "ledger.csv")
-        restored = import_supplies("ledger.csv")
-        export_supplies({}, "empty.csv")
-        result = restored == supplies and import_supplies("empty.csv") == {}
-    """,
+            supplies = {"wood, dry": 3, "rope": 1}
+            export_supplies(supplies, "ledger.csv")
+            restored = import_supplies("ledger.csv")
+            export_supplies({}, "empty.csv")
+            result = __expect__("restored", restored, supplies, "==") and __expect__(
+                "import_supplies('empty.csv')", import_supplies("empty.csv"), {}, "=="
+            )
+        """,
         "Use csv's reader and writer rather than splitting lines on commas.",
     ),
     scenario(
         "Playable save and load commands",
         """
-        state = new_game()
-        step(state, "forest")
-        step(state, "save")
-        step(state, "ridge")
-        step(state, "load")
-        result = state["location"] == "forest"
-    """,
+            state = new_game()
+            step(state, 'forest')
+            step(state, 'save')
+            step(state, 'ridge')
+            step(state, 'load')
+            result = __expect__("state['location']", state['location'], 'forest', '==')
+        """,
         "Connect persistence to commands in the actual game loop.",
     ),
 )
@@ -200,9 +207,13 @@ M5 = milestone(
                     'item,count\\n"wood, dry",2\\nrope,1\\n', encoding="utf-8"
                 )
                 Path("empty.csv").write_text("item,count\\n", encoding="utf-8")
-                result = (
-                    read_deliveries("delivery.csv") == [("wood, dry", 2), ("rope", 1)]
-                    and read_deliveries("empty.csv") == []
+                result = __expect__(
+                    "read_deliveries('delivery.csv')",
+                    read_deliveries("delivery.csv"),
+                    [("wood, dry", 2), ("rope", 1)],
+                    "==",
+                ) and __expect__(
+                    "read_deliveries('empty.csv')", read_deliveries("empty.csv"), [], "=="
                 )
             """,
             "Let csv handle quoted delimiters and convert each count after reading the header.",
@@ -261,15 +272,38 @@ MARKER_CHECKS = SAVE_CHECKS + (
         """
             result = (
                 valid_marker("AB-123")
-                and not any(
-                    valid_marker(s)
-                    for s in ("AB-1234", "xAB-123", "ab-123", "AB-１２３", "AB-123\\n")
+                and (
+                    not any(
+                        (
+                            valid_marker(s)
+                            for s in (
+                                "AB-1234",
+                                "xAB-123",
+                                "ab-123",
+                                "AB-１２３",
+                                "AB-123\\n",
+                            )
+                        )
+                    )
                 )
-                and find_markers("Use AB-123, then CD-456. Not xEF-789 or AB-1234.")
-                == ["AB-123", "CD-456"]
-                and redact_markers("Use AB-123; keep xAB-123.")
-                == "Use [marker]; keep xAB-123."
-                and step(new_game(), "decode AB-123") == "Markers: AB-123"
+                and __expect__(
+                    "find_markers('Use AB-123, then CD-456. Not xEF-789 or AB-1234.')",
+                    find_markers("Use AB-123, then CD-456. Not xEF-789 or AB-1234."),
+                    ["AB-123", "CD-456"],
+                    "==",
+                )
+                and __expect__(
+                    "redact_markers('Use AB-123; keep xAB-123.')",
+                    redact_markers("Use AB-123; keep xAB-123."),
+                    "Use [marker]; keep xAB-123.",
+                    "==",
+                )
+                and __expect__(
+                    "step(new_game(), 'decode AB-123')",
+                    step(new_game(), "decode AB-123"),
+                    "Markers: AB-123",
+                    "==",
+                )
             )
         """,
         "Use fullmatch for the whole code and guard surrounding word characters when extracting.",
@@ -422,16 +456,20 @@ MODULE_CHECKS = MARKER_CHECKS + (
             before = random.getstate()
             first = encounter(5)
             result = (
-                encounter(5) == first
-                and random.getstate() == before
-                and first
-                in (
-                    "A fox crosses the trail.",
-                    "You find a clear spring.",
-                    "The valley is quiet.",
+                __expect__("encounter(5)", encounter(5), first, "==")
+                and __expect__("random.getstate()", random.getstate(), before, "==")
+                and (
+                    first
+                    in (
+                        "A fox crosses the trail.",
+                        "You find a clear spring.",
+                        "The valley is quiet.",
+                    )
                 )
-                and supply_mean([1, 2, 6]) == 3
-                and supply_mean([]) == 0
+                and __expect__(
+                    "supply_mean([1, 2, 6])", supply_mean([1, 2, 6]), 3, "=="
+                )
+                and __expect__("supply_mean([])", supply_mean([]), 0, "==")
             )
         """,
         "Use a local Random instance and handle an empty collection before calculating its mean.",
@@ -439,12 +477,15 @@ MODULE_CHECKS = MARKER_CHECKS + (
     scenario(
         "The engine is reusable without opening the input loop",
         """
-        import contextlib, importlib, io
-        output = io.StringIO()
-        with contextlib.redirect_stdout(output):
-            engine_module = importlib.reload(__import__("engine"))
-        result = output.getvalue() == "" and callable(engine_module.step)
-    """,
+            import contextlib, importlib, io
+
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                engine_module = importlib.reload(__import__("engine"))
+            result = __expect__(
+                "output.getvalue()", output.getvalue(), "", "=="
+            ) and callable(engine_module.step)
+        """,
         "Keep entrypoint execution behind the __name__ guard in game.py.",
     ),
 )
@@ -497,13 +538,18 @@ M7 = milestone(
         scenario(
             "Local randomness and caller ownership",
             """
-        import random
-        routes = ["river", "ridge", "forest"]
-        before = random.getstate()
-        first = choose_route(8, routes)
-        result = (first == choose_route(8, routes) and routes == ["river", "ridge", "forest"]
-            and random.getstate() == before and choose_route(0, []) is None)
-    """,
+                import random
+
+                routes = ["river", "ridge", "forest"]
+                before = random.getstate()
+                first = choose_route(8, routes)
+                result = (
+                    __expect__("first", first, choose_route(8, routes), "==")
+                    and __expect__("routes", routes, ["river", "ridge", "forest"], "==")
+                    and __expect__("random.getstate()", random.getstate(), before, "==")
+                    and (choose_route(0, []) is None)
+                )
+            """,
             "Create a private Random and choose without shuffling the caller's list.",
         ),
     ),
@@ -549,10 +595,27 @@ DATE_CHECKS = MODULE_CHECKS + (
             state = new_game()
             state["turn"] = 31
             result = (
-                str(game_date(state)) == "2030-04-01"
-                and days_left("2028-02-28", "2028-03-01") == 2
-                and days_left("2030-01-01", "2029-12-31") == -1
-                and parse_meeting("2030-03-08 09:30") == "2030-03-08T09:30"
+                __expect__(
+                    "str(game_date(state))", str(game_date(state)), "2030-04-01", "=="
+                )
+                and __expect__(
+                    "days_left('2028-02-28', '2028-03-01')",
+                    days_left("2028-02-28", "2028-03-01"),
+                    2,
+                    "==",
+                )
+                and __expect__(
+                    "days_left('2030-01-01', '2029-12-31')",
+                    days_left("2030-01-01", "2029-12-31"),
+                    -1,
+                    "==",
+                )
+                and __expect__(
+                    "parse_meeting('2030-03-08 09:30')",
+                    parse_meeting("2030-03-08 09:30"),
+                    "2030-03-08T09:30",
+                    "==",
+                )
                 and step(state, "calendar").startswith("2030-04-01")
             )
         """,
@@ -609,8 +672,18 @@ M8 = milestone(
                 except ValueError:
                     rejected = True
                 result = (
-                    arrival_date("2028-02-28", 2) == "2028-03-01"
-                    and arrival_date("2029-12-31", 1) == "2030-01-01"
+                    __expect__(
+                        "arrival_date('2028-02-28', 2)",
+                        arrival_date("2028-02-28", 2),
+                        "2028-03-01",
+                        "==",
+                    )
+                    and __expect__(
+                        "arrival_date('2029-12-31', 1)",
+                        arrival_date("2029-12-31", 1),
+                        "2030-01-01",
+                        "==",
+                    )
                     and rejected
                 )
             """,
@@ -717,14 +790,35 @@ DEPOT_CHECKS = DATE_CHECKS + (
         """
             names = ["Mira", "Oren", "Mira"]
             result = (
-                group_deliveries([("wood", 2), ("rope", 1), ("wood", 3)])
-                == {"wood": 5, "rope": 1}
-                and group_deliveries([]) == {}
-                and serve_queue(names, 2) == (["Mira", "Oren"], ["Mira"])
-                and serve_queue(names, 0) == ([], names)
-                and names == ["Mira", "Oren", "Mira"]
-                and active_requests([("bridge", True), ("beacon", False)]) == ["beacon"]
-                and step(new_game(), "depot") == "Requests: Oren, Tess"
+                __expect__(
+                    "group_deliveries([('wood', 2), ('rope', 1), ('wood', 3)])",
+                    group_deliveries([("wood", 2), ("rope", 1), ("wood", 3)]),
+                    {"wood": 5, "rope": 1},
+                    "==",
+                )
+                and __expect__("group_deliveries([])", group_deliveries([]), {}, "==")
+                and __expect__(
+                    "serve_queue(names, 2)",
+                    serve_queue(names, 2),
+                    (["Mira", "Oren"], ["Mira"]),
+                    "==",
+                )
+                and __expect__(
+                    "serve_queue(names, 0)", serve_queue(names, 0), ([], names), "=="
+                )
+                and __expect__("names", names, ["Mira", "Oren", "Mira"], "==")
+                and __expect__(
+                    "active_requests([('bridge', True), ('beacon', False)])",
+                    active_requests([("bridge", True), ("beacon", False)]),
+                    ["beacon"],
+                    "==",
+                )
+                and __expect__(
+                    "step(new_game(), 'depot')",
+                    step(new_game(), "depot"),
+                    "Requests: Oren, Tess",
+                    "==",
+                )
             )
         """,
         "A queue serves from the left; build a new queue rather than consuming the input list.",
@@ -732,22 +826,37 @@ DEPOT_CHECKS = DATE_CHECKS + (
     scenario(
         "Residents settle once and the outpost grows",
         """
-        state = new_game()
-        step(state, "help oren")
-        step(state, "help oren")
-        step(state, "forest")
-        for _ in range(3):
-            step(state, "gather")
-        step(state, "outpost")
-        step(state, "help tess")
-        again = step(state, "help tess")
-        result = (state["residents"] == ["Oren", "Tess"]
-                  and state["supplies"]["rope"] == 0
-                  and state["supplies"]["food"] == 4
-                  and state["supplies"]["wood"] == 0
-                  and state["buildings"] == ["storehouse"]
-                  and again == "Tess is already settled."
-                  and step(state, "depot") == "Requests: all complete")
+            state = new_game()
+            step(state, "help oren")
+            step(state, "help oren")
+            step(state, "forest")
+            for _ in range(3):
+                step(state, "gather")
+            step(state, "outpost")
+            step(state, "help tess")
+            again = step(state, "help tess")
+            result = (
+                __expect__(
+                    "state['residents']", state["residents"], ["Oren", "Tess"], "=="
+                )
+                and __expect__(
+                    "state['supplies']['rope']", state["supplies"]["rope"], 0, "=="
+                )
+                and __expect__(
+                    "state['supplies']['food']", state["supplies"]["food"], 4, "=="
+                )
+                and __expect__("Wood remaining", state["supplies"]["wood"], 0, "==")
+                and __expect__(
+                    "state['buildings']", state["buildings"], ["storehouse"], "=="
+                )
+                and __expect__("again", again, "Tess is already settled.", "==")
+                and __expect__(
+                    "step(state, 'depot')",
+                    step(state, "depot"),
+                    "Requests: all complete",
+                    "==",
+                )
+            )
         """,
         (
             "Finish each resident's request once; apply rewards only after "
@@ -812,10 +921,12 @@ M9 = milestone(
                 original = ["A", "B", "A"]
                 first = dispatch(original, 2)
                 result = (
-                    first == (["A", "B"], ["A"])
-                    and original == ["A", "B", "A"]
-                    and dispatch(original, 0) == ([], original)
-                    and dispatch([], 3) == ([], [])
+                    __expect__("first", first, (["A", "B"], ["A"]), "==")
+                    and __expect__("original", original, ["A", "B", "A"], "==")
+                    and __expect__(
+                        "dispatch(original, 0)", dispatch(original, 0), ([], original), "=="
+                    )
+                    and __expect__("dispatch([], 3)", dispatch([], 3), ([], []), "==")
                 )
             """,
             "Copy the input and stop before accepting one more than capacity.",
@@ -917,34 +1028,54 @@ CLASS_CHECKS = DEPOT_CHECKS + (
     scenario(
         "Independent expedition objects and quest states",
         """
-        left, right = Expedition(), Expedition()
-        left.command("forest")
-        left.command("gather")
-        result = right.state["supplies"]["wood"] == 0 and left.quest() is QuestState.OPEN
-    """,
+            left, right = (Expedition(), Expedition())
+            left.command("forest")
+            left.command("gather")
+            result = (
+                __expect__(
+                    "right.state['supplies']['wood']",
+                    right.state["supplies"]["wood"],
+                    0,
+                    "==",
+                )
+                and left.quest() is QuestState.OPEN
+            )
+        """,
         "Each instance needs fresh state and quest() must return the named enum member.",
     ),
     scenario(
         "Learner tests reject repeated reward and shared-state bugs",
         """
-        import contextlib, io, unittest, test_game, engine
-        original = engine.Expedition.command
-        def run_tests():
-            suite = unittest.defaultTestLoader.loadTestsFromModule(test_game)
-            report = unittest.TextTestRunner(stream=io.StringIO()).run(suite)
-            return report.testsRun >= 3 and report.wasSuccessful()
-        normal = run_tests()
-        def mutant(self, text):
-            if text.strip().lower() == "deliver":
-                self.state["quest"] = "open"
-            return original(self, text)
-        engine.Expedition.command = mutant
-        try:
-            rejects = not run_tests()
-        finally:
-            engine.Expedition.command = original
-        result = normal and rejects
-    """,
+            import contextlib, io, unittest, test_game, engine
+
+            original = engine.Expedition.command
+
+
+            def run_tests():
+                suite = unittest.defaultTestLoader.loadTestsFromModule(test_game)
+                report = unittest.TextTestRunner(stream=io.StringIO()).run(suite)
+                return (
+                    __expect__("report.testsRun", report.testsRun, 3, ">=")
+                    and report.wasSuccessful()
+                )
+
+
+            normal = run_tests()
+
+
+            def mutant(self, text):
+                if text.strip().lower() == "deliver":
+                    self.state["quest"] = "open"
+                return original(self, text)
+
+
+            engine.Expedition.command = mutant
+            try:
+                rejects = not run_tests()
+            finally:
+                engine.Expedition.command = original
+            result = normal and rejects
+        """,
         "Write assertions for the second delivery's unchanged stock, not just the first success.",
     ),
 )
@@ -1005,7 +1136,7 @@ M10 = milestone(
         scenario(
             "Independent chests and rejected transfers",
             """
-                left, right = SupplyChest(), SupplyChest()
+                left, right = (SupplyChest(), SupplyChest())
                 left.add("wood", 2)
                 left.add("wood", 1)
                 rejected = False
@@ -1015,12 +1146,12 @@ M10 = milestone(
                     rejected = True
                 result = (
                     rejected
-                    and right.items == {}
-                    and left.take("wood", 4) is False
-                    and left.items["wood"] == 3
-                    and left.take("wood", 3) is True
-                    and left.items["wood"] == 0
-                    and left.take("missing", 1) is False
+                    and __expect__("right.items", right.items, {}, "==")
+                    and (left.take("wood", 4) is False)
+                    and __expect__("left.items['wood']", left.items["wood"], 3, "==")
+                    and (left.take("wood", 3) is True)
+                    and __expect__("left.items['wood']", left.items["wood"], 0, "==")
+                    and (left.take("missing", 1) is False)
                 )
             """,
             "Initialize per-instance collections and validate before mutation.",
@@ -1123,8 +1254,10 @@ ARCHIVE_FILES = extend(
             if cleaned == "scene":
                 scenes = {
                     "outpost": "Mira studies the beacon frame. Oren and Tess unload their packs.",
-                    "forest": ("Fallen branches lie beneath tall pines. "
-                               "Gather wood for the outpost."),
+                    "forest": (
+                        "Fallen branches lie beneath tall pines. "
+                        "Gather wood for the outpost."
+                    ),
                     "ridge": "The valley opens below you. The dark beacon points toward home.",
                 }
                 return scenes[state["location"]]
@@ -1164,11 +1297,16 @@ ARCHIVE_CHECKS = CLASS_CHECKS + (
             except ValueError:
                 invalid = True
             result = (
-                preview == ["save.json"]
+                __expect__("preview", preview, ["save.json"], "==")
                 and untouched
                 and refused
                 and invalid
-                and Path("backup/save.json").read_text() == "journey"
+                and __expect__(
+                    "Path('backup/save.json').read_text()",
+                    Path("backup/save.json").read_text(),
+                    "journey",
+                    "==",
+                )
             )
         """,
         (
@@ -1193,7 +1331,12 @@ ARCHIVE_CHECKS = CLASS_CHECKS + (
             result = (
                 "first" in early
                 and state["beacon"] is True
-                and ending == "The beacon shines. Lantern Reach is home again."
+                and __expect__(
+                    "ending",
+                    ending,
+                    "The beacon shines. Lantern Reach is home again.",
+                    "==",
+                )
             )
         """,
         "The beacon can be restored only after Mira's delivery quest is complete.",
@@ -1263,18 +1406,28 @@ M11 = milestone(
         scenario(
             "Preview and conflict protection",
             """
-        from pathlib import Path
-        Path("source.txt").write_text("new")
-        copy_report("source.txt", "target.txt")
-        clean = not Path("target.txt").exists()
-        Path("target.txt").write_text("keep")
-        refused = False
-        try:
-            copy_report("source.txt", "target.txt", False)
-        except FileExistsError:
-            refused = True
-        result = clean and refused and Path("target.txt").read_text() == "keep"
-    """,
+                from pathlib import Path
+
+                Path("source.txt").write_text("new")
+                copy_report("source.txt", "target.txt")
+                clean = not Path("target.txt").exists()
+                Path("target.txt").write_text("keep")
+                refused = False
+                try:
+                    copy_report("source.txt", "target.txt", False)
+                except FileExistsError:
+                    refused = True
+                result = (
+                    clean
+                    and refused
+                    and __expect__(
+                        "Path('target.txt').read_text()",
+                        Path("target.txt").read_text(),
+                        "keep",
+                        "==",
+                    )
+                )
+            """,
             "Preview returns the plan only; real writes must use exclusive creation.",
         ),
     ),

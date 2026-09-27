@@ -72,3 +72,17 @@ A canonical reference demonstrates the authored base; learners carrying extra fe
 Keep `connections.py`, milestone requirements, hints, references, broken Repairs, and checks synchronized.
 Run `tests/test_growing_project.py`, the full regressions, visual journeys, and installed smoke after contract changes.
 Profiles migrate to version 4 with an original backup; do not infer game completion from old lessons or optional projects.
+
+## Feedback observations and mixed reviews
+
+Compound Lantern Reach scenarios use `__expect__(label, actual, expected, comparison="==")` to record concrete evidence while returning the comparison result.
+Evaluate the learner operation once and pass its value to the helper; do not rerun it for diagnostics.
+The worker records at most 16 observations per case, retaining an encountered failure when the observation list is full.
+Keep labels plain and explain the expected behavior in the check's description and nudge.
+
+Author optional mixed sessions in `content/reviews/`, with one prediction, one broken debugging task, and one small implementation per chapter.
+Each task needs a stable ID, explicit observable requirements, a reference, and meaningful checks or an explained prediction answer.
+Stay within that chapter's taught prerequisites and accept equivalent implementations.
+Reviews use the existing runner and separate progress records; never register them as required course activities.
+Validate all prediction outputs, all coding references, and failure of all broken starters with the real runner.
+Review pacing and scheduling are documented in [the learning experience guide](learning-experience.md).

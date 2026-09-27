@@ -11,9 +11,12 @@ from textual.events import DescendantFocus, Resize
 from textual.widgets import Button, Footer, Input, Markdown, OptionList, Static, TextArea, Tree
 from textual.widgets.option_list import Option
 
+from pytuitor.check_feedback import render_feedback
 from pytuitor.curriculum import BY_ID, Lesson, default_input
 from pytuitor.dialogs import ConfirmReset
+from pytuitor.experience_dialogs import CheckChooser, ResumeNote, WorkspaceTools
 from pytuitor.file_tree import FileTree
+from pytuitor.learning_progress import load_report, report_is_current, safe_view, saved_report
 from pytuitor.learning_tools import (
     DeleteFileDialog,
     EnvironmentDialog,
@@ -69,6 +72,12 @@ class LessonScreen(TutorScreen):
         self.active_file = lesson.entrypoint
         self.run_files = {}
         self.last_run_sources = {}
+        self.check_selected = None
+        self.check_details = False
+        self.check_selection_explicit = False
+        self.file_positions = {}
+        self.restoring_view = True
+        self.initial_view = {}
 
     @property
     def build_label(self) -> str:
@@ -84,6 +93,9 @@ class LessonScreen(TutorScreen):
             self.stage = "build"
         entry = self.stage_entry()
         sources = self.project_files()
+        self.initial_view = safe_view(entry, sources)
+        self.active_file = self.initial_view.get("active_file", self.lesson.entrypoint)
+        self.file_positions = self.initial_view.get("positions", {})
         yield brand(self.lesson.title.upper())
         with Horizontal(id="lesson-toolbar"):
             yield Button("← Dashboard", id="back")
@@ -159,6 +171,13 @@ class LessonScreen(TutorScreen):
                             ),
                             classes="muted",
                         )
+                    if self.lesson.project_id:
+                        from pytuitor.content.lantern.briefs import BRIEFS
+
+                        yield Markdown(
+                            BRIEFS[self.lesson.id.removeprefix("reach-")].markdown(),
+                            id="milestone-brief",
+                        )
                     yield Markdown(self.lesson.body, id="lesson-markdown")
                     if not self.lesson.project_id:
                         from pytuitor.content.lantern.connections import GAME_CONNECTIONS
@@ -193,8 +212,7 @@ class LessonScreen(TutorScreen):
                 with Horizontal(id="file-toolbar", classes="file-label"):
                     yield Button("Files", id="toggle-files")
                     yield Static(self.active_file, id="active-file", markup=False)
-                    yield Button("+ File", id="add-file")
-                    yield Button("Environment", id="environment")
+                    yield Button("Tools", id="workspace-tools")
                 yield Static(id="file-context", markup=False)
                 with Horizontal(id="editor-workspace"):
                     with Vertical(id="file-sidebar"):
@@ -211,6 +229,7 @@ class LessonScreen(TutorScreen):
                     yield Button("Run", id="run")
                     yield Button("Check  →", id="check", variant="primary")
                     yield Button("Stop", id="stop", disabled=True)
+                    yield Button("Play version", id="play-checkpoint")
                     yield Button("Run files", id="run-files", classes="run-files")
                     yield Button("Next  →", id="next", disabled=not self.stage_passed(self.stage))
                 with Vertical(id="console-pane"):
@@ -219,7 +238,12 @@ class LessonScreen(TutorScreen):
                         id="console-status",
                         classes="eyebrow",
                     )
+                    yield Static("", id="milestone-reward", markup=False, classes="topic-preview")
                     yield Static("", id="check-summary", markup=False)
+                    with Horizontal(id="check-actions"):
+                        yield Button("Checks", id="choose-check")
+                        yield Button("Details", id="check-details")
+                        yield Button("Hint", id="check-hint")
                     with VerticalScroll(id="results-scroll"):
                         yield Static(
                             "Run your program to see its output here.\n"
@@ -238,6 +262,8 @@ class LessonScreen(TutorScreen):
     def on_mount(self) -> None:
         self.refresh_file_tree()
         self.query_one("#run-files").display = False
+        self.query_one("#check-actions").display = False
+        self.query_one("#stop").display = False
         if not self.lesson.choices:
             for selector in (
                 "#prediction-heading",
@@ -255,8 +281,133 @@ class LessonScreen(TutorScreen):
             self.query_one("#prediction-feedback", Static).update(
                 Text("✓ " + self.lesson.explanation)
             )
+        self.call_after_refresh(self.restore_view)
+
+    def remember_file_position(self):
+        editor = self.query_one("#editor", TextArea)
+        self.file_positions[self.active_file] = {
+            "cursor": list(editor.cursor_location),
+            "scroll": [int(editor.scroll_x), int(editor.scroll_y)],
+        }
+
+    def capture_view(self):
+        self.remember_file_position()
+        self.stage_entry()["view"] = {
+            "active_file": self.active_file,
+            "positions": dict(self.file_positions),
+            "pane": self.active_pane,
+            "focus": self.focused.id if self.focused else None,
+            "reading": int(self.query_one("#reading-panel").scroll_y),
+            "exercise": int(self.query_one("#exercise-scroll").scroll_y),
+            "results": int(self.query_one("#results-scroll").scroll_y),
+            "selected": self.check_selected,
+            "details": self.check_details,
+        }
+
+    def restore_file_position(self):
+        editor = self.query_one("#editor", TextArea)
+        position = self.file_positions.get(self.active_file, {})
+        row, column = position.get("cursor", [0, 0])
+        lines = editor.text.split("\n")
+        row = min(row, len(lines) - 1)
+        column = min(column, len(lines[row]))
+        editor.move_cursor((row, column), center=False)
+        x, y = position.get("scroll", [0, 0])
+        editor.scroll_to(x=x, y=y, animate=False, immediate=True)
+
+    def restore_view(self):
+        if not self.is_mounted or self.suspend_saves:
+            return
+        view = self.initial_view
+        self.check_results = {
+            case["number"]: case for case in load_report(self.stage_entry(), self.lesson.revision)
+        }
+        self.check_selected = view.get("selected")
+        self.check_selection_explicit = self.check_selected in self.check_results
+        self.check_details = view.get("details", False)
+        if self.check_results:
+            self.render_checks()
+            if not report_is_current(self.stage_entry(), self.lesson.revision):
+                self.query_one("#check-summary", Static).update(
+                    "Earlier results. Draft changed; check again."
+                )
+        else:
+            self.query_one("#check-actions").display = False
+        self.select_pane(view.get("pane", "lesson"))
+        focus = view.get("focus")
+        if focus and self.query(f"#{focus}") and self.query_one(f"#{focus}").display:
+            self.query_one(f"#{focus}").focus()
+        self.restore_file_position()
+        for key, selector in (
+            ("reading", "#reading-panel"),
+            ("exercise", "#exercise-scroll"),
+            ("results", "#results-scroll"),
+        ):
+            self.query_one(selector).scroll_to(y=view.get(key, 0), animate=False, immediate=True)
+        self.restoring_view = False
+        self.update_reward()
         self.save_draft()
-        self.select_pane("lesson")
+
+    @on(Button.Pressed, "#workspace-tools")
+    def workspace_tools(self):
+        self.app.push_screen(WorkspaceTools(), self.workspace_tool_chosen)
+
+    def workspace_tool_chosen(self, action):
+        actions = {
+            "add-file": self.action_add_file,
+            "environment": self.action_environment,
+            "note": self.action_note,
+            "export": self.action_export,
+            "reset": self.action_reset,
+        }
+        if action in actions:
+            actions[action]()
+
+    def action_note(self):
+        note = self.store.entry(self.lesson).get("resume_note", "")
+        self.app.push_screen(ResumeNote(note if isinstance(note, str) else ""), self.note_saved)
+
+    def note_saved(self, note):
+        if note is not None and self.is_mounted and not self.suspend_saves:
+            entry = self.store.entry(self.lesson)
+            previous = entry.get("resume_note", "")
+            entry["resume_note"] = note
+            if not self.tutor.persist():
+                entry["resume_note"] = previous
+            else:
+                self.notify("Note saved for next time." if note else "Note cleared.")
+
+    def update_reward(self):
+        if not self.query("#play-checkpoint"):
+            return
+        root = self.store.entry(self.lesson)
+        available = bool(
+            self.lesson.project_id
+            and root.get("checkpoint")
+            and self.stage_passed("build")
+            and (self.stage == "build" or self.stage_passed("repair"))
+        )
+        self.query_one("#play-checkpoint").display = available
+        reward = self.query_one("#milestone-reward", Static)
+        reward.display = available
+        if available:
+            from pytuitor.content.lantern.briefs import BRIEFS
+
+            reward.update(BRIEFS[self.lesson.id.removeprefix("reach-")].outcome)
+
+    @on(Button.Pressed, "#play-checkpoint")
+    def play_checkpoint(self):
+        from pytuitor.project_screen import CheckpointPlayer
+        from pytuitor.project_workspace import ProjectWorkspace
+
+        identifier = self.store.entry(self.lesson).get("checkpoint")
+        if not identifier or self.running:
+            return
+        try:
+            payload = ProjectWorkspace(self.store).read_checkpoint(identifier)
+            self.app.push_screen(CheckpointPlayer(payload))
+        except (OSError, WorkspaceError) as error:
+            self.notify(str(error), severity="error")
 
     def project_files(self) -> dict[str, str]:
         entry = self.stage_entry()
@@ -280,7 +431,9 @@ class LessonScreen(TutorScreen):
         return dict(sources)
 
     def load_project(self) -> None:
-        self.active_file = self.lesson.entrypoint
+        view = safe_view(self.stage_entry(), self.project_files())
+        self.active_file = view.get("active_file", self.lesson.entrypoint)
+        self.file_positions = view.get("positions", {})
         self.refresh_file_tree()
         self.load_active_file()
         self.apply_layout()
@@ -313,6 +466,7 @@ class LessonScreen(TutorScreen):
         editor = self.query_one("#editor", TextArea)
         editor.language = "python" if self.active_file.endswith(".py") else None
         editor.load_text(self.project_files()[self.active_file])
+        self.restore_file_position()
         self.update_file_context()
 
     @on(Tree.NodeSelected, "#file-tree")
@@ -323,6 +477,7 @@ class LessonScreen(TutorScreen):
         self.select_pane("editor")
 
     def open_file(self, name: str) -> None:
+        self.remember_file_position()
         if name == self.active_file:
             return
         self.save_draft()
@@ -434,6 +589,7 @@ class LessonScreen(TutorScreen):
         return passed
 
     def update_stage_ui(self) -> None:
+        self.update_reward()
         for stage in ("build", "repair"):
             label = (
                 f"1  {self.build_label}"
@@ -463,9 +619,12 @@ class LessonScreen(TutorScreen):
             if self.stage == "build"
             else "2 OF 2 · REPAIR · INVESTIGATE AND FIX"
         )
-        self.query_one("#stage-instructions", Markdown).update(
-            self.stage_contract().instructions or default_instructions
-        )
+        instructions = self.stage_contract().instructions or default_instructions
+        if self.stage == "repair":
+            from pytuitor.repair_pacing import repair_guidance
+
+            instructions = repair_guidance(self.lesson) + "\n\n" + instructions
+        self.query_one("#stage-instructions", Markdown).update(instructions)
         self.query_one("#next", Button).label = "Repair →" if self.stage == "build" else "Next →"
         self.query_one("#next", Button).disabled = not self.stage_passed(self.stage)
 
@@ -482,6 +641,7 @@ class LessonScreen(TutorScreen):
         self.save_draft()
         if self.save_timer:
             self.save_timer.stop()
+        self.restoring_view = True
         self.stage = stage
         self.check_results = {}
         self.run_files = {}
@@ -517,8 +677,12 @@ class LessonScreen(TutorScreen):
         transition.display = True
         self.query_one("#exercise-scroll", VerticalScroll).scroll_home(animate=False)
         self.show_hints()
-        self.save_draft()
-        self.select_pane("editor")
+        self.initial_view = {
+            "pane": "editor",
+            **safe_view(self.stage_entry(), self.project_files()),
+        }
+        self.select_pane(self.initial_view["pane"])
+        self.call_after_refresh(self.restore_view)
 
     def on_resize(self, event: Resize) -> None:
         self.apply_layout()
@@ -585,7 +749,7 @@ class LessonScreen(TutorScreen):
 
     @on(TextArea.Changed, "#editor")
     def draft_changed(self) -> None:
-        if not self.is_mounted or self.suspend_saves:
+        if not self.is_mounted or self.suspend_saves or self.restoring_view:
             return
         entry = self.stage_entry()
         if "code" not in entry:
@@ -610,12 +774,18 @@ class LessonScreen(TutorScreen):
         self.save_timer = self.set_timer(0.4, self.save_draft)
 
     def save_draft(self) -> None:
-        if not self.is_mounted or self.suspend_saves or not self.query("#editor"):
+        if (
+            self.restoring_view
+            or not self.is_mounted
+            or self.suspend_saves
+            or not self.query("#editor")
+        ):
             return
         entry = self.stage_entry()
         if "code" not in entry:
             entry["revision"] = self.lesson.revision
         self.capture_editor()
+        self.capture_view()
         saved = self.tutor.persist()
         self.query_one("#save-status", Static).update("Saved locally" if saved else "Not saved")
 
@@ -688,6 +858,7 @@ class LessonScreen(TutorScreen):
         self.query_one("#run", Button).disabled = True
         self.query_one("#check", Button).disabled = True
         self.query_one("#stop", Button).disabled = False
+        self.query_one("#stop").display = True
         self.query_one("#console-status", Static).update(
             "CHECKING TEST CASES" if check else "RUNNING"
         )
@@ -702,6 +873,9 @@ class LessonScreen(TutorScreen):
                 ),
             )
         )
+        self.check_selected = None
+        self.check_selection_explicit = False
+        self.query_one("#check-actions").display = False
         self.query_one("#check-summary", Static).update("")
         self.select_pane("console")
         self.execution = self.run_code(check, self.run_serial, self.capture_editor())
@@ -745,47 +919,52 @@ class LessonScreen(TutorScreen):
         self.render_checks()
 
     def render_checks(self) -> None:
-        passed = sum(case.get("passed", False) for case in self.check_results.values())
-        lines = [
-            f"{self.stage_label().upper()} · "
-            f"{passed}/{len(self.stage_contract().checks)} checks passed",
-            "",
-        ]
-        for case in self.check_results.values():
-            status = (
-                "RUNNING" if case["status"] == "running" else "PASS" if case["passed"] else "FAIL"
+        if not self.check_selection_explicit:
+            first_failure = next(
+                (case for case in self.check_results.values() if case.get("passed") is False), None
             )
-            lines.extend(
-                [
-                    f"{case['number']}. {status} · {case['label']}",
-                    "   Keyboard input: " + case["input"].replace("\n", " ↵ ").rstrip()
-                    if case["input"]
-                    else "   Keyboard input: none",
-                    f"   Test: {case['operation']}",
-                    f"   Expected result: {case['expected']}",
-                    "   Expected printed output: "
-                    + (
-                        "final lines " + repr(case["expected_output"])
-                        if case.get("expected_output") is not None
-                        else "not required; this test checks behavior or a return value"
-                    ),
-                ]
-            )
-            if case["status"] == "finished":
-                lines.extend(
-                    [
-                        f"   Actual result: {case['actual']}",
-                        f"   Printed output: {case['output']!r}",
-                    ]
-                )
-                if not case["passed"]:
-                    lines.append(f"   Hint: {case['nudge']}")
-                    guidance = error_guidance(case["actual"])
-                    if guidance:
-                        lines.append("   Why: " + guidance)
-            lines.append("")
-        self.transcript = ""
-        self.append_output("\n".join(lines))
+            if first_failure:
+                self.check_selected = first_failure["number"]
+        text = render_feedback(
+            self.check_results,
+            self.check_selected,
+            details=self.check_details,
+            stage=self.stage_label(),
+        )
+        self.transcript = text
+        self.query_one("#results", Static).update(text)
+        self.query_one("#check-actions").display = bool(self.check_results)
+        self.query_one("#check-details", Button).label = (
+            "Hide details" if self.check_details else "Details"
+        )
+
+    @on(Button.Pressed, "#check-details")
+    def toggle_check_details(self):
+        self.check_details = not self.check_details
+        self.render_checks()
+        self.save_draft()
+
+    @on(Button.Pressed, "#choose-check")
+    def choose_check(self):
+        self.app.push_screen(
+            CheckChooser(self.check_results.values(), self.check_selected), self.check_chosen
+        )
+
+    def check_chosen(self, number):
+        if number is not None and number in self.check_results:
+            self.check_selected = number
+            self.check_selection_explicit = True
+            self.render_checks()
+            self.query_one("#results-scroll", VerticalScroll).scroll_home(animate=False)
+            self.save_draft()
+
+    @on(Button.Pressed, "#check-hint")
+    def selected_hint(self):
+        from pytuitor.check_feedback import selected_case
+
+        case = selected_case(self.check_results, self.check_selected)
+        if case:
+            self.notify(case["nudge"], timeout=15)
 
     @work(exclusive=True, group="execution")
     async def run_code(self, check: bool, serial: int, source: dict[str, str]) -> None:
@@ -811,6 +990,9 @@ class LessonScreen(TutorScreen):
                 for case in result.checks:
                     self.check_results[case["number"]] = case
                 self.render_checks()
+                self.stage_entry()["last_check"] = saved_report(
+                    result.checks, source, self.lesson.revision
+                )
                 summary = self.query_one("#check-summary", Static)
                 if result.error:
                     lines.extend(["Execution stopped:", result.error])
@@ -901,7 +1083,10 @@ class LessonScreen(TutorScreen):
                     self.query_one("#run", Button).disabled = False
                     self.query_one("#check", Button).disabled = False
                     self.query_one("#stop", Button).disabled = True
+                    self.query_one("#stop").display = False
                     self.query_one("#console-input", Input).disabled = True
+                    self.update_reward()
+                    self.save_draft()
 
     @on(Button.Pressed, "#run-files")
     def action_run_files(self) -> None:
@@ -946,6 +1131,7 @@ class LessonScreen(TutorScreen):
         self.query_one("#run", Button).disabled = False
         self.query_one("#check", Button).disabled = False
         self.query_one("#stop", Button).disabled = True
+        self.query_one("#stop").display = False
         self.query_one("#console-input", Input).disabled = True
 
     def action_stop(self) -> None:
@@ -1030,6 +1216,8 @@ class LessonScreen(TutorScreen):
                 "checked_revision",
                 "hints",
                 "prediction",
+                "view",
+                "last_check",
             ):
                 root.pop(key, None)
             root["revision"] = self.lesson.revision

@@ -1001,6 +1001,8 @@ REPAIR_STAGES = {
     ),
     "class-construction": _repair(
         (
+            "Focus this repair on base validation and the subclass-aware factory. "
+            "The abstract interface and instance decoding are supplied correctly. "
             "Define abstract Decoder with decode(self, text). Define IntegerDecoder(Dec"
             "oder), whose constructor stores base. Its decode uses int(text, self.base)"
             ". Define static valid_base(value) for integer bases 2 through 36 inclusive"
@@ -1038,7 +1040,10 @@ REPAIR_STAGES = {
             return int(text, self.base)
     """,
         """
-    class Decoder:
+    from abc import ABC, abstractmethod
+
+    class Decoder(ABC):
+        @abstractmethod
         def decode(self, text):
             pass
 
@@ -1055,7 +1060,7 @@ REPAIR_STAGES = {
             return IntegerDecoder(int(text))
 
         def decode(self, text):
-            return int(text)
+            return int(text, self.base)
     """,
         [
             _check(

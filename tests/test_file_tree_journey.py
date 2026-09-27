@@ -27,7 +27,8 @@ async def test_explorer_files_folders_and_drafts(tmp_path, size):
         assert editor.region.width >= 50
         assert editor.region.height >= 5
         await pilot.press("#", "a")
-        await pilot.click("#add-file")
+        await pilot.click("#workspace-tools")
+        await pilot.click("#tool-add-file")
         await pilot.click("#new-file")
         app.screen.query_one(Input).value = "notes/résumé.txt"
         await pilot.press("enter")

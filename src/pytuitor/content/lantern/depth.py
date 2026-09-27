@@ -51,16 +51,35 @@ COPY_CHECKS = ARCHIVE_CHECKS + (
     scenario(
         "Nested branches own their contents and preserve falsy choices",
         """
-    original = new_game()
-    changes = {"visits": []}
-    branch = branch_state(original, notes=changes)
-    branch["supplies"]["wood"] = 9
-    branch["notes"]["visits"].append("cave")
-    result = (original["supplies"]["wood"] == 0 and changes == {"visits": []}
-        and choose_value(0, 7) == 0 and choose_value("", "fallback") == ""
-        and choose_value(None, "fallback") == "fallback"
-        and "original preserved" in step(original, "branch"))
-""",
+            original = new_game()
+            changes = {"visits": []}
+            branch = branch_state(original, notes=changes)
+            branch["supplies"]["wood"] = 9
+            branch["notes"]["visits"].append("cave")
+            result = (
+                __expect__(
+                    "original['supplies']['wood']",
+                    original["supplies"]["wood"],
+                    0,
+                    "==",
+                )
+                and __expect__("changes", changes, {"visits": []}, "==")
+                and __expect__("choose_value(0, 7)", choose_value(0, 7), 0, "==")
+                and __expect__(
+                    "choose_value('', 'fallback')",
+                    choose_value("", "fallback"),
+                    "",
+                    "==",
+                )
+                and __expect__(
+                    "choose_value(None, 'fallback')",
+                    choose_value(None, "fallback"),
+                    "fallback",
+                    "==",
+                )
+                and ("original preserved" in step(original, "branch"))
+            )
+        """,
         (
             "Deep-copy both the base state and mutable replacement values; only "
             "None requests the fallback."
@@ -120,9 +139,14 @@ M12 = milestone(
                 preview = preview_route(state, "")
                 preview["supplies"]["wood"] = 8
                 result = (
-                    preview["location"] == ""
-                    and state["supplies"]["wood"] == 2
-                    and preview_route(state)["location"] == "outpost"
+                    __expect__("preview['location']", preview["location"], "", "==")
+                    and __expect__("Wood remaining", state["supplies"]["wood"], 2, "==")
+                    and __expect__(
+                        "preview_route(state)['location']",
+                        preview_route(state)["location"],
+                        "outpost",
+                        "==",
+                    )
                 )
             """,
             "A shallow outer copy still shares the nested supplies dictionary.",
@@ -166,11 +190,28 @@ ROUTE_CHECKS = COPY_CHECKS + (
         """
             tree = ["gate", [], ["pool", ["vault"]], "exit"]
             result = (
-                flatten_routes(tree) == ["gate", "pool", "vault", "exit"]
-                and flatten_routes([]) == []
-                and rank_routes(["aa", "b", "cc"], key=len) == ["b", "aa", "cc"]
-                and tree == ["gate", [], ["pool", ["vault"]], "exit"]
-                and step(new_game(), "caves") == "entrance, pool, crystal chamber"
+                __expect__(
+                    "flatten_routes(tree)",
+                    flatten_routes(tree),
+                    ["gate", "pool", "vault", "exit"],
+                    "==",
+                )
+                and __expect__("flatten_routes([])", flatten_routes([]), [], "==")
+                and __expect__(
+                    "rank_routes(['aa', 'b', 'cc'], key=len)",
+                    rank_routes(["aa", "b", "cc"], key=len),
+                    ["b", "aa", "cc"],
+                    "==",
+                )
+                and __expect__(
+                    "tree", tree, ["gate", [], ["pool", ["vault"]], "exit"], "=="
+                )
+                and __expect__(
+                    "step(new_game(), 'caves')",
+                    step(new_game(), "caves"),
+                    "entrance, pool, crystal chamber",
+                    "==",
+                )
             )
         """,
         (
@@ -295,11 +336,18 @@ DECORATOR_CHECKS = ROUTE_CHECKS + (
             except ValueError:
                 pass
             result = (
-                value == 0
-                and events == ["inner", "outer"]
-                and wrapped.__name__ == "operation"
-                and wrapped.__doc__ == operation.__doc__
-                and step(new_game(), "actions") == "ridge: survey"
+                __expect__("value", value, 0, "==")
+                and __expect__("events", events, ["inner", "outer"], "==")
+                and __expect__("wrapped.__name__", wrapped.__name__, "operation", "==")
+                and __expect__(
+                    "wrapped.__doc__", wrapped.__doc__, operation.__doc__, "=="
+                )
+                and __expect__(
+                    "step(new_game(), 'actions')",
+                    step(new_game(), "actions"),
+                    "ridge: survey",
+                    "==",
+                )
             )
         ''',
         "Append only after successful completion, return falsy results unchanged, and use wraps.",
@@ -363,10 +411,15 @@ M14 = milestone(
                 except ZeroDivisionError:
                     pass
                 result = (
-                    answer == 0
-                    and wrapped.calls == 1
-                    and wrapped.__name__ == "divide"
-                    and count_successes(divide).calls == 0
+                    __expect__("answer", answer, 0, "==")
+                    and __expect__("wrapped.calls", wrapped.calls, 1, "==")
+                    and __expect__("wrapped.__name__", wrapped.__name__, "divide", "==")
+                    and __expect__(
+                        "count_successes(divide).calls",
+                        count_successes(divide).calls,
+                        0,
+                        "==",
+                    )
                 )
             """,
             (
@@ -431,10 +484,15 @@ STREAM_CHECKS = COPY_CHECKS + (
             first = chronicle(events(), "quest", 1)
             empty = chronicle(events(), "quest", 0)
             result = (
-                first == ["help"]
-                and empty == []
-                and len(seen) == 2
-                and step(new_game(), "chronicle") == "Mira waits by the beacon."
+                __expect__("first", first, ["help"], "==")
+                and __expect__("empty", empty, [], "==")
+                and __expect__("len(seen)", len(seen), 2, "==")
+                and __expect__(
+                    "step(new_game(), 'chronicle')",
+                    step(new_game(), "chronicle"),
+                    "Mira waits by the beacon.",
+                    "==",
+                )
             )
         """,
         "Stop immediately after the requested matching item; limit zero must not touch the source.",
@@ -502,12 +560,16 @@ M15 = milestone(
 
                 stream = windows(source(), 2)
                 first = next(stream)
-                bounded = seen == [0, 1]
+                bounded = __expect__("seen", seen, [0, 1], "==")
                 result = (
-                    first == (0, 1)
+                    __expect__("first", first, (0, 1), "==")
                     and bounded
-                    and list(stream) == [(1, 2), (2, 3), (3, 4)]
-                    and list(windows(iter([1]), 2)) == []
+                    and __expect__(
+                        "list(stream)", list(stream), [(1, 2), (2, 3), (3, 4)], "=="
+                    )
+                    and __expect__(
+                        "list(windows(iter([1]), 2))", list(windows(iter([1]), 2)), [], "=="
+                    )
                 )
             """,
             "Use a fixed-size rolling buffer and yield each full overlapping window.",
@@ -607,10 +669,10 @@ CONTEXT_CHECKS = (
                     chained = isinstance(error.__cause__, ValueError)
                 result = (
                     raised
-                    and state["location"] == "outpost"
+                    and __expect__("state['location']", state["location"], "outpost", "==")
                     and chained
-                    and "return route preserved" in step(state, "station")
-                    and state["location"] == "outpost"
+                    and ("return route preserved" in step(state, "station"))
+                    and __expect__("state['location']", state["location"], "outpost", "==")
                 )
             """,
             (
@@ -680,18 +742,18 @@ M16 = milestone(
         scenario(
             "Absent keys and exceptional exit",
             """
-        settings = {"quiet": False}
-        caught = False
-        try:
-            with temporary_flag(settings, "new", True) as active:
-                assert active is settings
-                raise RuntimeError("storm")
-        except RuntimeError:
-            caught = True
-        with temporary_flag(settings, "quiet", True):
-            pass
-        result = caught and settings == {"quiet": False}
-    """,
+                settings = {'quiet': False}
+                caught = False
+                try:
+                    with temporary_flag(settings, 'new', True) as active:
+                        assert active is settings
+                        raise RuntimeError('storm')
+                except RuntimeError:
+                    caught = True
+                with temporary_flag(settings, 'quiet', True):
+                    pass
+                result = caught and __expect__('settings', settings, {'quiet': False}, '==')
+            """,
             "Remember whether the key existed, and restore inside a finally block.",
         ),
     ),
@@ -735,7 +797,7 @@ RECORD_CHECKS = COPY_CHECKS + (
     scenario(
         "Record validation and independent update/defaults",
         """
-            left, right = FieldRecord("wood"), FieldRecord("rope")
+            left, right = (FieldRecord("wood"), FieldRecord("rope"))
             left.notes.append("dry")
             updated = left.updated(4)
             updated.notes.append("stored")
@@ -746,12 +808,17 @@ RECORD_CHECKS = COPY_CHECKS + (
                 except ValueError:
                     rejected += 1
             result = (
-                right.notes == []
-                and left.count == 0
-                and left.notes == ["dry"]
-                and updated.count == 4
-                and rejected == 3
-                and step(new_game(), "records") == "wood: 0"
+                __expect__("right.notes", right.notes, [], "==")
+                and __expect__("left.count", left.count, 0, "==")
+                and __expect__("left.notes", left.notes, ["dry"], "==")
+                and __expect__("updated.count", updated.count, 4, "==")
+                and __expect__("rejected", rejected, 3, "==")
+                and __expect__(
+                    "step(new_game(), 'records')",
+                    step(new_game(), "records"),
+                    "wood: 0",
+                    "==",
+                )
             )
         """,
         (
@@ -824,9 +891,9 @@ M17 = milestone(
                 except ValueError:
                     rejected = True
                 result = (
-                    page.title == "First"
-                    and page.tags == ["trail"]
-                    and other.title == "Second"
+                    __expect__("page.title", page.title, "First", "==")
+                    and __expect__("page.tags", page.tags, ["trail"], "==")
+                    and __expect__("other.title", other.title, "Second", "==")
                     and rejected
                 )
             """,
@@ -919,12 +986,22 @@ STORE_CHECKS = RECORD_CHECKS + (
 
             result = (
                 type(store) is CustomStore
-                and len(store) == 2
-                and list(store) == ["wood", "rope"]
-                and store.total == 2
-                and stock_report(Fake(), output.append) == 1
-                and output == ["lamp: 1"]
-                and step(new_game(), "stores") == "Total stock: 3"
+                and __expect__("len(store)", len(store), 2, "==")
+                and __expect__("list(store)", list(store), ["wood", "rope"], "==")
+                and __expect__("store.total", store.total, 2, "==")
+                and __expect__(
+                    "stock_report(Fake(), output.append)",
+                    stock_report(Fake(), output.append),
+                    1,
+                    "==",
+                )
+                and __expect__("output", output, ["lamp: 1"], "==")
+                and __expect__(
+                    "step(new_game(), 'stores')",
+                    step(new_game(), "stores"),
+                    "Total stock: 3",
+                    "==",
+                )
             )
         """,
         (
@@ -935,25 +1012,37 @@ STORE_CHECKS = RECORD_CHECKS + (
     scenario(
         "Learner reporting test rejects a dropped zero-count row",
         """
-        import io, unittest, test_stores
-        original = test_stores.stock_report
-        def run_tests():
-            suite = unittest.defaultTestLoader.loadTestsFromModule(test_stores)
-            report = unittest.TextTestRunner(stream=io.StringIO()).run(suite)
-            return report.testsRun > 0 and report.wasSuccessful()
-        passed = run_tests()
-        def mutant(store, write):
-            values = [(name, n) for name, n in store.items() if n]
-            for name, n in values:
-                write(f"{name}: {n}")
-            return len(values)
-        test_stores.stock_report = mutant
-        try:
-            rejected = not run_tests()
-        finally:
-            test_stores.stock_report = original
-        result = passed and rejected
-    """,
+            import io, unittest, test_stores
+
+            original = test_stores.stock_report
+
+
+            def run_tests():
+                suite = unittest.defaultTestLoader.loadTestsFromModule(test_stores)
+                report = unittest.TextTestRunner(stream=io.StringIO()).run(suite)
+                return (
+                    __expect__("report.testsRun", report.testsRun, 0, ">")
+                    and report.wasSuccessful()
+                )
+
+
+            passed = run_tests()
+
+
+            def mutant(store, write):
+                values = [(name, n) for name, n in store.items() if n]
+                for name, n in values:
+                    write(f"{name}: {n}")
+                return len(values)
+
+
+            test_stores.stock_report = mutant
+            try:
+                rejected = not run_tests()
+            finally:
+                test_stores.stock_report = original
+            result = passed and rejected
+        """,
         "Assert that a zero-count row is written, not only positive counts.",
     ),
 )
@@ -1008,13 +1097,17 @@ M18 = milestone(
         scenario(
             "Structural input and exact injected output",
             """
-        class Store:
-            def items(self):
-                return [("wood", 0), ("rope", 2)]
-        output = []
-        count = render_inventory(Store(), output.append)
-        result = count == 2 and output == ["wood=0", "rope=2"]
-    """,
+                class Store:
+                    def items(self):
+                        return [("wood", 0), ("rope", 2)]
+
+
+                output = []
+                count = render_inventory(Store(), output.append)
+                result = __expect__("count", count, 2, "==") and __expect__(
+                    "output", output, ["wood=0", "rope=2"], "=="
+                )
+            """,
             "The injected writer is the output boundary, and zero still belongs in the report.",
         ),
     ),
