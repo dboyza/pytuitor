@@ -108,6 +108,11 @@ async def execute(
     from pytuitor.workspace import validate_files
 
     contract = stage or lesson.stage_contract("build")
+    check_count = len(contract.checks) if check else 0
+    limits = dict(WORKER_LIMITS)
+    # Each check executes a fresh program; the process CPU budget covers all
+    # cases while the wall-clock budget below still bounds each individual case.
+    limits["cpu_seconds"] *= max(1, check_count)
     if stdin is None:
         stdin = contract.stdin
     sources = validate_files(files if files is not None else {lesson.entrypoint: source})
@@ -119,7 +124,7 @@ async def execute(
         (root / "request.json").write_text(
             json.dumps(
                 {
-                    "limits": WORKER_LIMITS,
+                    "limits": limits,
                     "checks": [asdict(c) for c in contract.checks] if check else [],
                     "stdin": stdin,
                     "interactive": console is not None,
@@ -137,11 +142,13 @@ async def execute(
         offset = 0
         decoder = codecs.getincrementaldecoder("utf-8")("replace")
         check_offset = 0
+        active_check = 0
 
-        def report_checks() -> None:
-            nonlocal check_offset
+        def report_checks() -> bool:
+            nonlocal check_offset, active_check
+            started = False
             path = root / "checks.jsonl"
-            if on_check and path.exists():
+            if check_count and path.exists():
                 with path.open(encoding="utf-8", newline="") as stream:
                     stream.seek(check_offset)
                     for line in stream:
@@ -149,9 +156,19 @@ async def execute(
                             break
                         check_offset += len(line.encode())
                         try:
-                            on_check(check_event(json.loads(line)))
+                            event = check_event(json.loads(line))
                         except (ValueError, TypeError):
                             continue
+                        if (
+                            event["status"] == "running"
+                            and event["number"] == active_check + 1
+                            and event["number"] <= check_count
+                        ):
+                            active_check = event["number"]
+                            started = True
+                        if on_check:
+                            on_check(event)
+            return started
 
         try:
             with output_path.open("wb") as output:
@@ -164,7 +181,7 @@ async def execute(
                     stdin=asyncio.subprocess.PIPE if console else asyncio.subprocess.DEVNULL,
                     stdout=output,
                     stderr=output,
-                    limits=WORKER_LIMITS,
+                    limits=limits,
                     env=clean_environment(folder, temporary=True),
                 )
                 process = tree.process
@@ -174,13 +191,15 @@ async def execute(
                 active_seconds = 0.0
                 was_waiting = False
                 while process.returncode is None:
-                    report_checks()
+                    started_check = report_checks()
                     if output_path.stat().st_size > MAX_OUTPUT:
                         reason = "Output limit reached. Check for a loop that prints endlessly."
                         break
                     now = asyncio.get_running_loop().time()
                     waiting = bool(console and waiting_path.exists() and not console.eof)
-                    if not waiting and not was_waiting:
+                    if started_check:
+                        active_seconds = 0.0
+                    elif not waiting and not was_waiting:
                         active_seconds += now - previous
                     previous, was_waiting = now, waiting
                     if console:

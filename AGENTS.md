@@ -72,7 +72,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Save with file sync and Unix directory sync or Windows write-through replacement; never roll back memory after a committed rename.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
 - `runner.py` launches standard-library-only `_worker.py`; `execution_policy.py` owns process rules, `_windows.py` owns Win32 jobs and handles, and `run_files.py` reads bounded snapshots.
-- Checks receive fresh namespaces, local imports, working directories, and supplied stdin.
+- Checks receive fresh namespaces, local imports, working directories, supplied stdin, and individual execution time budgets.
 - Compare the entire file snapshot before marking an asynchronous check successful.
 - Input-wait time must not consume execution timeout; kill descendant processes during cancellation.
 - Process isolation, venvs, and resource limits are not an OS security sandbox.

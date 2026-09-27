@@ -73,6 +73,7 @@ Saving flushes the new file before replacement, then syncs the directory on Unix
 Storage hardware and filesystem behavior still determine durability during a sudden power loss.
 
 Every platform enforces execution time and captured-output limits.
+Each independently executed check receives its own time budget, so larger milestones can finish while an individual runaway check still stops.
 Unix also applies CPU and file-size resource limits, with address-space limits on Linux; Windows applies CPU and job-memory limits through Job Objects.
 Windows has no equivalent per-file `RLIMIT_FSIZE` here, so code can still write large files outside the preview limits.
 These are accidental-run protections, not a filesystem or network security sandbox.
