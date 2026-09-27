@@ -88,4 +88,6 @@ async def test_dashboard_centers_continue_and_omits_retired_features(tmp_path, s
         assert [index for index, text in enumerate(rows) if text] == [len(rows) // 2]
         assert len(rows) % 2 == 1
         await pilot.click("#continue")
+        await pilot.pause()
         assert app.screen.lesson.id == "first-light"
+        assert app.screen.query_one("#editor").is_mounted
