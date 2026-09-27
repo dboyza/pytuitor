@@ -6,6 +6,7 @@ import json
 import sys
 import tempfile
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -21,6 +22,27 @@ from pytuitor.progress_types import CheckEvent, check_event
 from pytuitor.run_files import collect_run_files as _collect_run_files
 
 MAX_OUTPUT = OUTPUT_BYTES
+WORKSPACE_CLEANUP_SECONDS = 2.0
+
+
+@asynccontextmanager
+async def _run_directory():
+    directory = tempfile.TemporaryDirectory(prefix="pytuitor-run-")
+    try:
+        yield directory.name
+    finally:
+        # The process tree is already stopped. Windows may briefly retain a
+        # directory handle; retry sharing/access errors without blocking the UI.
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + WORKSPACE_CLEANUP_SECONDS
+        while True:
+            try:
+                directory.cleanup()
+                break
+            except PermissionError as error:
+                if getattr(error, "winerror", None) not in (5, 32) or loop.time() >= deadline:
+                    raise
+                await asyncio.sleep(0.05)
 
 
 class ConsoleSession:
@@ -91,7 +113,7 @@ async def execute(
     sources = validate_files(files if files is not None else {lesson.entrypoint: source})
     if lesson.entrypoint not in sources:
         return RunResult(error=f"Missing entry point: {lesson.entrypoint}")
-    with tempfile.TemporaryDirectory(prefix="pytuitor-run-") as folder:
+    async with _run_directory() as folder:
         root = Path(folder)
 
         (root / "request.json").write_text(

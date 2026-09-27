@@ -97,3 +97,43 @@ def test_damaged_optional_view_is_ignored(view):
     result = safe_view({"view": view}, {"lesson.py": ""})
     assert "active_file" not in result
     assert "reading" not in result
+
+
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)], ids=["compact", "wide"])
+@pytest.mark.parametrize(
+    ("key", "pane", "focus"),
+    [("f4", "editor", "exercise-scroll"), ("ctrl+t", "console", "results-scroll")],
+    ids=["requirements", "console"],
+)
+async def test_stage_restore_does_not_override_new_keyboard_focus(
+    tmp_path, monkeypatch, size, key, pane, focus
+):
+    lesson = BY_ID["first-light"]
+    app = TutorApp(tmp_path)
+    async with app.run_test(size=size) as pilot:
+        await pilot.press("f5")
+        screen = app.screen
+        screen.query_one("#editor", TextArea).load_text(lesson.solution)
+        await pilot.press("f5")
+        await app.workers.wait_for_complete()
+        await pilot.pause()
+        callbacks = []
+        schedule = screen.call_after_refresh
+
+        def defer_restore(callback, *args, **kwargs):
+            if callback == screen.restore_view:
+                callbacks.append((callback, args, kwargs))
+                return True
+            return schedule(callback, *args, **kwargs)
+
+        monkeypatch.setattr(screen, "call_after_refresh", defer_restore)
+        await pilot.press("ctrl+n")
+        assert screen.stage == "repair"
+        assert callbacks
+        await pilot.press(key)
+        assert app.focused.id == focus
+        for callback, args, kwargs in callbacks:
+            callback(*args, **kwargs)
+        await pilot.pause()
+        assert screen.active_pane == pane
+        assert app.focused.id == focus

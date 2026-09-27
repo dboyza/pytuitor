@@ -281,6 +281,7 @@ class LessonScreen(TutorScreen):
             self.query_one("#prediction-feedback", Static).update(
                 Text("✓ " + self.lesson.explanation)
             )
+        self.restore_focus()
         self.call_after_refresh(self.restore_view)
 
     def remember_file_position(self):
@@ -315,6 +316,14 @@ class LessonScreen(TutorScreen):
         x, y = position.get("scroll", [0, 0])
         editor.scroll_to(x=x, y=y, animate=False, immediate=True)
 
+    def restore_focus(self):
+        # Restore before accepting another key, never from a delayed refresh.
+        view = self.initial_view
+        self.select_pane(view.get("pane", "lesson"))
+        focus = view.get("focus")
+        if focus and self.query(f"#{focus}") and self.query_one(f"#{focus}").display:
+            self.set_focus(self.query_one(f"#{focus}"))
+
     def restore_view(self):
         if not self.is_mounted or self.suspend_saves:
             return
@@ -333,10 +342,6 @@ class LessonScreen(TutorScreen):
                 )
         else:
             self.query_one("#check-actions").display = False
-        self.select_pane(view.get("pane", "lesson"))
-        focus = view.get("focus")
-        if focus and self.query(f"#{focus}") and self.query_one(f"#{focus}").display:
-            self.query_one(f"#{focus}").focus()
         self.restore_file_position()
         for key, selector in (
             ("reading", "#reading-panel"),
@@ -681,7 +686,7 @@ class LessonScreen(TutorScreen):
             "pane": "editor",
             **safe_view(self.stage_entry(), self.project_files()),
         }
-        self.select_pane(self.initial_view["pane"])
+        self.restore_focus()
         self.call_after_refresh(self.restore_view)
 
     def on_resize(self, event: Resize) -> None:
