@@ -2,6 +2,7 @@
 
 import pytest
 from textual.widgets import Button, OptionList, TextArea
+from textual.worker import WorkerCancelled
 
 from pytuitor import review_progress as progress
 from pytuitor.app import TutorApp
@@ -193,11 +194,15 @@ async def test_start_over_during_review_does_not_restore_erased_progress(tmp_pat
         await pilot.pause()
         await pilot.press("f5")
         await started.wait()
+        workers = [worker for worker in app.workers if worker.name == "check_answer"]
+        assert len(workers) == 1
         app.action_restart()
         await pilot.pause()
         await pilot.click("#confirm-restart")
         release.set()
-        await app.workers.wait_for_complete()
+        # Keep the worker reference: the manager may already have removed it.
+        with pytest.raises(WorkerCancelled):
+            await workers[0].wait()
         await pilot.pause()
         assert not app.store.data["onboarded"]
         assert "reviews" not in app.store.data
