@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -16,6 +22,20 @@ jobs:
       matrix:
         os: [ubuntu-24.04, macos-latest, windows-2022]
         python: ["3.11", "3.13", "3.14"]
+        # Five boundary/platform combinations on pushes and pull requests.
+        # Weekly and manual runs retain all ten combinations.
+        exclude: >-
+          ${{ fromJSON(
+            (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+            && '[]'
+            || '[
+              {"os":"ubuntu-24.04","python":"3.13"},
+              {"os":"macos-latest","python":"3.11"},
+              {"os":"macos-latest","python":"3.13"},
+              {"os":"windows-2022","python":"3.13"},
+              {"os":"windows-2022","python":"3.14"}
+            ]'
+          ) }}
         include:
           - os: windows-2025
             python: "3.14"

@@ -21,6 +21,7 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
         await pilot.pause()
         before = deepcopy(app.store.data)
         await pilot.click("#syllabus")
+        await pilot.pause()
         assert isinstance(app.screen, Syllabus)
         assert not app.screen.query("#syllabus-path")
         source = "\n".join(
@@ -34,7 +35,10 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
         for lesson in LESSONS:
             assert lesson.title in source
         first = chapters[0]
-        first.query_one("CollapsibleTitle").focus()
+        title = first.query_one("CollapsibleTitle")
+        title.focus()
+        await pilot.pause()
+        assert app.focused is title
         await pilot.press("enter")
         await pilot.pause()
         assert not first.collapsed
