@@ -32,8 +32,8 @@ async def test_timeout_retries_transient_workspace_locks(monkeypatch, winerror):
     assert not attempts[0].exists()
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Native Windows directory sharing locks")
-async def test_timeout_waits_for_native_directory_handle_release(monkeypatch):
+@pytest.mark.skipif(os.name != "nt", reason="Native Windows file sharing locks")
+async def test_timeout_waits_for_native_file_handle_release(monkeypatch):
     from pytuitor._windows import open_path
 
     cleanup = tempfile.TemporaryDirectory.cleanup
@@ -46,7 +46,7 @@ async def test_timeout_waits_for_native_directory_handle_release(monkeypatch):
         if Path(directory.name).name.startswith("pytuitor-run-"):
             attempts.append(Path(directory.name))
             if len(attempts) == 1:
-                lock = open_path(Path(directory.name), directory=True)
+                lock = open_path(Path(directory.name) / "request.json")
                 lock.__enter__()
                 release = asyncio.get_running_loop().call_later(0.1, unlock)
         cleanup(directory)
