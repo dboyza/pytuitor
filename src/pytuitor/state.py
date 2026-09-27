@@ -8,7 +8,7 @@ from pathlib import Path
 
 from platformdirs import user_data_path
 
-from pytuitor.curriculum import BY_ID, CHAPTERS, CONCEPTS, SECTIONS, Lesson, chapter_lessons
+from pytuitor.curriculum import BY_ID, CHAPTERS, CONCEPTS, SECTIONS, Lesson, chapter_activities
 from pytuitor.platform_files import lock_profile, replace_profile, sync_directory
 from pytuitor.progress_types import LessonProgress
 
@@ -19,11 +19,12 @@ class ProfileError(Exception):
 
 def fresh_profile() -> dict:
     return {
-        "version": 3,
+        "version": 4,
         "onboarded": False,
         "familiar": [],
         "lessons": {},
         "last_lesson": None,
+        "projects": {},
     }
 
 
@@ -51,10 +52,10 @@ class Store:
             try:
                 data = json.loads(self.path.read_text(encoding="utf-8"))
                 self._validate(data)
-                if data["version"] < 3:
+                if data["version"] < 4:
                     self._migration_original = self.path.read_bytes()
                 self.data.update(data)
-                self.data["version"] = 3
+                self.data["version"] = 4
                 for legacy_key in ("background", "goal", "diagnostic"):
                     self.data.pop(legacy_key, None)
             except (OSError, ValueError, TypeError, KeyError) as exc:
@@ -66,7 +67,7 @@ class Store:
 
     @staticmethod
     def _validate(data: object) -> None:
-        if not isinstance(data, dict) or data.get("version") not in (1, 2, 3):
+        if not isinstance(data, dict) or data.get("version") not in (1, 2, 3, 4):
             raise ValueError("Unsupported profile version")
         if "track" in data and data["track"] not in ("beginner", "experienced", "custom"):
             raise ValueError("Invalid legacy track")
@@ -130,6 +131,10 @@ class Store:
             raise ValueError("Invalid diagnostic")
         if not all(isinstance(value, bool) for value in data.get("diagnostic", {}).values()):
             raise ValueError("Invalid diagnostic answer")
+        if "projects" in data:
+            from pytuitor.project_workspace import validate_projects
+
+            validate_projects(data["projects"])
 
     def close(self) -> None:
         if not self._lock.closed:
@@ -147,7 +152,7 @@ class Store:
     def save(self) -> None:
         self.durability_warning = ""
         if self._migration_original is not None:
-            backup = self.directory / "profile-before-v3.json"
+            backup = self.directory / "profile-before-v4.json"
             try:
                 with backup.open("xb") as stream:
                     stream.write(self._migration_original)
@@ -175,9 +180,24 @@ class Store:
             Path(temporary).unlink(missing_ok=True)
 
     def entry(self, lesson: Lesson) -> LessonProgress:
+        if lesson.project_id:
+            from pytuitor.project_catalog import BY_MILESTONE
+            from pytuitor.project_workspace import ProjectWorkspace
+
+            return ProjectWorkspace(self, lesson.project_id).entry(BY_MILESTONE[lesson.id])
         return self.data["lessons"].setdefault(lesson.id, {})
 
     def status(self, lesson: Lesson) -> str:
+        if lesson.project_id:
+            entry = (
+                self.data.get("projects", {})
+                .get(lesson.project_id, {})
+                .get("milestones", {})
+                .get(lesson.id, {})
+            )
+            if entry.get("completed") and entry.get("completed_revision") == lesson.revision:
+                return "completed"
+            return "in progress" if entry else "new"
         entry = self.data["lessons"].get(lesson.id, {})
         if entry.get("completed"):
             return "completed"
@@ -191,7 +211,7 @@ class Store:
         return next(
             (
                 lesson
-                for lesson in chapter_lessons(chapter_id)
+                for lesson in chapter_activities(chapter_id)
                 if self.status(lesson) not in ("completed", "familiar")
             ),
             None,

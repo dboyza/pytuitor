@@ -214,3 +214,39 @@ SolutionDialog.compact .title { margin: 0; height: 1; }
 SolutionDialog.compact #solution-intro { display: none; }
 SolutionDialog.compact #solution-code { min-height: 6; }
 SolutionDialog.compact #compare-prompt { margin: 0; }
+
+#your-game { height: 1; padding: 0 1; margin-right: 1; background: transparent; color: #ffd343; }
+#your-game:focus, #your-game:hover { background: #384044; }
+#game-body { width: 110; max-width: 100%; height: 1fr; padding: 0 2; }
+ProjectScreen { align-horizontal: center; }
+#game-header { height: 3; align-vertical: middle; }
+#game-header Static { width: 1fr; margin: 0; }
+#game-back { height: 1; }
+#game-description { height: auto; max-height: 2; }
+#game-summary { height: 1; margin: 1 0; }
+#game-content { height: 1fr; min-height: 5; }
+#milestone-list { width: 3fr; padding: 0 1; border: solid transparent; }
+#milestone-list:focus { border: solid #3776ab; }
+#milestone-details { width: 2fr; padding: 0 2; }
+#milestone-details Static { height: auto; margin-bottom: 1; }
+#game-actions { height: 3; margin-top: 1; }
+#game-actions Button { margin-right: 1; min-width: 8; padding: 0 1; }
+#game-feedback { height: auto; max-height: 3; }
+ProjectScreen.narrow #game-description { display: none; }
+ProjectScreen.narrow #game-summary { margin: 0; }
+ProjectScreen.narrow #game-content { layout: vertical; }
+ProjectScreen.narrow #milestone-list { width: 1fr; height: 1fr; }
+ProjectScreen.narrow #milestone-details { width: 1fr; height: 4; padding: 0 1; }
+ProjectScreen.narrow #milestone-details Static { margin: 0; }
+#checkpoint-dialog { width: 94; height: 30; padding: 1 2; }
+#checkpoint-list { height: 1fr; min-height: 3; padding: 0; border: solid transparent; }
+#checkpoint-list:focus { border: solid #3776ab; }
+#checkpoint-detail { height: auto; max-height: 3; margin-top: 1; }
+#checkpoint-feedback { height: auto; max-height: 4; }
+#checkpoint-dialog .actions { height: 3; margin: 1 0 0 0; }
+#checkpoint-dialog .actions Button { padding: 0 1; margin-right: 1; }
+#checkpoint-player { width: 100; height: 36; padding: 1 2; }
+#checkpoint-output-scroll { height: 1fr; border: solid #3776ab; }
+#checkpoint-output { height: auto; }
+#checkpoint-input { height: 3; }
+#checkpoint-input:disabled { display: none; }

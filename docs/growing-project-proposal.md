@@ -1,161 +1,177 @@
-# One Python app that grows through the course
+# Lantern Reach implementation plan
 
-Status: proposal for review, not an implemented curriculum change.
+Status: implemented locally on 2026-09-27 after the product decisions agreed with the user on 2026-09-26.
+The sections below record the agreed design and acceptance criteria; the verification record at the end distinguishes executed checks from unavailable platform and learner-study evidence.
 
-## Recommendation
+## Product
 
-Give Pytuitor a continuing project called **Fieldbook**, a local command-line app for tracking small jobs, notes, supplies, and activity reports.
-The name is provisional; the important decision is one understandable domain and the learner's own code carried forward.
-It starts as a few printed lines and becomes a tested, persistent, exportable Python application.
-Optional chapters extend it with streaming, typed boundaries, asynchronous processing, packaging, and plugins.
-The core course should end with a useful, complete app even if the learner never takes those extensions.
+Lantern Reach is an offline expedition and settlement text game authored by the learner throughout Pytuitor.
+The learner explores a small valley, collects supplies, helps its residents, and restores an abandoned outpost.
+The tone is welcoming and curious, with recoverable mistakes, concise scenes, and no required combat, real-time pressure, network services, or accounts.
+A fixed world and explicit behavior contracts make checks understandable while permitting alternative implementations and personal extensions.
+The game uses standard-library Python with print/input commands and exports as a normal runnable project.
+Pytuitor remains the existing Textual tutor with its current colors, focus conventions, and keyboard support.
 
-Dockyard provides the relevant pattern: an evolving Dispatch application, immutable mission checkpoints, explicit continuation, and supplied checkpoints for later entry.
-Its supplied business logic is appropriate for teaching infrastructure.
-Pytuitor should instead make writing and understanding that business logic the learning activity.
+## Agreed learning structure
 
-## Learning rhythm
+- Keep 75 focused teaching lessons with blank Build and independent Repair.
+- Add one cumulative game milestone to each of the 21 chapters, scaled to the chapter's size.
+- Make the milestones the recommended project path; keep all 12 original projects as optional practice with their existing IDs, drafts, and historical completion.
+- Finish a satisfying playable game by the end of the three core sections; all optional chapters receive authored extensions but remain optional.
+- Ordinary lessons explain how their concepts connect to the game without requiring another compulsory task after every lesson.
+- Milestones use Extend followed by a separate authored Repair scenario; the first milestone starts blank.
+- Extend continues the learner's own successful source; Repair never replaces that source.
+- Permit later entry through clearly labeled supplied base code or adaptation of the learner's own copy.
+- Keep references explicitly revealed, record their use, and never mark supplied earlier code as learner-completed work.
 
-Keep short lessons and their independent blank Build and authored Repair exercises.
-Each lesson includes a short connection to the relevant Fieldbook feature, without requiring an extra project assignment after every lesson.
-At chapter boundaries, a project milestone asks the learner to extend their last working Fieldbook checkpoint.
-Show three things: what already works, the new user-visible behavior, and how to demonstrate it.
-After checking the extension, the learner fixes a separate, authored incident in the same domain.
+## Game progression and authored contracts
 
-Milestone **Extend** starts from previous project code and therefore needs its own explicit stage policy.
-Do not silently redefine ordinary blank Build exercises or add a third mandatory stage to all 75 lessons.
-Milestone **Repair** uses an authored broken workspace with a distinct scenario and matching prerequisite level, rather than trying to inject defects into arbitrary learner code.
-The successful Extend snapshot supplies future milestones; Repair code never replaces it.
-Passing Extend produces a usable checkpoint, while passing both stages records the milestone as complete.
-Require an explicit action to advance so an asynchronous check cannot unexpectedly change the learner's workspace.
+Each milestone needs complete requirements, prerequisite links, worked examples distinct from the solution, progressive hints, runnable reference files, observable checks, and a meaningful broken Repair with its own reference.
+Every newly required language construct must already be taught in the chapter or its declared preparation.
 
-## Course-wide progression
+| Chapter | Milestone | Playable outcome and check boundaries |
+| --- | --- | --- |
+| First programs | Arrival at Lantern Reach | Name the explorer, calculate starting supplies, and choose a safe route using input, numbers, formatting, and decisions; check both routes and resource boundaries. |
+| Lists and sets | Pack for the trail | Display an ordered pack, retain repeated supplies, and identify unique or missing equipment; check empty, repeated, and reordered collections. |
+| Loops and dictionaries | Open the outpost | Track locations and supplies and repeat look, travel, gather, inventory, and quit commands; reject unknown commands without losing state. |
+| Functions and input | Help the first resident | Extract reusable state and command operations, complete a small delivery quest, normalize input, and recover from invalid quantities without mutation. |
+| Files and structured data | Keep a journal | Save/reload game state as JSON and exchange a CSV supply ledger; verify round trips, quoted fields, missing files, and malformed saves. |
+| Text patterns | Decode trail markers | Validate and extract route or quest codes from notes; require complete matches and preserve unrelated text. |
+| Modules and library tools | Organize the expedition | Split engine and entrypoint; add CLI options, repeatable local encounters, and supply summaries; keep imports quiet. |
+| Dates and times | Plan the supply run | Track a specified in-game calendar and delivery deadlines; test month/year/leap boundaries without wall-clock dependence. |
+| Collection tools | Run the supply depot | Group supplies, filter active jobs, and process residents' requests in arrival order without mutating caller input. |
+| Classes and tested tools | Build the expedition engine | Model independent expeditions and named quest states; write learner tests that reject broken transitions and shared state. |
+| Careful automation | Restore the beacon | Complete the core story and provide previewable journal/archive exports that refuse overwrite and validate paths before writing. |
+| Python semantics | Try another route | Branch a nested game-state snapshot without sharing mutable inventory or losing valid zero/empty values. |
+| Recursion and functional tools | Explore the cave network | Traverse nested locations and select route ordering with callable strategies; handle empty branches and stable order. |
+| Decorators | Record expedition actions | Wrap operations with event recording and configurable policies while preserving results, keywords, and metadata. |
+| Iterators and streaming | Read the expedition chronicle | Stream bounded reports from a one-pass event source without consuming unnecessary events. |
+| Exceptions and contexts | Recover the field station | Raise useful domain failures and restore temporary resources/state on success, failure, and nested use. |
+| Dataclasses and types | Define field records | Introduce validated record values, independent defaults, and deliberate updates; distinguish invalid construction and shared state. |
+| Object protocols and testing | Connect supply stores | Use small storage/reporting contracts and injected effects with meaningful learner tests; accept equivalent implementations. |
+| Coordinate async work | Coordinate scout teams | Consume deterministic offline scout sources with bounded concurrency, ordered results, and cancellation cleanup measured with events. |
+| Build distributable tools | Share the expedition | Provide installable metadata, predictable CLI behavior, explicit data paths, and a portable offline source export. |
+| Understand the machinery | Add journal formatters | Register and inspect formatter extensions; exercise descriptor state, duplicate rejection, inheritance, and callable contracts. |
 
-These are proposed feature outcomes aligned with the current chapter order, not final exercise contracts.
-Small chapters get small milestones; avoid turning every checkpoint into a capstone.
+The game stays in one source file before the modules chapter.
+Later refactors must retain the previous behavior or explicitly document the changed public interface.
+Advanced features must connect to a playable command or visible game behavior rather than existing only as isolated library exercises.
+Use fixed seeds, explicit game dates, local fixtures, and deterministic async probes.
+Personal creative additions are retained but are outside the authored acceptance contract.
 
-| Current chapter | What Fieldbook gains |
-| --- | --- |
-| First programs | Print a job card, ask for a name and quantities, calculate an estimate, and label its priority. |
-| Lists and sets | List several jobs and identify unique or missing supply labels. |
-| Loops and dictionaries | Store job records, count states, edit records, and repeat a small menu. |
-| Functions and input | Extract reusable operations and recover from invalid commands and numbers. |
-| Files and structured data | Save and reload JSON; import or export a documented CSV report. |
-| Text patterns | Validate job reference codes and extract references from notes. |
-| Modules and library tools | Split the app into modules; add CLI options, summary statistics, and repeatable sample data. |
-| Dates and times | Add due dates and an overdue report. |
-| Collection tools | Filter and group jobs and process a first-in, first-out work queue. |
-| Classes and tested tools | Model a job and named states; write tests for the existing behavior. |
-| Careful automation | Preview an archive/export operation and refuse accidental overwrites. |
-| Python semantics | Make update and copy behavior deliberate so editing a draft cannot mutate an original record. |
-| Recursion and functional tools | Traverse nested job groups and support selectable sort/filter functions. |
-| Decorators | Wrap operations with activity recording while preserving arguments and metadata. |
-| Iterators and streaming | Process large activity files incrementally and bound report consumption. |
-| Exceptions and contexts | Add domain errors and reliably restore resources during failed operations. |
-| Dataclasses and types | Introduce typed record values with validated defaults and updates. |
-| Object protocols and testing | Separate storage/reporting interfaces and test effects through injected dependencies. |
-| Coordinate async work | Coordinate several supplied offline async sources with bounded work and cancellation. |
-| Build distributable tools | Package the CLI with predictable imports, paths, exit behavior, and metadata. |
-| Understand the machinery | Add an optional formatter extension system and inspect its callable contracts. |
+## Catalog and navigation
 
-Early versions must use only syntax already taught: no supplied class framework, hidden persistence layer, or decorators in the first chapters.
-Keep one source file until modules have been introduced.
-Use fixed local fixtures and standard-library operations for course checks.
-No database, web server, account, or network API is required to complete the app.
-Advanced refactors should solve an explained problem; they do not imply that every small Python app needs these abstractions.
+Keep the original lesson catalog as a stable compatibility and practice catalog.
+Add explicit project/milestone definitions and a recommended activity sequence containing the 75 teaching lessons and 21 milestones.
+Each chapter's recommended sequence ends with its milestone; standalone practice appears separately and does not delay Continue.
+Known topics can skip teaching lessons but never award project completion.
+Continue resumes active work and respects the existing optional-section boundary.
+The dashboard offers a compact Your game entry.
+The overview selects the last-opened milestone or first unfinished feature and provides access to the latest working checkpoint.
+A game overview lists milestones, status, prerequisite guidance, checkpoint provenance, and actions to continue, start with supplied code, revisit history, and export.
+Opening history or reading a preview does not change the course resume anchor.
+The syllabus distinguishes lessons, milestones, and optional practice and permits explicit entry to all of them.
 
-## Fit with the existing projects
+## Workspace and checkpoint lifecycle
 
-For an initial pilot, add Fieldbook alongside the unchanged course and keep its completion separate.
-After validating the learning flow, make its milestones the recommended cumulative project sequence.
-Map the 12 existing standalone projects to suitable milestones and retain their original IDs, drafts, and completion as optional independent practice.
-Do not require both the old standalone projects and their replacements in the recommended sequence.
-Use the text adventure as optional creative practice rather than forcing its story into a job tracker.
-Update the curriculum map, project counts, preparation map, and navigation together when that transition is approved.
+A milestone has a stable ID, revision, chapter, required base capabilities, entrypoint, two independent contracts, and a known-good supplied base containing only earlier capabilities.
+Use a small adapter into the existing workbench and runner instead of copying their execution and editing logic.
+Keep project lifecycle and persistence rules in a dedicated service.
+Internal storage may retain the existing build/repair keys, but all learner-facing milestone copy must consistently say Extend/Repair.
 
-## Learner experience
+Opening an unstarted milestone presents its compatible learner checkpoint or a labeled supplied base.
+A prior successful source snapshot is copied into a fresh draft, with new non-conflicting files added only when declared.
+Never splice arbitrary Python or overwrite a same-named learner file with authored code.
+If adaptation is necessary, show the old files and the new contract while keeping the source unchanged; an explicit supported-base action creates a separately backed-up attempt.
+A first milestone has a blank Extend workspace.
 
-The dashboard gets a compact **Your app** entry showing the latest working version and next feature.
-The syllabus marks Fieldbook milestones next to their chapters.
-Continue follows the chosen learning path, including recommended milestones, with separate course and project resume anchors.
-Opening a checkpoint history or preview must not change the resume target.
-Milestones reuse the existing lesson/editor/console workbench and conditional file explorer.
-Use the existing F10 help, keyboard focus rules, and narrow-terminal pane switching.
-Do not add a permanently visible fourth pane.
+Passing Extend stores an immutable full-source checkpoint tied to the exact checked draft and current content revision.
+The snapshot records its parent, milestone, capabilities, hash, check evidence, base origin, and reference-use provenance.
+Passing Repair completes the milestone without altering its Extend checkpoint.
+Further edits invalidate current-draft success while keeping historical snapshots and evidence.
+Only an explicit Next action changes the activity or stage.
 
-At milestone entry, default to a compatible learner checkpoint and show its origin.
-If none exists, offer a supplied checkpoint for the required base version, explicitly labeled as supplied earlier code.
-This is distinct from revealing the current milestone's solution and never marks skipped work complete.
-Known topics remain skippable and chapter access remains advisory.
-Running a historical checkpoint uses a temporary copy; editing from one creates a new draft.
-Export creates a normal Python folder with source, sample data, run instructions, and checkpoint provenance, without requiring Pytuitor to run it.
+Write and sync snapshot content before atomically persisting its profile pointer.
+On failure, preserve the draft and show actionable recovery; no completed state may point to absent or corrupt source.
+Validate snapshot paths and file maps through existing workspace boundaries, and verify stored hashes on load.
+Deduplicate identical snapshots; retain history without silent destructive pruning and expose size/retention information.
+Reset, branch replacement, and restore must back up the full current workspace before changing it.
+Historical snapshots remain read-only; restoring creates a current draft and does not manufacture current-revision success.
 
-## Implementation boundaries
+## Migration, optional branches, and export
 
-The existing `StageContract` in `src/pytuitor/models.py` already carries stage instructions, checks, hints, input, starter files, and reference files.
-The current profile in `src/pytuitor/state.py` is version 3 and keeps independent lesson stage drafts.
-These are useful foundations, but there is no cross-lesson project history in that profile schema.
+Add a backed-up profile schema migration without rewriting existing lesson IDs, drafts, or achievements.
+Keep project progress, project resume state, and checkpoint metadata separate from lesson records.
+Old supported profiles remain loadable; document that older app versions cannot read the new schema and provide the original backup for rollback.
+Never test against personal learning progress.
 
-1. Add immutable `ProjectDefinition` and `ProjectMilestone` content models with stable IDs, chapter links, preparation, required base capabilities, revision, entrypoint, Extend/Repair contracts, and acceptance suites.
-   Keep a dedicated project catalog instead of disguising project lineage as a `Lesson.project` boolean.
-2. Add a project workspace service that resolves a base checkpoint, creates a draft, checks compatibility, records snapshots, restores backups, and exports.
-   Reuse path validation, file limits, execution policy, runner, and atomic storage helpers.
-3. Add a backed-up profile migration for project drafts, independent stage status, checkpoint references, and the project resume anchor.
-   Keep existing lesson records intact and create no project achievements from old lesson completion.
-4. Adapt the workbench through a small shared exercise interface exposing the active contract, entrypoint, revision, and workspace operations.
-   Put project lifecycle rules in the service, not conditional branches throughout the screen.
-5. Add dashboard, syllabus, milestone navigation, checkpoint history, and explicit export actions.
-   Keep authored content separate from persistence and widgets.
+Optional extensions form a capability graph matching real chapter preparation.
+Packaging must not require async merely because its chapter appears later in the syllabus.
+Preserve compatible extra files from learner checkpoints; do not automatically merge competing branches.
+Offer a suitable supplied base when no compatible checkpoint exists and retain every previous branch.
+Curriculum revisions retain historical evidence, require rechecking changed contracts, and never discard the learner's source.
 
-Each checkpoint records its project/milestone revision, parent snapshot, required capabilities, full source-file map, content hash, and passing check evidence.
-Record supplied-base and reference-use provenance separately from the learner's own successful extension.
-Use immutable snapshots initially, with bounded workspace sizes and an explicit history storage policy; no learner-facing Git dependency is needed.
-Write and sync the snapshot before atomically recording its pointer in the profile.
-A crash may leave an unreferenced snapshot, but must never leave a completed milestone pointing to missing files.
+Export a normal folder containing source, safe sample data, run instructions, and a provenance manifest.
+The exported core game runs with Python 3.11 or newer and no tutor dependency.
+Keep source checkpoints distinct from a player's game saves, and teach save persistence explicitly in the files chapter.
+Within Pytuitor, generated save files use the existing Run files preview-and-keep workflow.
+Reference exports or supplied-base provenance must be labeled honestly.
+Exports refuse to replace an existing destination.
 
-## Carry-forward and checking rules
+## Implementation sequence
 
-The milestone receives a copy of the learner's successful previous source, not the author's full solution.
-Keep existing behavior plus the new feature under executable acceptance checks.
-Validate public behavior and documented interfaces, allowing alternative internal implementations.
-Version acceptance suites at refactors: a move from dictionaries to classes must not keep obsolete source-shape requirements.
-Intentional behavior changes need an explicit new contract rather than silently removing failing regressions.
-Keep fixtures, temporary outputs, and test effects isolated from persistent learner drafts.
-Only record success if the complete current file snapshot still matches the checked snapshot.
+1. Establish baseline checks and finish canonical project models, content layout, and prerequisite mapping.
+2. Implement migration, immutable checkpoint storage, draft continuation, provenance, reset/restore, and export with failure-path tests.
+3. Integrate the first three milestones through dashboard, syllabus, Continue, Extend/Repair, restart, and export.
+4. Author and validate the entire core game through Restore the beacon, including the real module/class refactors and persistence.
+5. Author and validate all optional extensions and their independent entry paths, including packaging and async cancellation.
+6. Connect every teaching lesson to its chapter milestone; make old projects discoverable as optional practice and update documentation and counts.
+7. Complete end-to-end journeys, terminal and visual review, regression checks, installed-wheel verification, and local commits.
 
-For new files, add only declared non-conflicting scaffolding and explain its role.
-Never silently overwrite changed files or splice arbitrary Python with text substitutions.
-When a learner skips ahead or a curriculum update changes the required base, offer an explicit supported-base branch or guided adaptation of their copy.
-Preserve the old checkpoint and label old evidence with its original revision.
-Restoring or resetting a draft backs up the full workspace first.
+These are execution stages, not approval gates or a reduced MVP delivery scope.
+Work proceeds directly without subagents and without pushing or publishing.
 
-The advanced course is a dependency graph rather than a single mandatory line.
-Optional extensions declare actual capabilities they require; packaging must not acquire an async prerequisite merely because it appears later in the syllabus.
-A compatible checkpoint can include other extensions, but unrelated branches are not automatically merged.
-If an optional feature is incompatible, preserve both branches and require an authored integration task to combine them.
+## Acceptance and verification
 
-## Delivery and evidence
+- Audit all 21 milestone Extend references, broken Repairs, and corrected Repair references through the real runner.
+- Demonstrate cumulative source continuity across the core sequence, including a valid alternative implementation and a retained personal file.
+- Verify existing behavior survives each extension; test deliberate mutants for important boundaries and learner-authored testing tasks.
+- Complete full UI journeys for first start, chapter transition, later entry, hints/reference, Repair independence, history/restore, reset, restart, and export.
+- Exercise optional branches independently and verify packaging does not depend on async.
+- Test migration from supported schemas, corrupt snapshots, missing files, failed writes, stale asynchronous results, and conflicting draft edits.
+- Run the exported core game and the final supported extended game outside Pytuitor with scripted inputs and actual observable outcomes.
+- Inspect real Textual output at 80 by 24 and 140 by 44, including dialogs, long contracts, file controls, failure messages, and keyboard focus.
+- Use scratch profiles, Textual Pilot, real Unix PTY journeys, and the existing platform-specific tests; report Windows execution only if actually available and performed.
+- Run locked dependency sync, full pytest, Ruff checks and formatting, package build, and isolated installed-wheel smoke.
+- Keep reviewed visual baselines honest and update them only for intentional changes after direct image inspection.
+- Update AGENTS.md, curriculum/authoring/release documentation, and user guidance with durable decisions; do not edit generated files or changelogs manually.
+- Report exact validation evidence and any unavailable platform checks; automated consistency checks do not establish learner effectiveness.
 
-Start with a vertical slice across First programs, Lists and sets, and Loops and dictionaries.
-This proves real code continuity while keeping the learner-facing content small enough to inspect closely.
-Deliver the milestone model, durable checkpoint history, Extend/Repair separation, later entry from supplied code, resume, and runnable export in that slice.
-Then complete the core app through Careful automation, followed by the optional extensions and standalone-project migration.
+## Evidence and decisions
 
-The first slice is ready when a learner can build version one, extend their own code twice, repair an independent incident, restart Pytuitor, and export a working version without losing any draft.
-Also verify later entry, reference provenance, changed-file checks, reset recovery, curriculum revisions, disk failures, and unsupported optional combinations.
-Exercise the flow with Textual Pilot and a real PTY at 80 by 24 and 140 by 44, with scratch profiles.
-Use the repository's lint, tests, build, and installed-wheel smoke checks for implementation releases, including supported Windows journeys.
-Learner observation must assess whether the app creates ownership and continuity without making each lesson feel longer; passing automated tests cannot establish that.
+The architecture was reviewed against Pytuitor's current models, state, runner, workbench, navigation, authoring rules, and release checks.
+Dockyard's local README and checkpoint guide informed the continuity and provenance model.
+All eight initial product questions and the game-setting follow-up were answered before implementation.
+The user delegated remaining product details to the agent and authorized complete implementation without routine interruptions.
 
-## Decisions to review
 
-The recommended shape is a practical Fieldbook CLI, chapter milestones, and focused lessons between them.
-A text adventure campaign is an alternative if creative engagement matters more than natural CLI, reporting, and automation features.
-A Dispatch-like job processor is another alternative if closer continuity with Dockyard matters more than a gentle starting domain.
-The first review should settle the app domain and learning rhythm before authoring all milestone contracts.
+## Local implementation verification
 
-## Evidence inspected
+The recommended path contains 75 teaching lessons and 21 Lantern Reach milestones, with all 12 original projects retained as optional practice.
+All 75 teaching lessons have specific game connections.
+A complete authored 21-milestone journey retains personal files and optional capabilities, exports successfully, and runs independently.
+The core and fully extended games were exercised through settlement help, beacon restoration, optional commands, and saved state.
 
-- Dockyard: `README.md`, `docs/user-guide.md` (Grow the Dispatch project), and `docs/implementation-plan.md` (Dispatch).
-- Pytuitor: `AGENTS.md`, `docs/curriculum.md`, `src/pytuitor/course_map.py`, `models.py`, `state.py`, `lesson_screen.py`, and `theme.tcss`.
-- This proposal does not claim implementation, runtime verification, or measured teaching effectiveness.
+On macOS with Python 3.12, the full locked suite passed with **837 passed and 7 skipped**.
+Ruff lint, Ruff formatting, and ordinary visual-baseline comparisons passed.
+Real Unix PTY journeys covered lesson and game navigation, keyboard focus, delayed focus delivery, and resizing at both required terminal sizes.
+Actual Textual screenshots were rendered and directly inspected at 80 by 24 and 140 by 44, including game overview, provenance, history, restore confirmation, and the multi-file workbench.
+Recovery tests cover checkpoint integrity, failed profile saves, old revisions, preservation of both drafts, full-size exports/backups, and restoration from an active editor without stale autosave overwrite.
+
+The tutor source distribution and wheel built successfully, including the new game content and excluding local editor logs, caches, and scratch artifacts.
+An isolated installed-wheel smoke outside the checkout passed all **216 stage reference programs**, onboarding and lesson completion, game continuation, profile reopening, and checkpoint export.
+The fully extended learner game built as its own source distribution and wheel; its installed CLI passed settlement/beacon play, optional commands, saving, Unicode story paths, and nonzero error exit status.
+
+Windows ConPTY, PowerShell, and Windows desktop execution were unavailable on this macOS host and were not claimed.
+No learner study was performed, and these automated checks do not establish teaching effectiveness.
+The implementation is committed locally; no remote push or publication is part of this delivery.

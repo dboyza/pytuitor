@@ -54,3 +54,21 @@ Reviewed SVG baselines live in `tests/visuals/`.
 Regenerate them deliberately with `PYTUITOR_UPDATE_VISUALS=1 uv run pytest tests/test_integrated_visuals.py`, render the results, and inspect both terminal sizes before accepting changes.
 Ordinary test runs compare against the accepted files and write differing actual images only under `.artifacts/`.
 Never regenerate baselines merely to silence an unexplained failure.
+
+## Growing game content
+
+`content/lantern/` authors Lantern Reach's 21 milestones and the 75 lesson-to-game connections.
+`project_catalog.py` assembles stable milestone IDs and chapter preparation without turning optional practice into required preparation.
+`ProjectMilestone` defines the supplied earlier-code base and declared capabilities; `Lesson.project_id` adapts its stages into the existing workbench and runner.
+The first milestone starts blank; later Extend stages start from a learner checkpoint or an explicitly labeled supplied earlier version.
+Repair is authored separately and never becomes the next milestone's source.
+
+Every feature must have a playable command or other visible outcome as well as behavioral checks.
+References must stay inside the taught syntax boundary, especially before functions, comprehensions, decorators, and classes.
+Declare intentional API changes at refactors and retain prior observable behavior through the current acceptance suite.
+The workspace's active contract adds regression checks for extra optional capabilities inherited from the selected parent.
+A canonical reference demonstrates the authored base; learners carrying extra features must retain and adapt those features too.
+
+Keep `connections.py`, milestone requirements, hints, references, broken Repairs, and checks synchronized.
+Run `tests/test_growing_project.py`, the full regressions, visual journeys, and installed smoke after contract changes.
+Profiles migrate to version 4 with an original backup; do not infer game completion from old lessons or optional projects.

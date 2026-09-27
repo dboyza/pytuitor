@@ -27,6 +27,7 @@ class KeyboardHelp(ModalScreen):
                 "C                   Continue learning\n"
                 "P                   Known topics\n"
                 "S                   Browse syllabus\n\n"
+                "G                   Your growing game\n\n"
                 "IN THE SYLLABUS\n"
                 "↑ ↓ / PageUp / PageDown   Scroll the outline\n"
                 "Home / End          Start / end of the outline\n"
@@ -74,7 +75,8 @@ class ConfirmRestart(ModalScreen[bool]):
         with Vertical(classes="dialog", id="restart-dialog"):
             yield Static("Erase progress and start over?", classes="title")
             yield Static(
-                "This erases all saved lesson drafts, completions, hints, and checked topics "
+                "This erases all saved lesson and game drafts, "
+                "completions, checkpoint history, hints, and checked topics "
                 "in this profile, then returns to the welcome screen.\n\n"
                 "This cannot be undone. Python files you already exported are separate and remain.",
                 classes="muted",
@@ -98,13 +100,27 @@ class ConfirmRestart(ModalScreen[bool]):
 class ConfirmReset(ModalScreen[bool]):
     BINDINGS = [Binding("escape", "cancel", "Cancel")]
 
+    def __init__(self, *, project: bool = False):
+        super().__init__()
+        self.project = project
+
     def compose(self) -> ComposeResult:
         with Vertical(classes="dialog", id="reset-dialog"):
             yield Static("Start this exercise again?", classes="title")
             yield Static(
                 "Your current code will be backed up in your profile's exports folder.\n"
                 "This stage's draft, hints, and pass status will be reset.\n"
-                "Build becomes blank; Repair restores the broken program. The other draft is kept.",
+                + (
+                    (
+                        "Extend returns to its chosen base; Repair restores the broken "
+                        "program. Your checkpoints remain."
+                    )
+                    if self.project
+                    else (
+                        "Build becomes blank; Repair restores the broken program. The other "
+                        "draft is kept."
+                    )
+                ),
                 classes="muted",
             )
             with Horizontal(classes="actions"):

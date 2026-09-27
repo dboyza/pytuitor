@@ -4,13 +4,13 @@ import json
 
 import pytest
 
-from pytuitor.curriculum import BY_ID, CHAPTERS, LESSONS, SECTIONS, chapter_lessons
+from pytuitor.curriculum import BY_ID, CHAPTERS, LESSONS, SECTIONS, chapter_activities
 from pytuitor.state import Store
 
 
 def finish(store, lessons):
     for lesson in lessons:
-        store.entry(lesson)["completed"] = True
+        store.entry(lesson).update(completed=True, completed_revision=lesson.revision)
 
 
 def test_new_profile_starts_at_foundations_without_path(tmp_path):
@@ -51,8 +51,8 @@ def test_saved_path_profile_resumes_same_chapter_with_both_drafts(tmp_path, old_
 
 def test_continue_completes_active_chapter_before_later_chapters(tmp_path):
     store = Store(tmp_path)
-    chapter = next(chapter for chapter in CHAPTERS if len(chapter_lessons(chapter.id)) >= 3)
-    units = chapter_lessons(chapter.id)
+    chapter = next(chapter for chapter in CHAPTERS if len(chapter_activities(chapter.id)) >= 3)
+    units = chapter_activities(chapter.id)
     store.data["last_lesson"] = units[-1].id
     finish(store, [units[-1]])
     assert store.next_lesson() == units[0]
@@ -65,11 +65,13 @@ def test_core_completion_does_not_automatically_enter_optional_sections(tmp_path
     store = Store(tmp_path)
     optional = {section.id for section in SECTIONS if section.optional}
     core_chapters = [chapter for chapter in CHAPTERS if chapter.section_id not in optional]
-    finish(store, [lesson for chapter in core_chapters for lesson in chapter_lessons(chapter.id)])
-    store.data["last_lesson"] = chapter_lessons(core_chapters[-1].id)[-1].id
+    finish(
+        store, [lesson for chapter in core_chapters for lesson in chapter_activities(chapter.id)]
+    )
+    store.data["last_lesson"] = chapter_activities(core_chapters[-1].id)[-1].id
     assert store.next_lesson() is None
     chosen = next(chapter for chapter in CHAPTERS if chapter.section_id in optional)
-    first = chapter_lessons(chosen.id)[0]
+    first = chapter_activities(chosen.id)[0]
     store.data["last_lesson"] = first.id
     assert store.next_lesson() == first
     store.close()
@@ -79,7 +81,7 @@ def test_optional_section_completion_waits_for_explicit_choice(tmp_path):
     store = Store(tmp_path)
     section = next(section for section in SECTIONS if section.optional)
     chapters = [chapter for chapter in CHAPTERS if chapter.section_id == section.id]
-    units = [lesson for chapter in chapters for lesson in chapter_lessons(chapter.id)]
+    units = [lesson for chapter in chapters for lesson in chapter_activities(chapter.id)]
     finish(store, units)
     store.data["last_lesson"] = units[-1].id
     assert store.next_lesson() is None

@@ -10,8 +10,11 @@ from textual.widgets import TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import CHAPTERS, LESSONS, SECTIONS, default_input
+from pytuitor.project_catalog import MILESTONES
+from pytuitor.project_workspace import ProjectWorkspace
 from pytuitor.runner import execute
 from pytuitor.screens import LessonScreen
+from pytuitor.state import Store
 
 
 async def main():
@@ -20,7 +23,9 @@ async def main():
     assert len(CHAPTERS) == 21
     assert len(SECTIONS) == 5
     assert files("pytuitor").joinpath("theme.tcss").is_file()
-    for lesson in LESSONS:
+    units = (*LESSONS, *(item.lesson for item in MILESTONES))
+    assert len(units) == 108
+    for lesson in units:
         assert lesson.body.strip()
         for stage_name in ("build", "repair"):
             contract = lesson.stage_contract(stage_name)
@@ -52,9 +57,28 @@ async def main():
                     await pilot.press("ctrl+n")
                     await pilot.pause()
             assert app.store.status(screen.lesson) == "completed"
+            app.action_dashboard()
+            app.open_activity(MILESTONES[0].lesson)
+            await pilot.pause()
+            screen = app.screen
+            screen.query_one("#editor", TextArea).load_text(screen.lesson.solution)
+            await pilot.press("f5")
+            await app.workers.wait_for_complete()
+            assert screen.stage_passed("build")
+            checkpoint = ProjectWorkspace(app.store).data["checkpoints"][0]
+            app.action_dashboard()
+            app.open_activity(MILESTONES[1].lesson)
+            await pilot.pause()
+            assert app.store.entry(app.screen.lesson)["parent"] == checkpoint["id"]
+        reopened = Store(Path(directory))
+        workspace = ProjectWorkspace(reopened)
+        assert workspace.read_checkpoint(checkpoint["id"])["files"]["game.py"]
+        destination = workspace.export_checkpoint(checkpoint["id"])
+        assert (destination / "game.py").is_file()
+        reopened.close()
     print(
         f"Pytuitor {version('pytuitor')}: installed content and all "
-        f"{len(LESSONS) * 2} Build and Repair reference programs passed."
+        f"{len(units) * 2} stage references passed; game continuation, reopen, and export passed."
     )
 
 

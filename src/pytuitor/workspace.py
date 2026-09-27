@@ -43,8 +43,12 @@ class WorkspaceError(ValueError):
 
 def validate_files(files: dict[str, str]) -> dict[str, str]:
     """Return a copy after checking paths, collisions, and UTF-8 size limits."""
-    if not isinstance(files, dict) or not files or len(files) > MAX_FILES:
-        raise WorkspaceError(f"A workspace needs between 1 and {MAX_FILES} files.")
+    return _validate_files(files, MAX_FILES, MAX_WORKSPACE_BYTES)
+
+
+def _validate_files(files: dict[str, str], file_limit: int, byte_limit: int) -> dict[str, str]:
+    if not isinstance(files, dict) or not files or len(files) > file_limit:
+        raise WorkspaceError(f"A workspace needs between 1 and {file_limit} files.")
     result: dict[str, str] = {}
     normalized: set[str] = set()
     total = 0
@@ -89,7 +93,7 @@ def validate_files(files: dict[str, str]) -> dict[str, str]:
     for name in normalized:
         if any(parent.as_posix() in normalized for parent in PurePosixPath(name).parents):
             raise WorkspaceError("A project path cannot be both a file and a directory.")
-    if total > MAX_WORKSPACE_BYTES:
+    if total > byte_limit:
         raise WorkspaceError("The workspace exceeds the 1 MiB total size limit.")
     return result
 
@@ -107,9 +111,33 @@ def _destination(path: Path) -> Path:
     return path
 
 
-def export_workspace(destination: Path, files: dict[str, str]) -> Path:
+def export_workspace(
+    destination: Path, files: dict[str, str], *, metadata: dict[str, str] | None = None
+) -> Path:
     """Export all files atomically into a new directory, never an existing one."""
     checked = validate_files(files)
+    if metadata:
+        notes = validate_files(metadata)
+        if checked.keys() & notes.keys():
+            raise WorkspaceError("Export metadata would overwrite a workspace file.")
+        # Tutor-added metadata must not consume the learner's source budget.
+        checked = _validate_files(
+            checked | notes,
+            MAX_FILES + len(notes),
+            MAX_WORKSPACE_BYTES + sum(len(text.encode("utf-8")) for text in notes.values()),
+        )
+    return _export_validated(destination, checked)
+
+
+def export_stage_backup(destination: Path, extend: dict, repair: dict) -> Path:
+    """Atomically back up two separately bounded stages under distinct directories."""
+    files = {f"extend/{name}": source for name, source in validate_files(extend).items()}
+    if repair:
+        files.update({f"repair/{name}": source for name, source in validate_files(repair).items()})
+    return _export_validated(destination, files)
+
+
+def _export_validated(destination: Path, checked: dict[str, str]) -> Path:
     path = _destination(destination)
     staging = Path(tempfile.mkdtemp(prefix=f".{path.name}-", dir=path.parent))
     reserved = False

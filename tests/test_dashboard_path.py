@@ -2,7 +2,7 @@ import pytest
 from textual.widgets import Button, OptionList, Static
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import CHAPTERS, LESSONS, chapter_lessons
+from pytuitor.curriculum import ACTIVITIES, CHAPTERS, LESSONS, chapter_activities
 from pytuitor.screens import Dashboard
 
 
@@ -28,7 +28,7 @@ async def test_dashboard_uses_available_rows_in_normal_macos_terminal(tmp_path, 
         assert listing.highlighted == 5
         assert listing.max_scroll_y == 0
         await pilot.press("enter")
-        assert app.screen.lesson.id == "ticket-desk"
+        assert app.screen.lesson.id == "reach-arrival"
 
 
 @pytest.mark.parametrize("legacy_track", ["beginner", "experienced", "custom"])
@@ -42,9 +42,9 @@ async def test_dashboard_has_one_curriculum_regardless_of_legacy_path(tmp_path, 
         assert str(app.screen.query_one("#path-title", Static).content) == "Learning"
         listing = app.screen.query_one("#lesson-list", OptionList)
         assert [listing.get_option_at_index(i).id for i in range(listing.option_count)] == [
-            lesson.id for lesson in chapter_lessons(CHAPTERS[0].id)
+            lesson.id for lesson in chapter_activities(CHAPTERS[0].id)
         ]
-        assert f"0 of {len(LESSONS)}" in str(
+        assert f"0 of {len(ACTIVITIES)}" in str(
             app.screen.query_one("#dashboard-summary", Static).content
         )
 
@@ -64,8 +64,8 @@ async def test_known_topics_settings_remain_available(tmp_path):
 async def test_completed_curriculum_keeps_lessons_and_settings_available(tmp_path):
     app = TutorApp(tmp_path)
     app.store.data.update(onboarded=True)
-    for lesson in LESSONS:
-        app.store.entry(lesson)["completed"] = True
+    for lesson in ACTIVITIES:
+        app.store.entry(lesson).update(completed=True, completed_revision=lesson.revision)
     async with app.run_test(size=(80, 24)) as pilot:
         assert app.screen.query_one("#continue", Button).disabled
         assert "CHOOSE YOUR NEXT CHAPTER" in str(

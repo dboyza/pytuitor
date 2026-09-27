@@ -5,10 +5,12 @@ A configured CI workflow is not evidence that its jobs passed, and a built wheel
 
 ## Product and content
 
-- Verify the unified course contains 75 teaching lessons and 12 projects organized into five sections.
+- Verify the unified course contains 75 teaching lessons, 21 game milestones, and 12 optional practice projects organized into five sections.
 - Verify Start learning opens the first lesson, Browse syllabus opens the outline, and Known topics remains editable from the dashboard.
 - Verify Continue follows the active chapter and section, with optional depth requiring an explicit choice.
-- Verify every Build reference passes, every original Repair fails meaningfully, and every corrected Repair passes.
+- Verify every Build/Extend reference passes, every original Repair fails meaningfully, and every corrected Repair passes.
+- Verify game checkpoint continuity, inherited optional-capability checks, supported later entry, history integrity, both-draft recovery, and independently runnable exports.
+- Build the learner game package and run its installed entrypoint in addition to checking the tutor wheel.
 - Check prerequisite order, worked examples, input/output contracts, and unfamiliar syntax in each chapter.
 - Complete the [learner study](learner-study.md) and resolve observed blockers, or record an explicit waiver and make no measured teaching-effectiveness claim.
 - Preserve existing profiles, drafts, known topics, and completion information during upgrades; legacy path preferences must not hide course content.

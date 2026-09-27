@@ -28,6 +28,9 @@ testpaths = ["tests"]
 timeout = 120
 timeout_method = "thread"
 
+[tool.hatch.build]
+exclude = ["**/nvim.log"]
+
 [tool.ruff]
 line-length = 100
 extend-exclude = [".artifacts"]

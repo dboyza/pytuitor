@@ -1,7 +1,9 @@
 # Topic coverage
 
 This maps Pytuitor's authored curriculum to the 31 topic families in the [Pythonlings curriculum](https://pythonlings.abhik.ai/curriculum/) and its [exercise manifest](https://github.com/abhiksark/pythonlings/blob/main/info.toml), reviewed on September 8, 2026.
-Pytuitor has 75 teaching lessons and 12 projects, each with a blank Build stage and a broken Repair stage.
+Pytuitor has 75 teaching lessons, 21 cumulative Lantern Reach milestones, and 12 optional independent projects.
+Lessons and independent projects use blank Build followed by Repair; game milestones use cumulative Extend followed by an independent Repair.
+See [the growing game guide](lantern-reach.md) for continuity, checkpoints, and optional extensions.
 Pythonlings advertises 292 exercises.
 These are different units of work; this map establishes subject coverage, not equal exercise volume or proven teaching effectiveness.
 

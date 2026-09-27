@@ -114,3 +114,36 @@ async def test_integrated_learning_visuals(tmp_path, monkeypatch, size):
         assert panel.scroll_y > 0
         assert panel.max_scroll_x == 0
         assert screen.query_one("#editor", TextArea).region.height >= 5
+
+
+@pytest.mark.parametrize("size", [(80, 24), (140, 44)], ids=["small", "wide"])
+async def test_growing_game_visuals(tmp_path, monkeypatch, size):
+    from pytuitor.project_catalog import BY_MILESTONE, MILESTONES
+    from pytuitor.project_workspace import ProjectWorkspace
+
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setenv("TERM", "xterm-256color")
+    monkeypatch.setenv("COLORTERM", "truecolor")
+    app = TutorApp(tmp_path)
+    app.store.data["onboarded"] = True
+    workspace = ProjectWorkspace(app.store)
+    first = MILESTONES[0]
+    source = first.lesson.solution_files
+    workspace.entry(first).update(files=source, code=source["game.py"])
+    workspace.checkpoint(
+        first, source, [{"label": check.label, "passed": True} for check in first.lesson.checks]
+    )
+    workspace.data["checkpoints"][0]["created"] = "2026-09-27T12:00:00+00:00"
+    async with app.run_test(size=size) as pilot:
+        await pilot.press("g")
+        await capture(app, pilot, f"{size[0]}-game-overview")
+        app.screen.history()
+        await capture(app, pilot, f"{size[0]}-game-history")
+        app.screen.restore()
+        await capture(app, pilot, f"{size[0]}-game-restore")
+        await pilot.press("escape")
+        app.screen.selected = BY_MILESTONE["reach-package"]
+        app.screen.open_milestone()
+        await capture(app, pilot, f"{size[0]}-game-source")
+        await pilot.press("f4", "ctrl+e")
+        await capture(app, pilot, f"{size[0]}-game-workbench")

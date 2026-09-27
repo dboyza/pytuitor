@@ -24,10 +24,10 @@ def test_version_two_migration_backs_up_original_and_preserves_stage_drafts(tmp_
     raw = json.dumps(profile)
     (tmp_path / "profile.json").write_text(raw)
     store = Store(tmp_path)
-    assert store.data["version"] == 3
+    assert store.data["version"] == 4
     assert store.data["lessons"] == profile["lessons"]
     store.save()
-    assert (tmp_path / "profile-before-v3.json").read_text() == raw
+    assert (tmp_path / "profile-before-v4.json").read_text() == raw
     store.close()
 
 

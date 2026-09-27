@@ -9,14 +9,14 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
-- The v1 candidate has 75 lessons and 12 chapter projects.
+- The recommended course has 75 lessons and 21 Lantern Reach game milestones; 12 original projects remain optional practice.
 - One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Welcome offers Start learning or Browse syllabus; Known topics groups concepts by category.
 - Batch onboarding transitions to avoid dashboard flashes.
 - Known topics are skipped by Continue but remain accessible; project concepts describe their relevant preparation.
 - Dashboard browses all chapters; Continue resumes the active chapter, then the core sequence or explicitly selected optional section.
-- Every course unit has blank Build followed by broken Repair, with separate saved drafts and both required for new completion.
+- Lessons and optional practice use blank Build then Repair; game milestones use cumulative Extend then independent Repair, with both required for completion.
 - Prerequisites advise without blocking; references require explicit reveal and never replace drafts.
 - Learner studies are user-run; automated tests do not establish teaching effectiveness.
 
@@ -62,8 +62,10 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Stage contracts live in `content/` chapter modules and the six Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
 - `lesson_screen.py` owns stage/editor/console execution; `file_tree.py` renders workspace files; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
-- `course_map.py` defines section/chapter order and project preparation; `syllabus.py` renders it.
-- `state.py` owns version 3 profiles, atomic writes, migration backups and locks.
+- `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` separates optional practice.
+- `project_workspace.py` owns immutable checkpoints and continuation; keep extra inherited capability checks via its active contract and never replace learner source silently.
+- `project_screen.py` owns game history, explicit supplied bases, restoration, temporary checkpoint play, and portable exports.
+- `state.py` owns version 4 profiles, atomic writes, migration backups and locks.
 - Save with file sync and Unix directory sync or Windows write-through replacement; never roll back memory after a committed rename.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.
 - `runner.py` launches standard-library-only `_worker.py`; `execution_policy.py` owns process rules, `_windows.py` owns Win32 jobs and handles, and `run_files.py` reads bounded snapshots.

@@ -59,6 +59,11 @@ class Lesson:
     stdin: str = ""
     build_stage: StageContract | None = None
     repair_stage: StageContract | None = None
+    project_id: str = ""
+
+    @property
+    def build_label(self) -> str:
+        return "Extend" if self.project_id else "Build"
 
     @property
     def starter(self) -> str:
@@ -115,3 +120,21 @@ class Chapter:
     outcome: str
     section_id: str = ""
     prerequisites: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ProjectMilestone:
+    """A versioned extension with an independently authored repair contract."""
+
+    lesson: Lesson
+    requires: tuple[str, ...]
+    provides: tuple[str, ...]
+    base_files: dict[str, str]
+
+
+@dataclass(frozen=True)
+class ProjectDefinition:
+    id: str
+    title: str
+    description: str
+    milestones: tuple[ProjectMilestone, ...]

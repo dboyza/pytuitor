@@ -12,7 +12,7 @@ Offline, with no account required.</p>
   <a href="#development">Development</a> ·
   <a href="https://github.com/dboyza/pytuitor/issues">Report an issue</a>
 </p>
-<p align="center"><strong>75 lessons</strong> &nbsp; / &nbsp; <strong>12 projects</strong> &nbsp; / &nbsp; <strong>21 chapters</strong></p>
+<p align="center"><strong>75 lessons</strong> &nbsp; / &nbsp; <strong>21 game milestones</strong> &nbsp; / &nbsp; <strong>21 chapters</strong></p>
 
 ## Start learning
 
@@ -44,7 +44,10 @@ See [installation and upgrades](docs/install.md) for a standalone wheel installa
 Start as a complete beginner or deepen your existing Python knowledge.
 
 - **Build, then repair.**
-  Write a program from scratch, then debug a broken one; complete both stages to finish the unit.
+  Write a lesson program from scratch, then debug a broken one; complete both stages to finish the unit.
+- **Grow your own game.**
+  Build [Lantern Reach](docs/lantern-reach.md), an expedition and settlement adventure, through 21 cumulative milestones.
+  Continue your own code, revisit working checkpoints, and export a game that runs without Pytuitor.
 - **Get useful feedback.**
   Run code with interactive input and compare checked results with expected behavior.
   Use hints or explicitly reveal a reference solution when you get stuck.
@@ -66,7 +69,9 @@ The first three form the core sequence; the last two offer optional depth.
 | Python depth | Python-specific behavior, composition, and object protocols |
 | Specialized topics | Async programming, distribution, and language machinery |
 
-See the [curriculum map](docs/curriculum.md) for chapters, projects, and preparation.
+Each chapter ends with a Lantern Reach milestone: Extend your game, then Repair a separate incident.
+The 12 original standalone projects remain available as optional practice in the syllabus, with existing progress preserved.
+See the [curriculum map](docs/curriculum.md) for chapters, milestones, and preparation.
 
 <details>
 <summary><strong>Keyboard shortcuts</strong></summary>

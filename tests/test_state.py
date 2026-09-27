@@ -44,7 +44,7 @@ def test_legacy_profile_keeps_drafts_and_completion(tmp_path):
     }
     (tmp_path / "profile.json").write_text(json.dumps(original))
     store = Store(tmp_path)
-    assert store.data["version"] == 3
+    assert store.data["version"] == 4
     assert store.data["lessons"] == original["lessons"]
     assert store.data["familiar"] == original["familiar"]
     assert "diagnostic" not in store.data

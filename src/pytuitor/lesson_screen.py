@@ -70,6 +70,13 @@ class LessonScreen(TutorScreen):
         self.run_files = {}
         self.last_run_sources = {}
 
+    @property
+    def build_label(self) -> str:
+        return self.lesson.build_label
+
+    def stage_label(self, stage: str | None = None) -> str:
+        return self.build_label if (stage or self.stage) == "build" else "Repair"
+
     def compose(self) -> ComposeResult:
         root = self.store.entry(self.lesson)
         self.stage = root.get("stage", "build")
@@ -80,11 +87,14 @@ class LessonScreen(TutorScreen):
         yield brand(self.lesson.title.upper())
         with Horizontal(id="lesson-toolbar"):
             yield Button("← Dashboard", id="back")
+            if self.lesson.project_id:
+                yield Button("Your game", id="game-overview")
             yield Static(self.lesson.title, id="lesson-name", classes="title")
             yield Static("Saved locally", id="save-status", classes="muted")
         with Horizontal(id="stage-navigation"):
             yield Button(
-                "1  Build from scratch",
+                f"1  {self.build_label}"
+                + (" your game" if self.lesson.project_id else " from scratch"),
                 id="stage-build",
                 variant="primary" if self.stage == "build" else "default",
             )
@@ -105,7 +115,8 @@ class LessonScreen(TutorScreen):
                     if "code" in entry and entry.get("revision", 1) != self.lesson.revision:
                         yield Static(
                             "This exercise has been updated. Your previous draft is kept below. "
-                            "Reset this stage if you want to begin with a blank Build editor.",
+                            f"Reset this stage to restore its original {self.build_label} "
+                            "starting code.",
                             id="updated-notice",
                             classes="muted",
                         )
@@ -123,7 +134,41 @@ class LessonScreen(TutorScreen):
                             + ". You can continue now or revisit these from the dashboard.",
                             classes="topic-preview",
                         )
+                    if self.lesson.project_id:
+                        origin = root.get("base_origin", "blank")
+                        origins = {
+                            "blank": "Your first version starts blank.",
+                            ("supplied"): (
+                                "Starting from supplied earlier code. Skipped milestones stay "
+                                "incomplete."
+                            ),
+                            ("learner"): (
+                                "Continuing your own working "
+                                "checkpoint. Earlier source is preserved."
+                            ),
+                            ("restored"): (
+                                "A historical checkpoint was restored "
+                                "into this draft. Check it again."
+                            ),
+                        }
+                        yield Static(origins[origin], id="project-origin", classes="topic-preview")
+                        yield Static(
+                            (
+                                "Your game opens checkpoint history, exports, and an explicit "
+                                "supplied-base restart."
+                            ),
+                            classes="muted",
+                        )
                     yield Markdown(self.lesson.body, id="lesson-markdown")
+                    if not self.lesson.project_id:
+                        from pytuitor.content.lantern.connections import GAME_CONNECTIONS
+
+                        connection = GAME_CONNECTIONS.get(self.lesson.id)
+                        if connection:
+                            yield Static(
+                                "In Lantern Reach: " + connection,
+                                classes="topic-preview",
+                            )
                     yield Static(
                         "OPTIONAL: CHECK YOUR UNDERSTANDING",
                         classes="eyebrow",
@@ -371,16 +416,31 @@ class LessonScreen(TutorScreen):
         return root if self.stage == "build" else root.setdefault("repair", {})
 
     def stage_contract(self) -> StageContract:
+        if self.lesson.project_id:
+            from pytuitor.project_catalog import BY_MILESTONE
+            from pytuitor.project_workspace import ProjectWorkspace
+
+            return ProjectWorkspace(self.store, self.lesson.project_id).contract(
+                BY_MILESTONE[self.lesson.id], self.stage
+            )
         return self.lesson.stage_contract(self.stage)
 
     def stage_passed(self, stage: str) -> bool:
         root = self.store.entry(self.lesson)
         entry = root if stage == "build" else root.get("repair", {})
-        return entry.get("checked_revision") == self.lesson.revision and "checked_code" in entry
+        passed = entry.get("checked_revision") == self.lesson.revision and "checked_code" in entry
+        if self.lesson.project_id:
+            passed = passed and entry.get("checked_files") == entry.get("files")
+        return passed
 
     def update_stage_ui(self) -> None:
         for stage in ("build", "repair"):
-            label = "1  Build from scratch" if stage == "build" else "2  Repair a program"
+            label = (
+                f"1  {self.build_label}"
+                + (" your game" if self.lesson.project_id else " from scratch")
+                if stage == "build"
+                else "2  Repair a program"
+            )
             self.query_one(f"#stage-{stage}", Button).label = (
                 label + " ✓" if self.stage_passed(stage) else label
             )
@@ -396,10 +456,10 @@ class LessonScreen(TutorScreen):
             "Run it, then Check. Passing unlocks Repair."
             if self.stage == "build"
             else "This separate program contains a mistake. Run and Check to investigate, then "
-            "fix it to meet the requirements. Your Build draft is saved separately."
+            f"fix it to meet the requirements. Your {self.build_label} draft is saved separately."
         )
         self.query_one("#stage-heading", Static).update(
-            "1 OF 2 · BUILD · WRITE AND CHECK"
+            f"1 OF 2 · {self.build_label.upper()} · WRITE AND CHECK"
             if self.stage == "build"
             else "2 OF 2 · REPAIR · INVESTIGATE AND FIX"
         )
@@ -430,25 +490,29 @@ class LessonScreen(TutorScreen):
         self.load_project()
         self.transcript = ""
         if self.stage_passed(stage):
-            self.append_output(f"{stage.title()} draft restored. This stage has passed its checks.")
+            self.append_output(
+                f"{self.stage_label(stage)} draft restored. This stage has passed its checks."
+            )
         else:
             self.append_output(
-                "Build draft restored."
+                f"{self.build_label} draft restored."
                 if stage == "build"
                 else "Repair program loaded. Run to investigate the mistake, then Check your fix."
             )
         self.query_one("#check-summary", Static).update("")
-        self.query_one("#console-status", Static).update(f"{stage.upper()} · READY")
+        self.query_one("#console-status", Static).update(
+            f"{self.stage_label(stage).upper()} · READY"
+        )
         self.update_stage_ui()
         transition = self.query_one("#stage-transition", Static)
         transition.update(
             (
-                "Saved Repair draft restored. Build saved."
+                f"Saved Repair draft restored. {self.build_label} saved."
                 if repair_saved
-                else "New Repair program loaded. Build saved."
+                else f"New Repair program loaded. {self.build_label} saved."
             )
             if stage == "repair"
-            else "Saved Build draft restored."
+            else f"Saved {self.build_label} draft restored."
         )
         transition.display = True
         self.query_one("#exercise-scroll", VerticalScroll).scroll_home(animate=False)
@@ -527,6 +591,10 @@ class LessonScreen(TutorScreen):
         if "code" not in entry:
             entry["revision"] = self.lesson.revision
         self.capture_editor()
+        if self.lesson.project_id and entry.get("checked_files") != entry.get("files"):
+            root = self.store.entry(self.lesson)
+            root.pop("completed", None)
+            root.pop("completed_revision", None)
         self.update_stage_ui()
         if (
             not self.running
@@ -679,7 +747,8 @@ class LessonScreen(TutorScreen):
     def render_checks(self) -> None:
         passed = sum(case.get("passed", False) for case in self.check_results.values())
         lines = [
-            f"{self.stage.upper()} · {passed}/{len(self.stage_contract().checks)} checks passed",
+            f"{self.stage_label().upper()} · "
+            f"{passed}/{len(self.stage_contract().checks)} checks passed",
             "",
         ]
         for case in self.check_results.values():
@@ -752,6 +821,23 @@ class LessonScreen(TutorScreen):
                             "Checks passed for an earlier draft. Check your latest changes again."
                         )
                     else:
+                        if self.lesson.project_id and self.stage == "build":
+                            from pytuitor.project_catalog import BY_MILESTONE
+                            from pytuitor.project_workspace import ProjectWorkspace
+
+                            try:
+                                ProjectWorkspace(self.store, self.lesson.project_id).checkpoint(
+                                    BY_MILESTONE[self.lesson.id], source, result.checks
+                                )
+                            except (OSError, WorkspaceError) as error:
+                                summary.update(
+                                    "Checks passed, but the "
+                                    "checkpoint could not be "
+                                    "saved. Check again to "
+                                    "retry."
+                                )
+                                self.append_output(f"\nCheckpoint not saved: {error}")
+                                return
                         entry = self.stage_entry()
                         entry["checked_code"] = source[self.lesson.entrypoint]
                         entry["checked_files"] = source
@@ -764,9 +850,13 @@ class LessonScreen(TutorScreen):
                             )
                         else:
                             summary.update(
-                                "Build passed. Next: choose Repair to investigate a new program."
+                                f"{self.build_label} passed. "
+                                "Next: choose Repair to investigate a new program."
                             )
-                            lines.append("✓ BUILD PASSED · Ctrl+N or Repair → opens stage 2.")
+                            lines.append(
+                                f"✓ {self.build_label.upper()} PASSED · "
+                                "Ctrl+N or Repair → opens stage 2."
+                            )
                         self.tutor.persist()
                 else:
                     failed = next((case for case in result.checks if not case.get("passed")), None)
@@ -866,6 +956,11 @@ class LessonScreen(TutorScreen):
         self.save_draft()
         self.app.pop_screen()
 
+    @on(Button.Pressed, "#game-overview")
+    def game_overview(self) -> None:
+        self.save_draft()
+        self.tutor.action_game()
+
     @on(Button.Pressed, "#next")
     def next_lesson(self) -> None:
         if self.running:
@@ -874,7 +969,7 @@ class LessonScreen(TutorScreen):
             if self.stage_passed("build"):
                 self.switch_stage("repair")
             else:
-                self.notify("Pass the Build checks to unlock Repair.")
+                self.notify(f"Pass the {self.build_label} checks to unlock Repair.")
             return
         if not self.stage_passed("repair"):
             self.notify("Pass the Repair checks to complete the lesson.")
@@ -883,11 +978,7 @@ class LessonScreen(TutorScreen):
         self.store.data["last_lesson"] = self.lesson.id
         following = self.store.next_lesson()
         if following is not None and following.id != self.lesson.id:
-            self.store.data["last_lesson"] = following.id
-            if self.tutor.persist():
-                self.app.switch_screen(LessonScreen(following))
-            else:
-                self.store.data["last_lesson"] = self.lesson.id
+            self.tutor.open_activity(following, replace=True)
         else:
             self.app.pop_screen()
             self.notify("Section complete. Open the syllabus to choose another chapter.")
@@ -919,7 +1010,9 @@ class LessonScreen(TutorScreen):
 
     @on(Button.Pressed, "#update-starter")
     def action_reset(self) -> None:
-        self.app.push_screen(ConfirmReset(), self.reset_confirmed)
+        self.app.push_screen(
+            ConfirmReset(project=bool(self.lesson.project_id)), self.reset_confirmed
+        )
 
     def reset_confirmed(self, confirmed: bool) -> None:
         if not confirmed or not self.export_code():
@@ -940,6 +1033,9 @@ class LessonScreen(TutorScreen):
             ):
                 root.pop(key, None)
             root["revision"] = self.lesson.revision
+            if self.lesson.project_id:
+                root["files"] = dict(root["base_files"])
+                root["code"] = root["files"][self.lesson.entrypoint]
         else:
             root["repair"] = {"revision": self.lesson.revision}
         self.load_project()

@@ -2,6 +2,8 @@
 
 A lesson workspace contains editable text files, with one entry point used by Run and Check.
 Build and Repair keep separate drafts.
+[Lantern Reach milestones](lantern-reach.md) label Build as Extend and continue compatible learner source across chapters.
+The game overview adds immutable working history and exports with provenance; the workbench still edits one stage at a time.
 Run and Check use temporary copies so experiments cannot overwrite the saved draft automatically.
 Export creates a new directory containing the complete saved workspace; it refuses to replace an existing destination.
 

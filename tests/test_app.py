@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from textual.widgets import Button, OptionList, Select, SelectionList, Static, TextArea
+from textual.widgets import Button, Collapsible, OptionList, SelectionList, Static, TextArea
 
 from pytuitor.app import TutorApp
 from pytuitor.curriculum import BY_ID, LESSONS
@@ -188,11 +188,13 @@ async def test_capstone_run_check_and_export(tmp_path, lesson_id):
     lesson = BY_ID[lesson_id]
     app.store.data["track"] = lesson.track
     async with app.run_test(size=(120, 40)) as pilot:
-        app.screen.query_one("#chapter-picker", Select).value = lesson.chapter_id
+        await pilot.press("s")
+        chapter = app.screen.query_one(f"#syllabus-{lesson.chapter_id}", Collapsible)
+        chapter.collapsed = False
+        chapter.query_one("Collapsible", Collapsible).collapsed = False
         await pilot.pause()
-        options = app.screen.query_one("#lesson-list", OptionList)
-        options.focus()
-        await pilot.press("end")
+        button = next(item for item in chapter.query(".open-unit") if item.name == lesson.id)
+        button.focus()
         await pilot.press("enter")
         await pilot.pause()
         screen = app.screen

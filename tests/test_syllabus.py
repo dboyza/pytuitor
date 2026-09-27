@@ -5,7 +5,7 @@ from textual.containers import VerticalScroll
 from textual.widgets import Button, Collapsible, Select, Static
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import CHAPTERS, LESSONS, SECTIONS, chapter_lessons
+from pytuitor.curriculum import CHAPTERS, LESSONS, SECTIONS, chapter_activities
 from pytuitor.screens import Dashboard
 from pytuitor.syllabus import Syllabus
 
@@ -26,7 +26,7 @@ async def test_syllabus_browsing_is_keyboard_accessible_and_preserves_progress(t
         source = "\n".join(
             str(item.content) for item in app.screen.query("#syllabus-content Static")
         )
-        chapters = list(app.screen.query(Collapsible))
+        chapters = list(app.screen.query(".syllabus-chapter"))
         assert len(chapters) == len(CHAPTERS)
         assert all(chapter.collapsed for chapter in chapters)
         for section in SECTIONS:
@@ -60,9 +60,9 @@ async def test_start_chapter_opens_first_unfinished_or_revisits_completed(tmp_pa
     app = TutorApp(tmp_path)
     app.store.data.update(onboarded=True)
     chapter = CHAPTERS[-1]
-    units = chapter_lessons(chapter.id)
+    units = chapter_activities(chapter.id)
     for lesson in units if completed else units[:1]:
-        app.store.entry(lesson)["completed"] = True
+        app.store.entry(lesson).update(completed=True, completed_revision=lesson.revision)
     async with app.run_test(size=(80, 24)) as pilot:
         await pilot.press("s")
         detail = app.screen.query_one(f"#syllabus-{chapter.id}", Collapsible)
@@ -112,7 +112,7 @@ async def test_failed_save_does_not_change_active_chapter(tmp_path, monkeypatch)
 async def test_continue_chapter_resumes_current_draft_before_earlier_lessons(tmp_path):
     app = TutorApp(tmp_path)
     chapter = CHAPTERS[0]
-    active = chapter_lessons(chapter.id)[2]
+    active = chapter_activities(chapter.id)[2]
     app.store.data.update(onboarded=True, last_lesson=active.id)
     app.store.entry(active)["code"] = "print('saved draft')"
     async with app.run_test(size=(80, 24)) as pilot:

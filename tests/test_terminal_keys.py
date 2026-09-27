@@ -19,12 +19,17 @@ pty = pytest.importorskip("pty")
 termios = pytest.importorskip("termios")
 
 
+@pytest.mark.parametrize("lesson_id", ["first-light", "reach-package"], ids=["lesson", "game"])
 @pytest.mark.parametrize("size", [(80, 24), (140, 44)])
 @pytest.mark.parametrize("delay_editor_focus", [False, True], ids=["normal", "delayed-focus"])
-def test_ctrl_t_cycles_through_terminal_input(tmp_path, size, delay_editor_focus):
+def test_ctrl_t_cycles_through_terminal_input(tmp_path, size, delay_editor_focus, lesson_id):
     store = Store(tmp_path / "profile")
     store.data["onboarded"] = True
-    store.entry(BY_ID["first-light"])["files"] = {"lesson.py": "", "helpers.py": ""}
+    lesson = BY_ID[lesson_id]
+    entry = store.entry(lesson)
+    entry.setdefault("files", {lesson.entrypoint: ""})["helpers.py"] = ""
+    if lesson.project_id:
+        store.data["projects"][lesson.project_id]["last_milestone"] = lesson_id
     store.save()
     store.close()
     state = tmp_path / "terminal-state"
@@ -74,6 +79,7 @@ class ObservedApp(TutorApp):
             screen.deliver_focus()
         observation = {
             "pane": getattr(screen, "active_pane", "dashboard"),
+            "screen": type(screen).__name__,
             "focused": self.focused.id if self.focused else None,
             "pending": getattr(screen, "delayed_focus", None) is not None,
             "delivered": getattr(screen, "focus_delivered", False),
@@ -132,7 +138,12 @@ ObservedApp(Path(sys.argv[1])).run()
 
     try:
         wait_for("dashboard")
-        os.write(master, b"c")
+        if lesson.project_id:
+            os.write(master, b"g")
+            wait_for("dashboard", screen="ProjectScreen", focused="milestone-list")
+            os.write(master, b"\r")
+        else:
+            os.write(master, b"c")
         wait_for("lesson", focused="reading-panel")
         os.write(master, b"\x14")  # Ctrl+T's standard terminal byte.
         wait_for("editor", focused="editor", pending=delay_editor_focus)

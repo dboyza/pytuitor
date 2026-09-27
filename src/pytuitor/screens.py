@@ -16,14 +16,14 @@ from textual.widgets import (
 from textual.widgets.option_list import Option
 
 from pytuitor.curriculum import (
+    ACTIVITIES,
     BY_ID,
     CHAPTERS,
-    LESSONS,
     SECTIONS,
     Lesson,
-    chapter_lessons,
+    chapter_activities,
 )
-from pytuitor.lesson_screen import LessonScreen
+from pytuitor.lesson_screen import LessonScreen as LessonScreen
 from pytuitor.setup import Onboarding
 from pytuitor.ui import TutorScreen, brand
 
@@ -44,6 +44,7 @@ class Dashboard(TutorScreen):
         Binding("c", "continue", "Continue"),
         Binding("p", "preferences", "Known topics"),
         Binding("s", "syllabus", "Syllabus", show=False),
+        Binding("g", "game", "Your game", show=False),
     ]
 
     def __init__(self):
@@ -58,6 +59,7 @@ class Dashboard(TutorScreen):
             with Vertical(id="dashboard-main"):
                 with Horizontal(id="path-header"):
                     yield Static(id="path-title", classes="hero")
+                    yield Button("Your game", id="your-game")
                     yield Button("Syllabus", id="syllabus")
                     yield Button("Known topics", id="preferences")
                 yield Static(id="dashboard-summary", classes="muted")
@@ -103,7 +105,7 @@ class Dashboard(TutorScreen):
             self.chapter_id = BY_ID[last_lesson].chapter_id
             self.current = BY_ID[last_lesson]
         self.seen_last_lesson = last_lesson
-        lessons = LESSONS
+        lessons = ACTIVITIES
         completed = sum(self.store.status(lesson) == "completed" for lesson in lessons)
         familiar = sum(self.store.status(lesson) == "familiar" for lesson in lessons)
         self.query_one("#path-title", Static).update("Learning")
@@ -152,7 +154,7 @@ class Dashboard(TutorScreen):
         self.show_course()
 
     def show_course(self) -> None:
-        lessons = chapter_lessons(self.chapter_id) if self.chapter_id else LESSONS
+        lessons = chapter_activities(self.chapter_id) if self.chapter_id else ACTIVITIES
         chapter = next((c for c in CHAPTERS if c.id == self.chapter_id), None)
         self.query_one("#chapter-outcome", Static).update(chapter.outcome if chapter else "")
         listing = self.query_one("#lesson-list", OptionList)
@@ -164,11 +166,13 @@ class Dashboard(TutorScreen):
             text = Text()
             text.append(f"{symbols[status]}  {index + 1:02}  {lesson.title}", style="bold")
             label = "known · skipped" if status == "familiar" else status
-            kind = "project · " if lesson.project else ""
+            kind = "game milestone · " if lesson.project_id else ""
             if self.size.width < 100:
                 detail = (
                     "known"
                     if status == "familiar"
+                    else "game"
+                    if lesson.project_id
                     else "project"
                     if lesson.project and not lesson.title.lower().startswith("project:")
                     else ""
@@ -193,13 +197,12 @@ class Dashboard(TutorScreen):
         self.open_lesson(BY_ID[event.option.id])
 
     def open_lesson(self, lesson: Lesson) -> None:
-        previous = self.store.data.get("last_lesson")
-        self.store.data["last_lesson"] = lesson.id
-        if not self.tutor.persist():
-            self.store.data["last_lesson"] = previous
-            return
-        self.chapter_id = lesson.chapter_id
-        self.app.push_screen(LessonScreen(lesson))
+        if self.tutor.open_activity(lesson):
+            self.chapter_id = lesson.chapter_id
+
+    @on(Button.Pressed, "#your-game")
+    def action_game(self) -> None:
+        self.tutor.action_game()
 
     @on(Button.Pressed, "#continue")
     def action_continue(self) -> None:

@@ -89,6 +89,36 @@ class TutorApp(App):
     def on_unmount(self) -> None:
         self.store.close()
 
+    def open_activity(self, lesson, *, replace: bool = False) -> bool:
+        """Prepare a workspace before committing its navigation target."""
+        from pytuitor.screens import LessonScreen
+        from pytuitor.workspace import WorkspaceError
+
+        previous = self.store.data.get("last_lesson")
+        try:
+            self.store.entry(lesson)
+        except (OSError, WorkspaceError) as error:
+            self.notify(str(error), severity="error", timeout=12)
+            return False
+        self.store.data["last_lesson"] = lesson.id
+        if lesson.project_id:
+            self.store.data["projects"][lesson.project_id]["last_milestone"] = lesson.id
+        if not self.persist():
+            self.store.data["last_lesson"] = previous
+            return False
+        if replace:
+            self.switch_screen(LessonScreen(lesson))
+        else:
+            self.push_screen(LessonScreen(lesson))
+        return True
+
+    def action_game(self) -> None:
+        from pytuitor.project_screen import ProjectScreen
+
+        if not self.store.data["onboarded"] or isinstance(self.screen, ProjectScreen):
+            return
+        self.push_screen(ProjectScreen())
+
     def action_keyboard_help(self) -> None:
         from pytuitor.dialogs import KeyboardHelp
 
@@ -139,6 +169,9 @@ class TutorApp(App):
             "Dashboard", "Continue your chapter or revisit lessons", self.action_dashboard
         )
         if self.store.data["onboarded"]:
+            yield SystemCommand(
+                "Your game", "Lantern Reach milestones, checkpoints, and exports", self.action_game
+            )
             yield SystemCommand(
                 "Known topics",
                 "Choose which familiar concepts Continue skips",

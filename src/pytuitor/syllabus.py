@@ -7,8 +7,7 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.events import Resize
 from textual.widgets import Button, Collapsible, Footer, Static
 
-from pytuitor.curriculum import BY_ID, CHAPTERS, LESSONS, SECTIONS, chapter_lessons
-from pytuitor.lesson_screen import LessonScreen
+from pytuitor.curriculum import BY_ID, CHAPTERS, PRACTICE, SECTIONS, chapter_activities
 from pytuitor.ui import TutorScreen, brand
 
 
@@ -23,10 +22,10 @@ class Syllabus(TutorScreen):
                     yield Static("Curriculum", classes="hero")
                     yield Button("Back", id="syllabus-back")
                 with VerticalScroll(id="syllabus-scroll"):
-                    projects = sum(lesson.project for lesson in LESSONS)
                     yield Static(
-                        f"{len(CHAPTERS)} chapters · {len(LESSONS) - projects} lessons · "
-                        f"{projects} projects\nEach unit includes Build and Repair.",
+                        f"{len(CHAPTERS)} chapters · 75 lessons · 21 game milestones\n"
+                        "Lessons: Build + Repair. Game: Extend + "
+                        "Repair. 12 optional practice projects.",
                         id="syllabus-summary",
                         classes="muted",
                     )
@@ -48,13 +47,11 @@ class Syllabus(TutorScreen):
                             for chapter in CHAPTERS:
                                 if chapter.section_id != section.id:
                                     continue
-                                units = chapter_lessons(chapter.id)
+                                units = chapter_activities(chapter.id)
                                 projects = sum(lesson.project for lesson in units)
                                 count = f"{len(units) - projects} lessons"
                                 if projects:
-                                    count += f" · {projects} project" + (
-                                        "s" if projects != 1 else ""
-                                    )
+                                    count += " · game milestone"
                                 with Collapsible(
                                     title=f"{chapter.title} · {count}",
                                     id=f"syllabus-{chapter.id}",
@@ -91,13 +88,34 @@ class Syllabus(TutorScreen):
                                             classes="syllabus-lesson",
                                             markup=False,
                                         )
+                                        yield Button(
+                                            "Open milestone"
+                                            if lesson.project_id
+                                            else "Open lesson",
+                                            name=lesson.id,
+                                            classes="open-unit",
+                                        )
+                                    practice = [
+                                        item for item in PRACTICE if item.chapter_id == chapter.id
+                                    ]
+                                    if practice:
+                                        with Collapsible(
+                                            title="Optional independent practice", collapsed=True
+                                        ):
+                                            for item in practice:
+                                                yield Static(item.title, markup=False)
+                                                yield Button(
+                                                    "Open practice",
+                                                    name=item.id,
+                                                    classes="open-unit",
+                                                )
         yield Footer(show_command_palette=False)
 
     def chapter_action(self, chapter_id: str) -> str:
         pending = self.store.chapter_next_lesson(chapter_id)
         if pending is None:
             return "Revisit chapter"
-        units = chapter_lessons(chapter_id)
+        units = chapter_activities(chapter_id)
         if any(self.store.status(lesson) != "new" for lesson in units):
             return "Continue chapter"
         return "Start chapter"
@@ -115,7 +133,7 @@ class Syllabus(TutorScreen):
     @on(Button.Pressed, ".start-chapter")
     def start_chapter(self, event: Button.Pressed) -> None:
         chapter_id = event.button.name
-        units = chapter_lessons(chapter_id)
+        units = chapter_activities(chapter_id)
         active = BY_ID.get(self.store.data.get("last_lesson"))
         lesson = (
             active
@@ -124,12 +142,11 @@ class Syllabus(TutorScreen):
             and self.store.status(active) in ("new", "in progress")
             else self.store.chapter_next_lesson(chapter_id) or units[0]
         )
-        previous = self.store.data.get("last_lesson")
-        self.store.data["last_lesson"] = lesson.id
-        if not self.tutor.persist():
-            self.store.data["last_lesson"] = previous
-            return
-        self.app.push_screen(LessonScreen(lesson))
+        self.tutor.open_activity(lesson)
+
+    @on(Button.Pressed, ".open-unit")
+    def open_unit(self, event: Button.Pressed) -> None:
+        self.tutor.open_activity(BY_ID[event.button.name])
 
     @on(Button.Pressed, "#syllabus-back")
     def action_back(self) -> None:

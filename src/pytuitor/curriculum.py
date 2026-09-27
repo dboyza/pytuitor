@@ -13,6 +13,7 @@ from pytuitor.legacy import LESSONS as LEGACY_LESSONS
 from pytuitor.legacy import default_input as legacy_input
 from pytuitor.models import Check as Check
 from pytuitor.models import Lesson as Lesson
+from pytuitor.project_catalog import BY_CHAPTER, MILESTONES
 
 _AUTHORED_LESSONS = (*BEGINNER_LESSONS, *EXPERIENCED_LESSONS)
 _AUTHORED_BY_ID = {lesson.id: lesson for lesson in _AUTHORED_LESSONS}
@@ -50,7 +51,19 @@ def _assemble_lessons() -> tuple[Lesson, ...]:
 
 LESSONS = _assemble_lessons()
 
-BY_ID = {lesson.id: lesson for lesson in (*LEGACY_LESSONS, *LESSONS)}
+BY_ID = {
+    lesson.id: lesson
+    for lesson in (*LEGACY_LESSONS, *LESSONS, *(item.lesson for item in MILESTONES))
+}
+PRACTICE = tuple(lesson for lesson in LESSONS if lesson.project)
+ACTIVITIES = tuple(
+    unit
+    for chapter in CHAPTERS
+    for unit in (
+        *(lesson for lesson in LESSONS if lesson.chapter_id == chapter.id and not lesson.project),
+        BY_CHAPTER[chapter.id].lesson,
+    )
+)
 CONCEPTS = tuple(
     dict.fromkeys(c for lesson in LESSONS if not lesson.project for c in lesson.concepts)
 )
@@ -73,6 +86,11 @@ def track_chapters(track: str):
 
 def chapter_lessons(chapter_id: str) -> list[Lesson]:
     return [lesson for lesson in LESSONS if lesson.chapter_id == chapter_id]
+
+
+def chapter_activities(chapter_id: str) -> list[Lesson]:
+    """Recommended lessons and the cumulative milestone, excluding optional practice."""
+    return [lesson for lesson in ACTIVITIES if lesson.chapter_id == chapter_id]
 
 
 def default_input(lesson: Lesson, stage: str = "build") -> str:

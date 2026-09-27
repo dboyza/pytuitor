@@ -114,7 +114,8 @@ These are placeholder paths; substitute the actual artifact you reviewed.
 It can report an error while this project has no published release.
 Startup and lessons never run this lookup.
 
-Version 3 profiles preserve previous lesson drafts and create `profile-before-v3.json` when first saving a migrated profile.
+Version 4 profiles preserve previous lesson drafts and create `profile-before-v4.json` when first saving a migrated profile.
+Game milestones and immutable working checkpoints have their own records; see [Lantern Reach](lantern-reach.md).
 Old drafts remain available when a lesson changes, with an explicit reset option.
 The previous application may not understand a newer profile, so use the backup with a separate `--data-dir` when testing a downgrade.
 
