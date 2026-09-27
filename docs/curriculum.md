@@ -7,7 +7,7 @@ Each chapter lists useful preparation without locking access.
 Lessons and optional standalone projects use blank Build followed by Repair.
 Each chapter ends with Extend and independent Repair for the growing [Lantern Reach game](lantern-reach.md).
 Existing standalone project IDs, drafts, and achievements remain available as optional practice in the syllabus.
-See [topic coverage](coverage.md) for the mapping to Pythonlings and the boundaries of that comparison.
+Use the [topic index](coverage.md) to find lessons by Python subject.
 
 Optional mixed review adds one three-task session per chapter without changing required completion.
 See [returning, checking, and reviewing](learning-experience.md) for resume behavior, feedback controls, and local review scheduling.
@@ -266,7 +266,7 @@ Useful preparation: Object protocols and testing.
 
 ## Teaching and validation
 
-Every chapter now ends with a cumulative game milestone, scaled to the chapter's scope.
+Every chapter ends with a cumulative game milestone, scaled to the chapter's scope.
 Standalone projects listed above are optional independent practice, not additional requirements for Continue.
 Projects remain where their required concepts have been introduced, including preparation from earlier chapters.
 Recursion is optional depth rather than a prerequisite for an introductory text adventure.
@@ -274,12 +274,13 @@ Generator and class context managers follow generators, decorators, and classes.
 Packaging does not require async, and language machinery does not require packaging.
 
 Each lesson states the names, inputs, outputs, and edge cases needed to build its program from a blank editor.
-Repair uses the same contract with a deliberately defective implementation.
+Game milestones specify the behavior to add and preserve when extending an earlier version.
+Repair has its own behavior contract and a deliberately defective implementation, with a distinct scenario or debugging decision.
 Checks report expected and actual behavior; reference solutions never replace learner drafts.
-All existing lesson IDs, exercise contracts, revisions, and saved drafts remain intact.
+Stable lesson IDs preserve saved drafts and historical completion across curriculum updates.
+A changed stage contract increases its revision and requires fresh checks.
 Game milestone progress is separate and is never awarded from historical standalone project completion.
-Retired authoring paths remain implementation provenance, not learner navigation.
 
-See the [language review](language-review.md) for terminology and prerequisite review coverage.
+See the [authoring guide](authoring.md) and [challenge criteria](teaching-criteria.md) for terminology, prerequisite, and exercise standards.
 Automated checks establish executable consistency.
 Use the [learner study](learner-study.md) to assess teaching effectiveness with real learners.

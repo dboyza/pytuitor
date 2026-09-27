@@ -54,7 +54,11 @@ Start as a complete beginner or deepen your existing Python knowledge.
 - **Choose your path.**
   Follow the course or skip known topics when continuing; prerequisites guide you without locking lessons.
 - **Keep your progress.**
-  Separate Build and Repair drafts are saved locally so you can pick up where you left off.
+  Resume your saved file, cursor, reading position, and stage, with an optional note for next time.
+- **Revisit what you learned.**
+  Try optional mixed reviews with prediction, debugging, and short coding tasks; suggestions never block Continue.
+
+See the [learning experience guide](docs/learning-experience.md) for workspace recovery, check details, and review controls.
 
 ### A course that grows with you
 
@@ -122,6 +126,7 @@ uv run ruff format --check .
 uv build
 ```
 
+Use the [authoring guide](docs/authoring.md) and [product decisions](docs/product-decisions.md) when changing course content or learning behavior.
 See the [release checklist](docs/release-checklist.md) for installed-wheel validation and the [learner study guide](docs/learner-study.md) for evaluating the teaching experience.
 
 ## Next steps

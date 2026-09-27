@@ -1,7 +1,8 @@
 # Chapter challenge criteria
 
 These are authoring and review criteria, not measured claims about learner difficulty.
-Build asks the learner to combine the chapter's ideas from a blank editor.
+Lesson and standalone-project Build stages ask the learner to combine taught ideas from a blank editor.
+Game milestones use Extend to add chapter concepts to an earlier version; see the [game authoring guidance](authoring.md#growing-game-content).
 Repair must require a different decision, data flow, or observable behavior; changing names alone does not qualify.
 Worked examples teach the ingredients without supplying the complete required program.
 Checks exercise ordinary cases, boundaries, and the chapter's likely misconception while accepting equivalent implementations.
@@ -48,4 +49,4 @@ Optional predictions ask learners to anticipate behavior; they do not unlock exe
 Reference passes establish consistency with authored checks.
 Mutant rejection and independent alternative solutions establish selected properties of those checks.
 Neither proves the exercises are moderately challenging or establishes transfer to new problems.
-Learner studies are currently skipped at the user's request; retain the study protocol for future use without recording fictional outcomes.
+Use the [learner study protocol](learner-study.md) to evaluate difficulty and transfer, and report only observed outcomes.

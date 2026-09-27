@@ -1,9 +1,9 @@
 # Learning and release decisions
 
-## Immediate priorities
+## Learning and feedback
 
 Complete specifications and trustworthy checks take priority over adding more completion signals.
-Keep teaching separate from the active exercise, with a persistent Build or Repair heading and independently scrollable Markdown requirements.
+Keep teaching separate from the active exercise, with a persistent Build, Extend, or Repair heading and independently scrollable Markdown requirements.
 Short requirements should give space back to the editor.
 Check results must show the next action outside the scrolling case details, using words rather than color alone.
 
@@ -13,12 +13,12 @@ A textual difference is not proof that the learner's solution is wrong.
 Optional prediction checkpoints provide a short conceptual pause in every chapter and never gate coding progress.
 See [chapter challenge criteria](teaching-criteria.md) for the content review standard.
 
-## Deliberate deferrals
+## Reviews and evidence boundaries
 
-Retrieval scheduling and mastery scoring remain deferred.
-Existing practice and study-note profile fields remain loadable but inert, and no new completion gates or inferred mastery scores are introduced.
-A future proposal needs an explicit learning model, opt-in controls, migration behavior, and evidence that the feature improves learning without misleading learners about mastery.
-Learner studies are skipped at the user's request, so no teaching-effectiveness claim is made.
+[Optional mixed reviews](learning-experience.md#optional-mixed-review) provide local scheduling, independent drafts, and controls to defer or pause suggestions.
+Reviews never block Continue or award course credit, and the app does not infer mastery scores.
+Legacy practice and study-note profile fields remain loadable but inert; current review records and personal notes are separate.
+Use the [learner study protocol](learner-study.md) to evaluate learning outcomes; executable checks alone do not establish teaching effectiveness.
 
 Textual status words, keyboard access, and monochrome readability are supported design requirements.
 A fully linear screen-reader interface still needs dedicated assistive-technology evaluation; terminal screenshots and synthetic keyboard checks do not establish that support.

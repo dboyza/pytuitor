@@ -49,9 +49,6 @@ Focused Repairs target smaller concepts; concept Repairs trace a fuller behavior
 The displayed ranges of roughly 3-5, 5-8, and 8-12 minutes are planning guidance, not measured completion times or timers.
 They never affect access or completion.
 
-The curriculum audit retained the existing short Foundation and function tasks and the fuller file, object, async, and project scenarios.
-The class-construction Repair now supplies a correct abstract interface and instance decoder, concentrating the learner's debugging on inclusive base validation and subclass-aware factory construction.
-Its complete behavior checks remain, and its revision increases to preserve older drafts with an update notice.
 No task is completed by reading a reference or using a hint.
 
 ## Optional mixed review

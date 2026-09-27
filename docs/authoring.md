@@ -8,7 +8,8 @@ The six First programs units use the `_FOUNDATION_STAGES` table in `src/pytuitor
 
 The legacy `Lesson` fields remain populated as compatibility projections for imports and saved drafts.
 
-New authoring should provide both stage contracts when Build and Repair need different scenarios or checks.
+Author explicit contracts for both stages, with distinct scenarios or debugging decisions.
+Compatibility defaults support legacy callers; they are not a reason to reuse the Build exercise as Repair.
 
 Keep each Repair solvable with concepts already taught, behavior-based, and meaningfully different from its Build scenario.
 
@@ -38,7 +39,6 @@ Old drafts and historical completion stay preserved, but an old checked revision
 Use each stage's `reference_files` in journeys and exports; the legacy `lesson.solution` describes Build only.
 
 Run the catalog tests and `scripts/smoke_installed.py` after changing a stage contract.
-
 
 ## Teaching and visual review
 

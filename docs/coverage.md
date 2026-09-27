@@ -1,16 +1,15 @@
 # Topic coverage
 
-This maps Pytuitor's authored curriculum to the 31 topic families in the [Pythonlings curriculum](https://pythonlings.abhik.ai/curriculum/) and its [exercise manifest](https://github.com/abhiksark/pythonlings/blob/main/info.toml), reviewed on September 8, 2026.
+Use this index to find lessons by Python topic.
+For the recommended sequence and advisory prerequisites, see the [curriculum map](curriculum.md).
 Pytuitor has 75 teaching lessons, 21 cumulative Lantern Reach milestones, and 12 optional independent projects.
 Lessons and independent projects use blank Build followed by Repair; game milestones use cumulative Extend followed by an independent Repair.
 See [the growing game guide](lantern-reach.md) for continuity, checkpoints, and optional extensions.
-Pythonlings advertises 292 exercises.
-These are different units of work; this map establishes subject coverage, not equal exercise volume or proven teaching effectiveness.
 
 Each linked lesson contains an explanation, worked examples, a required exercise, and executable checks.
 The focus column describes what is taught across those lessons; not every API mentioned in prose is independently required by a check.
 
-| Pythonlings topic | Pytuitor lessons | Coverage focus |
+| Python topic | Pytuitor lessons | Coverage focus |
 |---|---|---|
 | variables | [Variables and input](../src/pytuitor/lessons/names-and-voices.md), [Objects and copying](../src/pytuitor/lessons/objects-not-boxes.md) | Assignment, conversion, identity, aliasing, mutability |
 | strings | [Cleaning strings](../src/pytuitor/lessons/clean-labels.md), [Decimal measurements](../src/pytuitor/lessons/decimal-measurements.md) | String methods, normalization, splitting, f-strings and formatting |
@@ -50,8 +49,7 @@ Practical collection operations and ordinary class protocols precede specialized
 One syllabus groups the curriculum into Foundations, Everyday Python, Building programs, Python depth, and Specialized topics.
 The first three sections are recommended, while depth and specialized chapters are optional.
 Descriptors, class hooks, and cooperative inheritance remain available for learners who need language machinery.
-No existing lesson was removed or repurposed, preserving its exercise contract and saved drafts.
-The 21 chapters group related topics, with projects placed after their required preparation.
-Projects combine relevant taught concepts without requiring every chapter to end in a project.
+Each of the 21 chapters ends with a cumulative game milestone.
+Optional standalone projects combine relevant taught concepts and appear after their required preparation.
 See the [curriculum map](curriculum.md) for chapter order and advisory prerequisites.
 The topic map is a maintenance aid; learner studies are required to assess retention and transfer to unfamiliar problems.

@@ -15,6 +15,8 @@ A configured CI workflow is not evidence that its jobs passed, and a built wheel
 - Complete the [learner study](learner-study.md) and resolve observed blockers, or record an explicit waiver and make no measured teaching-effectiveness claim.
 - Preserve existing profiles, drafts, known topics, and completion information during upgrades; legacy path preferences must not hide course content.
 - Confirm reference-solution reveal does not replace a learner's code.
+- Verify all 21 mixed review sessions, including prediction answers, passing references, failing broken starters, independent drafts, and optional suggestions that never block Continue.
+- Verify stage and file positions, selected checks, focused panes, and personal notes survive reopening; changed source or revisions must invalidate saved check evidence.
 
 ## Engineering and terminals
 
