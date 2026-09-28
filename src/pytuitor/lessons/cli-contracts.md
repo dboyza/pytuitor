@@ -1,7 +1,7 @@
 # Define a predictable CLI
 
 A **command-line interface (CLI)** lets someone run a program by typing its name and arguments in a terminal.
-Python's standard-library `argparse` provides positional arguments, options, conversion, and generated help.
+You first used `argparse` in Command-line arguments; this lesson makes its behavior a deliberate contract.
 An argument list passed explicitly is easier to test than code that reads global `sys.argv` everywhere.
 
 ```python
@@ -14,9 +14,8 @@ parser.add_argument("--loud", action="store_true")
 options = parser.parse_args(["Ada", "--repeat", "2"])
 ```
 
-A **positional argument**, such as `name`, is identified by its position.
-An **option** starts with a name such as `--repeat` and may take a value.
-A **flag**, such as `--loud`, is an option whose presence switches something on.
+`name` is a positional argument and `--loud` is a flag.
+An **option** starts with a name such as `--repeat` and may take a value; a flag is an option whose presence switches something on.
 The returned object holds parsed values as attributes such as `options.repeat`.
 Here, `type=int` converts text to an integer and `default=1` supplies a value when the option is absent.
 `store_true` sets a Boolean when the flag appears.

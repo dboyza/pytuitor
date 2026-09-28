@@ -1,7 +1,7 @@
 # Preserve the reason for failure
 
 Custom exceptions give callers a meaningful category to catch.
-A **subclass** inherits behavior from an existing class.
+Recall that a subclass inherits behavior from an existing class.
 `class ConfigurationError(ValueError):` defines a new error class that is also a `ValueError`, so `except ValueError` catches it too.
 Use `pass` for an otherwise empty class body when no additional behavior is needed.
 `raise NewError(...) from error` stores the original error on the new error's `__cause__` attribute.

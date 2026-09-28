@@ -35,7 +35,6 @@ print("red" not in colors)
 ```
 
 This prints `2`, `True`, and `True`.
-`True` and `False` are Boolean values, the results of yes-or-no questions.
 The **membership** operator `in` asks whether a value is present; `not in` asks whether it is absent.
 These operators also work with lists and tuples.
 Sets do not support indexing, because there is no first or last position.

@@ -9,7 +9,8 @@ Python does not enforce them at runtime, so validation still belongs in your cod
 
 ## Test behavior with assertions
 
-An `assert` checks a condition and raises `AssertionError` if it is false:
+As in Writing automated tests, `assert` raises `AssertionError` when its condition is false.
+A plain function can use it as a test:
 
 ```python
 def test_zero():
@@ -22,8 +23,7 @@ Do not use `assert` to validate user input in production code: assertions can be
 
 Use `raise ValueError("message")` when an input has an unacceptable value.
 To test that an error occurs without a testing library, combine `try`, `except`, and `else`.
-The `except` block handles the expected error.
-`pass` means "do nothing".
+The `except` block handles the expected error, and `pass` lets it do nothing else.
 The `else` block runs only when the `try` block raised no error.
 
 ```python

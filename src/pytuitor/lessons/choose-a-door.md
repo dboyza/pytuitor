@@ -41,6 +41,23 @@ The instructions belonging to that branch begin four spaces farther to the right
 This is called **indentation**, and it tells Python which instructions belong together.
 The editor inserts spaces when you press Tab.
 
+## Combine conditions
+
+The **Boolean operators** `and`, `or`, and `not` combine conditions.
+`a and b` is true only when both conditions are true.
+`a or b` is true when at least one condition is true.
+`not a` reverses a condition, so `not True` is `False`.
+
+```python
+age = 15
+has_ticket = True
+
+if age >= 12 and has_ticket:
+    print("Board the train")
+```
+
+Both comparisons are true, so this displays `Board the train`.
+
 ## Practice in the workspace
 
 Use the active exercise panel beside the editor for the current task requirements and cases.

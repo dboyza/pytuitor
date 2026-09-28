@@ -12,7 +12,7 @@ print(repeat_word("ha", times=3))
 
 Multiplying a string by an integer repeats the string that many times.
 The first call returns `"haha"`; the second returns `"hahaha"`.
-`times=3` is a keyword argument: it names the parameter receiving that value.
+`times=3` is a keyword argument, like `start=1` in `enumerate()`: it names the parameter receiving that value.
 Required parameters go before parameters with defaults.
 A variable assigned inside a function is normally **local**: it belongs to that function call.
 An **accumulator** is a variable that keeps a running result, such as a total.

@@ -4,7 +4,6 @@ Input/output, often shortened to **I/O**, includes reading files, displaying out
 A function that controls timing or I/O is easier to test when the operations it relies on are passed as arguments.
 This is **dependency injection**.
 You can pass a real operation in production and a small fake in tests.
-A callable is any object you can call with parentheses.
 A **mock** is a test object that records how it was called and can supply chosen results or errors.
 
 ```python

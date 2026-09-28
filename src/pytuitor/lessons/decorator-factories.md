@@ -24,7 +24,6 @@ def cheer(name):
     return name + "!"
 ```
 
-`*args` collects positional arguments and `**kwargs` collects keyword arguments.
-Using them in a call forwards those arguments.
+As in the previous lesson, `*args` and `**kwargs` collect the call's arguments, and using them in a call forwards those arguments.
 `wraps` preserves metadata and exposes the original function as `__wrapped__`.
 Stacked decorators apply bottom-up: `@outer` above `@inner` means `outer(inner(function))`.

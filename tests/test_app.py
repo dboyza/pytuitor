@@ -27,6 +27,9 @@ async def test_beginner_journey_and_resume(tmp_path):
         await pilot.pause()
         screen = app.screen
         assert isinstance(screen, LessonScreen)
+        # The game is unknown on the first lesson, so its connection explains what it is.
+        connection = str(screen.query_one("#game-connection", Static).content)
+        assert "Lantern Reach, the text adventure you build" in connection
         editor = screen.query_one("#editor", TextArea)
         # Build begins blank; checks explain what the learner still needs to implement.
         await pilot.click("#check")

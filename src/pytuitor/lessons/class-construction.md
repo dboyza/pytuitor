@@ -1,6 +1,6 @@
 # Separate instances, classes, and helpers
 
-A subclass extends another class: `class Child(Parent):` inherits methods from `Parent` unless it replaces them.
+Recall that `class Child(Parent):` creates a subclass that inherits methods from `Parent` unless it replaces them.
 Creating an instance means calling a class to make an object, as in `Coordinate(2, 3)`.
 An ordinary method receives `self`, the instance.
 A `@classmethod` receives `cls`, the class used for the call, making it useful for alternate constructors: named methods that create instances.

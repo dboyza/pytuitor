@@ -185,8 +185,11 @@ class LessonScreen(TutorScreen):
                         connection = GAME_CONNECTIONS.get(self.lesson.id)
                         if connection:
                             yield Static(
-                                "In Lantern Reach: " + connection,
+                                "Your game: each chapter ends by extending Lantern Reach, "
+                                "the text adventure you build across the course. "
+                                "This lesson helps you " + connection[0].lower() + connection[1:],
                                 classes="topic-preview",
+                                id="game-connection",
                             )
                     yield Static(
                         "OPTIONAL: CHECK YOUR UNDERSTANDING",

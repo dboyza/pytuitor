@@ -1,14 +1,15 @@
 ## Iterables and iterators
 
-An **iterable** is something you can loop over, such as a list.
-`iter(values)` gets an **iterator**, which keeps track of the current position.
+Recall that an iterable is something you can loop over, such as a list, and an iterator supplies its items one at a time.
+`iter(values)` gets an iterator, which keeps track of the current position.
 `next(iterator)` returns the next item or raises `StopIteration` when no items remain.
 A `for` loop requests each next item and stops automatically at `StopIteration`.
 These agreed operations form the iterator **protocol**, the behavior an object must provide to act as an iterator.
 
-## Build a list with a comprehension
+## Comprehensions build complete lists
 
-A **list comprehension** combines a loop, an optional condition, and an expression for each result:
+You have used list comprehensions to transform and filter values.
+Here is a short reminder, because generators use the same shape:
 
 ```python
 numbers = [-2, 0, 3, 2]

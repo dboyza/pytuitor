@@ -36,7 +36,7 @@ A long calculation or `time.sleep` blocks the event loop, preventing other tasks
 ## Before entering async work
 
 You should be comfortable with functions, exceptions, and ordinary iteration before this chapter.
-Review Small superpowers, Handle invalid input, and Loop helpers if returning values or propagating an exception is unfamiliar.
+Review Writing functions, Handling invalid input, and Numbering and pairing items if returning values or propagating an exception is unfamiliar.
 Calling an `async def` function creates a coroutine object; it does not immediately return the eventual result.
 `asyncio.run(...)` owns an event loop for a standalone program, while `await` is used inside an already-running coroutine.
 Concurrency means overlapping progress at suspension points; it does not imply simultaneous CPU execution.

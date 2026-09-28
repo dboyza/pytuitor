@@ -41,3 +41,38 @@ async def test_run_does_not_mark_passing_checks():
     assert result.output == "Hello, world!\n13\n"
     assert not result.passed
     assert result.checks == []
+
+
+def _course_order():
+    from pytuitor.course_map import _OUTLINE
+    from pytuitor.curriculum import BY_ID
+
+    return [BY_ID[unit] for chapter in _OUTLINE for unit in chapter[5]]
+
+
+def test_each_bold_term_is_introduced_only_once_in_course_order():
+    import re
+
+    introduced = {}
+    for lesson in _course_order():
+        for term in re.findall(r"\*\*([^*]+)\*\*", lesson.body):
+            key = term.lower().removesuffix("s")
+            assert key not in introduced, (term, introduced.get(key), lesson.id)
+            introduced[key] = lesson.id
+
+
+def test_prose_cites_lessons_by_their_visible_titles():
+    from pytuitor.curriculum import BY_ID
+
+    lessons = _course_order()
+    titles = {lesson.title for lesson in BY_ID.values()}
+    # Single-word IDs such as "comprehensions" are ordinary words, not internal names.
+    internal_names = {
+        lesson.id.replace("-", " ").capitalize() for lesson in lessons if "-" in lesson.id
+    } - titles
+    for lesson in lessons:
+        body = lesson.body
+        for title in sorted(titles, key=len, reverse=True):
+            body = body.replace(title, "")
+        for name in internal_names:
+            assert name not in body, (lesson.id, name)

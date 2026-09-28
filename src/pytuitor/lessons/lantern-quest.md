@@ -6,14 +6,13 @@ A location string can describe where the player is, a number can count collected
 
 ## Returning two values
 
-`return place, coins` returns two values together as a tuple.
-A tuple is an ordered group of values, often written with parentheses: `("forest", 0)`.
+`return place, coins` returns two values together as a tuple, such as `("forest", 0)`.
 The caller can unpack the result into two names or inspect the tuple as a whole.
 
 ## Conditions depend on state
 
 A branch can check both the current location and the command before changing state.
-`and` joins conditions that must both be true.
+Use `and` when both conditions must be true.
 `not collected` is true when `collected` is false.
 A one-time action needs a boolean guard so visiting the same place again does not repeat the reward.
 

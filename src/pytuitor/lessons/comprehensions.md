@@ -11,7 +11,5 @@ lengths = [len(word) for word in ["sun", "a", "moon"] if len(word) > 1]
 
 This produces `[3, 4]`.
 A regular loop is often clearer when each item needs several decisions or actions such as printing or writing a file.
-`sorted(values)` returns a new sorted list, leaving its input unchanged.
-For integers, the default order is smallest first.
-A set, created with `set(values)`, keeps distinct items but has no reliable display order.
-Sorting a set gives a predictable list of distinct values.
+For integers, `sorted(values)` puts the smallest value first.
+Because a set has no reliable display order, sorting a set gives a predictable list of distinct values.

@@ -13,7 +13,7 @@ lengths = list(map(len, ["oak", "willow"]))
 long_names = list(filter(lambda name: len(name) > 3, ["oak", "willow"]))
 ```
 
-An **accumulator** holds the result built so far.
+An accumulator holds the result built so far, like a running total.
 A **fold** repeatedly combines that result with the next item.
 `functools.reduce(combine, items, initial)` performs a left fold.
 Here `combine` is a **callback**, a function passed in for another operation to call.

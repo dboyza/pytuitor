@@ -41,7 +41,7 @@ def announce(fn):
     return wrapper
 ```
 
-The wrapper remembers `fn` from the enclosing function; this is a **closure**.
+The wrapper remembers `fn` from the enclosing function, so it is a closure, as in Callable tools and sorting.
 A scope is the region where a name is available.
 Python looks up names in the current function, then enclosing functions, then the module, and finally its built-in names.
 

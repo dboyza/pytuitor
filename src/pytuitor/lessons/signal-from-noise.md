@@ -20,8 +20,7 @@ Check the number of fields before accessing a message field.
 Normalize a severity field before looking it up in a fixed set of report categories.
 Keep parsing separate from the command-line entry point so callers can provide any iterable of lines.
 
-Python sets `__name__` to `"__main__"` when running a file directly.
-An `if __name__ == "__main__":` guard prevents an imported module from unexpectedly reading standard input or printing output.
+The `if __name__ == "__main__":` guard from Keep imports predictable prevents an imported module from unexpectedly reading standard input or printing output.
 
 In a regular terminal, shell redirection such as `python report.py < app.log` supplies a file as standard input.
 The same standard-library approach can support other line-oriented reports without installing packages.

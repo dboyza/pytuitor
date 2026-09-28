@@ -1,5 +1,5 @@
 ## String methods return changed text
-A method is an operation accessed through a value with a dot.
+Like `.split()` and `.append()`, string methods are operations called through a value with a dot.
 **Whitespace** includes spaces, tabs, and line breaks.
 `"  Sunset  ".strip()` removes whitespace from both ends.
 `"Sunset".lower()` returns `"sunset"`.

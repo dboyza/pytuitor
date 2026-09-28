@@ -17,4 +17,3 @@ with open("stock.csv", newline="", encoding="utf-8") as handle:
 `DictReader` uses the first row as column names and returns one dictionary for each remaining row.
 Every field starts as a string, even when it contains digits.
 `newline=""` lets the CSV module handle line endings correctly.
-`print(a, b)` prints its arguments separated by a space.

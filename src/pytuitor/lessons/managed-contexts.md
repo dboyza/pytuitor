@@ -1,7 +1,7 @@
 # Define the context-manager methods
 
-A **protocol** is a set of operations an object supplies so Python can use it in a particular way.
-The context-manager protocol uses the two methods below.
+Like the iterator protocol, the context-manager protocol is a set of methods Python calls for you.
+It uses the two methods below.
 `with manager as value:` calls `manager.__enter__()` and assigns its result to `value`.
 When the body finishes, Python calls `__exit__(exc_type, exc_value, traceback)`.
 All three arguments are `None` for a normal exit.
@@ -10,7 +10,7 @@ Returning a truthy value suppresses the exception, so the caller does not receiv
 Return `False` or `None` to let the exception propagate, meaning continue back to the caller.
 Cleanup normally should preserve failures.
 
-A class defines a new kind of object, and calling the class constructs an instance.
+As a reminder, a class defines a new kind of object, and calling the class constructs an instance.
 Python then calls `__init__` with that instance as `self` and the supplied constructor arguments.
 Instance methods also receive `self` automatically, so `self.label` stores a value on this particular object for later methods to use.
 

@@ -17,6 +17,6 @@ def read_count(text):
 If conversion succeeds, Python skips the `except` block.
 If it raises `ValueError`, Python runs that block instead.
 Catch the specific exception you expect so unrelated programming mistakes remain visible.
-`None` is a value used to represent the absence of a result.
+Recall that `None` represents the absence of a result.
 It is different from the string `"None"` and the number `0`.
 `result is None` is the conventional way to test for it.

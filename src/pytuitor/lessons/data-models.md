@@ -1,8 +1,6 @@
 # Model a small value object
 
-A class groups state with behavior.
-Methods receive the instance as their first parameter, conventionally named `self`.
-A regular class initializes attributes in `def __init__(self, ...)`.
+As in Your first class, a regular class initializes attributes in `def __init__(self, ...)`, and its methods receive the instance as `self`.
 For records, `dataclasses.dataclass` can generate initialization, equality, and readable text for inspecting an object.
 A **field** is a named piece of stored data, such as `x` or `y` below.
 `@dataclass(...)` applies this behavior to the class written immediately below it, using its annotated fields.

@@ -34,7 +34,7 @@ In `__set_name__`, save a name such as `"_" + name` on the descriptor, then use 
 
 ## Before controlling attribute access
 
-Review Your first class, Practical object protocols, and Separate instances, classes, and helpers before this chapter if instances, properties, or inheritance are unfamiliar.
+Review Your first class, Objects that fit Python, and Factories and abstract interfaces before this chapter if instances, properties, or inheritance are unfamiliar.
 Ordinary instance attributes live in `instance.__dict__`; a class attribute can instead hold a shared object that manages access.
 `getattr(object, name, default)` reads a named attribute with a fallback, and `setattr(object, name, value)` assigns it.
 A descriptor must distinguish the shared manager from each instance's stored value.

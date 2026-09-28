@@ -3,7 +3,7 @@
 A class is itself an object, usually created by `type`.
 A metaclass customizes that creation process.
 A metaclass can enforce rules while classes are created, such as rejecting duplicate registration names.
-For simpler registration, a class decorator or the `__init_subclass__` method taught in the chapter project may be enough.
+For simpler registration, a class decorator or the `__init_subclass__` method covered in this chapter's project may be enough.
 
 ```python
 class NamedMeta(type):

@@ -1,6 +1,7 @@
 ## Read a measurement with a fractional part
 
-A `float` stores a number that can have a fractional part, such as `3.5`.
+In the previous lesson, ordinary `/` division produced a `float`: a number that can have a fractional part, such as `3.5`.
+You can also read a float directly from input.
 `float()` converts a numeric string, so `float("3.5")` gives `3.5`.
 Unlike `int()`, it accepts a decimal point in the input.
 Use ordinary `/` division when the fractional part matters.
@@ -17,10 +18,10 @@ For this lesson, inputs are valid nonnegative measurements, so you do not need t
 
 ## Choose how the result looks
 
-An **f-string** starts with `f` before its opening quote.
-Put an expression inside braces to insert its value into the text.
-A **format specifier** controls how a value looks in text.
-The specifier `:.2f` inside the braces displays a number rounded to two digits after the decimal point.
+You already used f-strings to put a variable's value into a message.
+The braces can hold any expression, not just a variable name, such as `{minutes * 60}`.
+Inside the braces, you can also add a **format specifier** after a colon to control how the value looks in text.
+The specifier `:.2f` displays a number rounded to two digits after the decimal point.
 It adds zeros at the end when needed to show two decimal places.
 
 ```python

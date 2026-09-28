@@ -18,7 +18,6 @@ def count_words(items):
 print(count_words(["tea", ["bread", ["rice"]]]))  # 3
 ```
 
-`count += 1` means `count = count + 1`.
 An empty list contributes zero, so it is a base case without a special `if` statement.
 Each recursive call receives an inner list, moving deeper into a finite structure until there are no children left.
 The nesting structure is sometimes called a tree: each list branches into its items.

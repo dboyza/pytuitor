@@ -15,7 +15,7 @@ print(answer)
 
 `double` is the function's name.
 `number` is a **parameter**, a variable that receives a value when the function is called.
-The value `4` in `double(4)` is called an **argument**.
+The value `4` in `double(4)` is the argument, just like the values you have passed to `print()`.
 The indented line is the function's body.
 
 Defining the function does not run its body.
@@ -26,7 +26,7 @@ Calling `double(4)` runs the body with `number` set to `4`.
 
 `return` gives the caller a value to use.
 `print()` displays something in the console.
-A function that finishes without `return` gives back `None`, Python's value for "no result".
+A function that finishes without `return` gives back `None`, the "no result" value you saw returned by `sort()`.
 
 ```python
 def double(number):

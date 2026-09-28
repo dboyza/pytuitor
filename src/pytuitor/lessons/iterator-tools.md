@@ -21,7 +21,7 @@ Reusing and clearing that same list for the next batch would change the caller's
 
 ## Keep a sliding history
 
-`from collections import deque` imports a double-ended queue.
+The `deque` from Queues with deque can also keep a bounded history.
 `deque(maxlen=2)` keeps at most two values; appending a third automatically discards the oldest.
 For example, after appending `"a"`, `"b"`, and `"c"`, converting the deque to a tuple gives `("b", "c")`.
 A **window** overlaps its predecessor, while a batch starts after the previous batch ends.
