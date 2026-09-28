@@ -1,7 +1,7 @@
 # Release checklist
 
 This checklist describes required evidence, not completed release work.
-A configured CI workflow is not evidence that its jobs passed, and a built wheel is not a published release.
+A listed check is not evidence that it passed, and a built wheel is not a published release.
 
 ## Product and content
 
@@ -32,13 +32,11 @@ uv build
 
 Inspect the wheel to confirm all authored Markdown resources are included.
 Install that wheel into a fresh isolated environment outside the checkout, launch it, and complete an onboarding-to-lesson journey.
-Run Windows, macOS, and Linux CI on the supported Python versions and record the actual job links and outcomes.
-Pushes and pull requests run five combinations: Linux on Python 3.11 and 3.14, macOS on Python 3.14, Windows 2022 on Python 3.11, and Windows 2025 on Python 3.14.
-The full ten-combination matrix runs weekly on Monday at 06:17 UTC and through the manual Checks workflow; run it before a release.
-New pushes and pull-request updates cancel superseded runs for the same event and branch.
+Run the checks locally on Windows, macOS, and Linux with the supported Python versions and record the versions and outcomes actually verified.
+GitHub CI is intentionally disabled; do not create or enable workflows without an explicit user request.
 Verify real terminal control-key behavior in addition to synthetic Textual key events.
 Run the native ConPTY journeys with Windows PowerShell 5.1 and PowerShell 7.
-Hosted Windows Server runners cover the native APIs; before a Windows desktop release, also record a Windows 10/11 Windows Terminal smoke check for installation, display, keyboard input, resizing, and upgrades.
+Before a Windows desktop release, record a Windows 10/11 Windows Terminal smoke check for installation, display, keyboard input, resizing, and upgrades.
 Inspect 80 × 24 and 140 × 44 layouts, including errors, dialogs, multi-file controls, the console, and reference comparison.
 Run the reviewed visual baseline tests without update mode.
 Exercise interrupted execution, EOF, infinite loops, excessive output, cancelled environment creation, failed package installation, and full progress reset.

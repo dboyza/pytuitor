@@ -41,6 +41,7 @@ Save a complete temporary profile, flush and sync it, atomically replace the des
 If directory synchronization fails after replacement, report a durability warning without pretending the committed write was rolled back.
 Preserve migration backups, historical completion, and both stage drafts; a changed exercise revision invalidates only its old checked-pass evidence.
 
-Release requires evidence from the configured Windows/macOS/Linux Python matrix, installed-wheel checks, an upgrade journey, and explicit publication authorization.
-Local validation is not a substitute for a missing Linux job, and a configured workflow is not evidence that it passed.
+Release requires recorded Windows/macOS/Linux verification, installed-wheel checks, an upgrade journey, and explicit publication authorization.
+Verification runs locally; GitHub CI requires an explicit user request.
+Validation on one platform is not evidence that another platform passed.
 Keep branch-push authorization separate from package publication authorization.

@@ -89,6 +89,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Use scratch `--data-dir` profiles; never test against the user's progress.
 - Keep the checkout's Python interpreter in a persistent installation, never a temporary directory; virtual environments depend on that base interpreter remaining intact.
 - Run `uv sync --locked`, `uv run pytest`, `uv run ruff check .`, and `uv run ruff format --check .`.
+- Keep verification local; do not create or enable GitHub CI unless the user explicitly requests it.
 - Give large pytest parameters short explicit IDs; Windows limits the `PYTEST_CURRENT_TEST` environment value.
 - Use Textual Pilot plus real Unix PTY and Windows ConPTY journeys; test Windows PowerShell 5.1/7, Unicode paths, EOF, cancellation, and resizing.
 - Windows support uses Job Objects, byte-range profile locks, and reparse-point-safe reads; do not substitute Unix APIs or require symlink privileges.
