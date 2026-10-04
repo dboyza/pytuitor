@@ -16,7 +16,7 @@ TASKS = [task for tasks in REVIEWS.values() for task in tasks]
 
 def test_every_chapter_has_a_mixed_session():
     assert set(REVIEWS) == {chapter.id for chapter in CHAPTERS}
-    assert len({task.id for task in TASKS}) == 63
+    assert len({task.id for task in TASKS}) == 66
     for tasks in REVIEWS.values():
         assert [task.kind for task in tasks] == ["predict", "debug", "code"]
 

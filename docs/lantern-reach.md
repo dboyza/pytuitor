@@ -3,12 +3,12 @@
 Lantern Reach is an offline text adventure about exploring a valley, helping its residents, and restoring an outpost.
 You write the Python yourself, starting with a few questions and growing it into a persistent, tested game.
 The first three course sections finish a playable core adventure.
-Optional depth adds capabilities such as cave traversal, streaming chronicles, concurrent scouts, packaging, and journal formatters.
+Optional depth adds capabilities such as cave traversal, streaming chronicles, concurrent scouts, packaging, journal formatters, and a ranger station report.
 
 ## Find your game
 
 Choose **Your game** on the dashboard, press **G** there, or search **Your game** in the command palette.
-The overview lists all 21 milestones, their progress, and working checkpoint history.
+The overview lists all 22 milestones, their progress, and working checkpoint history.
 Choose a milestone to see its story and starting-code origin, then open it with Enter or **Open milestone**.
 The syllabus also lists each milestone at the end of its chapter.
 Continue follows the recommended lessons and milestones; optional sections still require an explicit choice.
@@ -66,6 +66,7 @@ The folder includes Python source, instructions, and a provenance manifest.
 Use Python 3.11 or newer to run `python game.py` from that folder.
 The packaging milestone also supports `python -m lantern_reach` and authors installable package metadata.
 Build tooling may require an explicitly requested download; normal source play is offline and requires no third-party runtime packages.
+The optional ranger milestone imports requests only inside its report functions, so the rest of the game still runs without it; its `requirements.txt` lists what `report URL` and the pytest tests need, and installing them needs internet.
 
 A core expedition starts at the outpost.
 Visit the forest and gather wood, return to deliver two pieces to Mira, then restore the beacon.

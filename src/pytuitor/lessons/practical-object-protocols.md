@@ -40,4 +40,5 @@ class Temperature:
 ```
 
 The underscore is a convention for internal storage, not access enforcement.
+A property supports encapsulation: callers keep writing `object.celsius`, while the class checks every assignment before storing it.
 Validate before assigning so rejected updates leave the previous state intact.

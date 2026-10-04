@@ -6,6 +6,7 @@ from pytuitor.content.lantern.authoring import PROJECT_ID
 from pytuitor.content.lantern.core import CORE
 from pytuitor.content.lantern.depth import DEPTH
 from pytuitor.content.lantern.foundations import FOUNDATIONS
+from pytuitor.content.lantern.online import ONLINE
 from pytuitor.content.lantern.specialized import SPECIALIZED
 from pytuitor.course_map import CHAPTER_UNITS
 from pytuitor.models import ProjectDefinition
@@ -15,7 +16,7 @@ MILESTONES = tuple(
         milestone,
         lesson=replace(milestone.lesson, prerequisites=CHAPTER_UNITS[milestone.lesson.chapter_id]),
     )
-    for milestone in (*FOUNDATIONS, *CORE, *DEPTH, *SPECIALIZED)
+    for milestone in (*FOUNDATIONS, *CORE, *DEPTH, *SPECIALIZED, *ONLINE)
 )
 BY_MILESTONE = {milestone.lesson.id: milestone for milestone in MILESTONES}
 BY_CHAPTER = {milestone.lesson.chapter_id: milestone for milestone in MILESTONES}

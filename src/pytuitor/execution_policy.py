@@ -28,6 +28,8 @@ def clean_environment(home: str, *, temporary: bool = False) -> dict[str, str]:
         "HOME": home,
         "PYTHONIOENCODING": "utf-8",
         "PIP_CONFIG_FILE": os.devnull,
+        # Practice servers run locally; never route them through a configured proxy.
+        "NO_PROXY": "127.0.0.1,localhost",
     }
     if os.name == "nt":
         for name in ("SystemRoot", "WINDIR", "COMSPEC", "PATHEXT"):

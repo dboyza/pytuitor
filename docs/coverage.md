@@ -2,7 +2,7 @@
 
 Use this index to find lessons by Python topic.
 For the recommended sequence and advisory prerequisites, see the [curriculum map](curriculum.md).
-Pytuitor has 75 teaching lessons, and 21 cumulative Lantern Reach milestones.
+Pytuitor has 84 teaching lessons and 22 cumulative Lantern Reach milestones.
 Lessons use blank Build followed by Repair; game milestones use cumulative Extend followed by an independent Repair.
 See [the growing game guide](lantern-reach.md) for continuity, checkpoints, and optional extensions.
 
@@ -16,14 +16,14 @@ The focus column describes what is taught across those lessons; not every API me
 | conditionals | [Making decisions](../src/pytuitor/lessons/choose-a-door.md), [Expressions](../src/pytuitor/lessons/python-expressions.md) | Comparisons, branching, truthiness, Boolean expressions |
 | loops | [Lists and loops](../src/pytuitor/lessons/pack-your-bag.md), [Loop helpers](../src/pytuitor/lessons/loop-helpers.md), [Nested lists](../src/pytuitor/lessons/nested-collections.md), [While loops](../src/pytuitor/lessons/repeat-until-done.md) | For/while loops, range, enumerate, zip, nested traversal, stopping conditions |
 | functions | [Writing functions](../src/pytuitor/lessons/small-superpowers.md), [Function options](../src/pytuitor/lessons/function-options.md), [Call contracts](../src/pytuitor/lessons/call-contracts.md) | Parameters, return values, defaults, keyword and positional arguments, debugging |
-| lists | [List positions](../src/pytuitor/lessons/list-positions.md), [Editing collections](../src/pytuitor/lessons/editing-collections.md), [Nested lists](../src/pytuitor/lessons/nested-collections.md) | Indexing, empty lists, insertion/removal, sorting, nested and ragged data |
+| lists | [List positions](../src/pytuitor/lessons/list-positions.md), [Editing collections](../src/pytuitor/lessons/editing-collections.md), [Nested lists](../src/pytuitor/lessons/nested-collections.md), [Summarizing lists](../src/pytuitor/lessons/summary-builtins.md) | Indexing, empty lists, insertion/removal, sorting, nested and ragged data; sum, max, min, any, and all |
 | tuples | [Tuples and sets](../src/pytuitor/lessons/tuples-and-sets.md), [Loop helpers](../src/pytuitor/lessons/loop-helpers.md) | Ordered fixed groups, unpacking, tuple-producing iteration |
-| dictionaries | [Dictionaries and counts](../src/pytuitor/lessons/word-counts.md), [Editing collections](../src/pytuitor/lessons/editing-collections.md) | Key/value access, counting, defaults, deletion, dictionary views |
+| dictionaries | [Dictionaries and counts](../src/pytuitor/lessons/word-counts.md), [Editing collections](../src/pytuitor/lessons/editing-collections.md), [Dictionary pairs](../src/pytuitor/lessons/dictionary-pairs.md) | Key/value access, counting, defaults, deletion, dictionary views; keys, values, and items loops |
 | sets | [Tuples and sets](../src/pytuitor/lessons/tuples-and-sets.md), [Comparing sets](../src/pytuitor/lessons/comparing-sets.md) | Uniqueness, membership, union, intersection, differences, subsets |
 | comprehensions | [Readable comprehensions](../src/pytuitor/lessons/comprehensions.md), [Collection idioms](../src/pytuitor/lessons/collection-idioms.md) | Transformation, filtering, dictionary/set comprehensions, order |
 | exceptions | [Invalid input](../src/pytuitor/lessons/handle-invalid-input.md), [Exceptions with context](../src/pytuitor/lessons/exception-boundaries.md) | Recovery, custom errors, exception chaining, cleanup and propagation |
 | file_io | [Text files](../src/pytuitor/lessons/text-files.md), [CSV tables](../src/pytuitor/lessons/csv-tables.md), [Safe copying](../src/pytuitor/lessons/copy-with-care.md) | Context-managed text files, structured tables, non-overwriting writes |
-| classes | [Your first class](../src/pytuitor/lessons/your-first-class.md), [Object protocols](../src/pytuitor/lessons/practical-object-protocols.md), [Class construction](../src/pytuitor/lessons/class-construction.md) | Instance state, properties, representations, length, equality, operators, factories |
+| classes | [Your first class](../src/pytuitor/lessons/your-first-class.md), [Object protocols](../src/pytuitor/lessons/practical-object-protocols.md), [Class construction](../src/pytuitor/lessons/class-construction.md), [Inheritance and polymorphism](../src/pytuitor/lessons/object-principles.md) | Instance state, properties, representations, length, equality, operators, factories; encapsulation, abstraction, inheritance, overriding, super(), and polymorphism |
 | functional | [Callable tools](../src/pytuitor/lessons/callable-tools.md), [Functional pipelines](../src/pytuitor/lessons/functional-pipelines.md) | Function values, lambdas, sorting keys, partial application, map/filter/reduce |
 | decorators | [Arguments and decorators](../src/pytuitor/lessons/functions-with-memory.md), [Decorator factories](../src/pytuitor/lessons/decorator-factories.md) | Closures, argument forwarding, metadata, configured and stacked decorators |
 | generators | [Iterators and generators](../src/pytuitor/lessons/lazy-by-design.md), [Iterator tools](../src/pytuitor/lessons/iterator-tools.md) | Yield, lazy consumption, iterator exhaustion, independent yielded values |
@@ -31,7 +31,7 @@ The focus column describes what is taught across those lessons; not every API me
 | dataclasses | [Value objects](../src/pytuitor/lessons/data-models.md), [Dataclass lifecycle](../src/pytuitor/lessons/dataclass-lifecycle.md) | Generated methods, value equality, mutable defaults, post-init validation, replacement |
 | type_hints | [Types and tests](../src/pytuitor/lessons/ready-to-ship.md), [Typed contracts](../src/pytuitor/lessons/typed-contracts.md), [Protocols](../src/pytuitor/lessons/structural-typing.md) | Annotations, unions, aliases, generic relationships, structural typing |
 | regex | [Matching patterns](../src/pytuitor/lessons/regex-validation.md), [Extracting and replacing](../src/pytuitor/lessons/regex-transformations.md) | Whole-string matching, groups, character classes, extraction and substitution |
-| testing | [Automated tests](../src/pytuitor/lessons/tests-for-your-code.md), [Types and tests](../src/pytuitor/lessons/ready-to-ship.md), [Test doubles](../src/pytuitor/lessons/test-doubles.md) | Assertions, unittest, boundaries, dependency injection, mocking |
+| testing | [Automated tests](../src/pytuitor/lessons/tests-for-your-code.md), [Types and tests](../src/pytuitor/lessons/ready-to-ship.md), [Test doubles](../src/pytuitor/lessons/test-doubles.md), [Test with pytest](../src/pytuitor/lessons/pytest-basics.md) | Assertions, unittest, boundaries, dependency injection, mocking; pytest discovery, parametrize, raises, and fixtures |
 | recursion | [Base cases](../src/pytuitor/lessons/recursion-basics.md), [Recursive collections](../src/pytuitor/lessons/recursive-collections.md) | Stopping conditions, shrinking inputs, nested traversal and limits |
 | modules | [Your own modules](../src/pytuitor/lessons/your-own-modules.md), [Module boundaries](../src/pytuitor/lessons/module-boundaries.md), [Numeric tools](../src/pytuitor/lessons/numeric-tools.md), [Randomness](../src/pytuitor/lessons/repeatable-randomness.md) | Imports, reusable modules, math/statistics, independent seeded generators |
 | collections | [Counting and grouping](../src/pytuitor/lessons/counting-and-grouping.md), [Queues](../src/pytuitor/lessons/queues-with-deque.md) | Counter, defaultdict, deque, ordering and mutation boundaries |
@@ -42,13 +42,18 @@ The focus column describes what is taught across those lessons; not every API me
 | pathlib | [Paths and folders](../src/pytuitor/lessons/paths-and-folders.md), [Resource paths](../src/pytuitor/lessons/resource-paths.md) | Path composition, file queries, explicit roots, safe automation |
 | oop_advanced | [Class construction](../src/pytuitor/lessons/class-construction.md), [Descriptors](../src/pytuitor/lessons/descriptors.md), [Metaclasses](../src/pytuitor/lessons/metaclasses.md), [Method resolution](../src/pytuitor/lessons/method-resolution.md) | Abstract interfaces, class/static methods, descriptors, class hooks, cooperative inheritance |
 | async | [Coroutines](../src/pytuitor/lessons/coroutine-basics.md), [Task groups](../src/pytuitor/lessons/task-groups.md), [Async streams](../src/pytuitor/lessons/async-streams.md) | Await, resource lifetimes, cancellation, async iteration |
+| pattern_matching | [Match values by their shape](../src/pytuitor/lessons/pattern-matching.md) | match and case with literal, capture, sequence, mapping, and wildcard patterns, guards, and case order |
+| logging | [Logging](../src/pytuitor/lessons/logging-basics.md) | Named loggers, levels, argument formatting, application-only configuration, and exception records |
+| databases | [SQLite records](../src/pytuitor/lessons/sqlite-records.md) | sqlite3 tables, placeholders against SQL injection, transactions, and queries |
+| packages | [Install and inspect packages](../src/pytuitor/lessons/installing-packages.md) | pip, virtual environments, requirements and version specifiers, importlib.metadata; try-it steps need internet |
+| web_apis | [Call a web API with requests](../src/pytuitor/lessons/web-requests.md) | HTTP methods, status codes, JSON APIs, requests with params, json, and timeouts; checks use a local practice server |
 
 ## Curriculum choices
 
 Practical collection operations and ordinary class protocols precede specialized machinery.
-One syllabus groups the curriculum into Foundations, Everyday Python, Building programs, Python depth, and Specialized topics.
-The first three sections are recommended, while depth and specialized chapters are optional.
+One syllabus groups the curriculum into Foundations, Everyday Python, Building programs, Python depth, Specialized topics, and Online and third-party.
+The first three sections are recommended; the other three are optional.
 Descriptors, class hooks, and cooperative inheritance remain available for learners who need language machinery.
-Each of the 21 chapters ends with a cumulative game milestone.
+Each of the 22 chapters ends with a cumulative game milestone.
 See the [curriculum map](curriculum.md) for chapter order and advisory prerequisites.
 The topic map is a maintenance aid; learner studies are required to assess retention and transfer to unfamiliar problems.

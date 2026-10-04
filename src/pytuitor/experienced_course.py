@@ -9,6 +9,7 @@ from pytuitor.content import (
     experienced_delivery,
     experienced_design,
     experienced_internals,
+    experienced_online,
     experienced_semantics,
 )
 from pytuitor.experienced_stages import apply as apply_stage_refresh
@@ -51,6 +52,12 @@ CHAPTERS = (
         "Understand the machinery",
         "Use descriptors and class hooks, and inspect Python execution.",
     ),
+    Chapter(
+        "python-online",
+        "experienced",
+        "Packages, tests, and web APIs",
+        "Install packages, test with pytest, and call web APIs safely.",
+    ),
 )
 
 LESSONS = tuple(
@@ -62,6 +69,7 @@ LESSONS = tuple(
         experienced_concurrency,
         experienced_delivery,
         experienced_internals,
+        experienced_online,
     )
     for lesson in chapter.LESSONS
 )
@@ -74,6 +82,7 @@ EXTRA_CHECKS = {
         experienced_concurrency,
         experienced_delivery,
         experienced_internals,
+        experienced_online,
     )
     for key, checks in chapter.EXTRA_CHECKS.items()
 }

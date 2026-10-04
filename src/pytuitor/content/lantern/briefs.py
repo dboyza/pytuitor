@@ -172,4 +172,13 @@ BRIEFS = {
         "> formatters\nTrail: The beacon shines.",
         "Your game supports discoverable journal formatter extensions.",
     ),
+    "ranger": MilestoneBrief(
+        "The core adventure is complete and the beacon can be lit.",
+        "Send an expedition report to a ranger station's web API, with pytest tests and "
+        "listed requirements.",
+        "Keep every command playable offline; a missing station gives a calm message, "
+        "never a crash.",
+        "> report http://127.0.0.1:8000\nReport filed: #12",
+        "Your game can report to a ranger station and proves it with offline pytest tests.",
+    ),
 }

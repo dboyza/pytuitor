@@ -2,5 +2,6 @@
 
 from pytuitor.content.reviews.core import CORE
 from pytuitor.content.reviews.depth import DEPTH
+from pytuitor.content.reviews.online import ONLINE
 
-REVIEWS = CORE | DEPTH
+REVIEWS = CORE | DEPTH | ONLINE

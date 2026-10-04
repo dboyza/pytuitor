@@ -8,11 +8,13 @@ GAME_CONNECTIONS = {
     "choose-a-door": "Choose a route based on both the player's choice and their supplies.",
     "pack-your-bag": "Keep the pack in order and display every item, including repeated supplies.",
     "list-positions": "Inspect a pack's positions without assuming it contains any items.",
+    "summary-builtins": "Total the pack's supplies and warn when any supply has run out.",
     "tuples-and-sets": "Distinguish the supplies the explorer carries from the kinds they own.",
     "comparing-sets": "Find required expedition equipment that is missing from the pack.",
     "loop-helpers": "Number choices so the player can follow an ordered set of options.",
     "nested-collections": "Traverse grouped expedition supplies without losing empty groups.",
     "word-counts": "Associate each supply name with the amount stored at the outpost.",
+    "dictionary-pairs": "List every stored supply with its amount in a single loop.",
     "editing-collections": "Update the pack when the explorer gathers or spends supplies.",
     "repeat-until-done": "Keep reading game commands until the player decides to leave.",
     "small-superpowers": "Separate reusable game rules from the input-and-print conversation.",
@@ -35,6 +37,9 @@ GAME_CONNECTIONS = {
     "counting-and-grouping": "Combine repeated deliveries into totals for the supply depot.",
     "queues-with-deque": "Serve residents in arrival order while keeping the waiting queue intact.",
     "your-first-class": "Give each expedition its own state and related command operations.",
+    "object-principles": (
+        "Let different kinds of residents answer the same request in their own way."
+    ),
     "named-states": "Name a quest's allowed states instead of scattering arbitrary strings.",
     ("tests-for-your-code"): (
         "Prove a quest cannot award its reward twice or share another game's pack."
@@ -51,6 +56,7 @@ GAME_CONNECTIONS = {
     ("collection-idioms"): (
         "Preserve the order and ownership of expedition records while transforming them."
     ),
+    "pattern-matching": "Recognize each command's shape, such as take followed by any items.",
     "recursion-basics": "Explore a cave branch by solving the same problem for a smaller branch.",
     ("recursive-collections"): (
         "Visit every named location in a nested cave map, including empty branches."
@@ -72,6 +78,7 @@ GAME_CONNECTIONS = {
     ("exception-boundaries"): (
         "Report a station-specific failure while retaining the underlying cause."
     ),
+    "logging-basics": "Keep a maintainer's log of skipped commands without cluttering the story.",
     ("context-practice"): (
         "Restore the explorer's previous location even when a temporary visit fails."
     ),
@@ -83,6 +90,7 @@ GAME_CONNECTIONS = {
     ("dataclass-lifecycle"): (
         "Give each record independent notes and validate every updated instance."
     ),
+    "sqlite-records": "Keep the outpost's supply ledger in a database that survives restarts.",
     "typed-contracts": "Describe the alternatives accepted by an expedition API precisely.",
     ("practical-object-protocols"): (
         "Make a supply store work naturally with len, iteration, and properties."
@@ -110,4 +118,7 @@ GAME_CONNECTIONS = {
         "Let a formatter mixin cooperate with classes added later in the method order."
     ),
     "runtime-inspection": "Describe a formatter's accepted arguments without running it.",
+    "installing-packages": "List the packages a shared copy of your game needs to run.",
+    "pytest-basics": "Prove the ranger report with pytest, without contacting a real station.",
+    "web-requests": "File an expedition report with a ranger station's web API.",
 }

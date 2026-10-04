@@ -416,6 +416,127 @@ LESSONS = (
             ),
         ],
     ),
+    unit(
+        "sqlite-records",
+        "python-design",
+        "Store records in SQLite",
+        "sqlite3 databases",
+        """
+        import sqlite3
+
+
+        def open_store(path):
+            connection = sqlite3.connect(path)
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS supplies "
+                "(name TEXT PRIMARY KEY, amount INTEGER NOT NULL)"
+            )
+            return connection
+
+
+        def add_supply(connection, name, amount):
+            if amount < 0:
+                raise ValueError("Amount cannot be negative")
+            try:
+                with connection:
+                    connection.execute("INSERT INTO supplies VALUES (?, ?)", (name, amount))
+            except sqlite3.IntegrityError as error:
+                raise ValueError(f"{name} is already stored") from error
+
+
+        def supply_amount(connection, name):
+            row = connection.execute(
+                "SELECT amount FROM supplies WHERE name = ?", (name,)
+            ).fetchone()
+            return None if row is None else row[0]
+
+
+        def low_supplies(connection, limit):
+            rows = connection.execute(
+                "SELECT name FROM supplies WHERE amount < ? ORDER BY name", (limit,)
+            ).fetchall()
+            return [name for (name,) in rows]
+        """,
+        [
+            probe(
+                "Add and read back, including apostrophes",
+                """
+                store = open_store(":memory:")
+                add_supply(store, "rope", 3)
+                add_supply(store, "O'Brien lamp", 1)
+                __probe_result__ = [
+                    supply_amount(store, "rope"),
+                    supply_amount(store, "O'Brien lamp"),
+                    supply_amount(store, "map"),
+                ]
+                """,
+                [3, 1, None],
+                "Add rope 3 and O'Brien lamp 1 to a new in-memory store, then read rope, "
+                "O'Brien lamp, and the missing map",
+                "Use ? placeholders so quotes inside a name are ordinary data.",
+            ),
+            probe(
+                "Low supplies are sorted by name",
+                """
+                store = open_store(":memory:")
+                for name, amount in [("zeta", 1), ("apple", 2), ("mid", 9), ("edge", 3)]:
+                    add_supply(store, name, amount)
+                __probe_result__ = [low_supplies(store, 3), low_supplies(store, 0)]
+                """,
+                [["apple", "zeta"], []],
+                "Store zeta 1, apple 2, mid 9, and edge 3, then ask for supplies below 3 and "
+                "below 0",
+                "Filter with amount < ? and sort with ORDER BY name.",
+            ),
+            probe(
+                "Duplicates and negative amounts are rejected",
+                """
+                store = open_store(":memory:")
+                add_supply(store, "rope", 3)
+                __probe_result__ = [
+                    __raises_value_error__(lambda name: add_supply(store, name, 8), "rope"),
+                    __raises_value_error__(lambda amount: add_supply(store, "map", amount), -1),
+                    supply_amount(store, "rope"),
+                    supply_amount(store, "map"),
+                ]
+                """,
+                [True, True, 3, None],
+                "Add rope 3, then try adding rope 8 and map -1",
+                "Translate sqlite3.IntegrityError into ValueError; check the amount before "
+                "inserting.",
+            ),
+            probe(
+                "Saved changes survive reopening the file",
+                """
+                first = open_store("store.db")
+                add_supply(first, "rope", 3)
+                first.close()
+                second = open_store("store.db")
+                __probe_result__ = supply_amount(second, "rope")
+                second.close()
+                """,
+                3,
+                "Add rope 3 to store.db, close it, open store.db again, and read rope",
+                "Commit each insert, for example with a with connection: block.",
+            ),
+            probe(
+                "SQL-shaped text is only data",
+                """
+                store = open_store(":memory:")
+                name = "x'); DROP TABLE supplies; --"
+                add_supply(store, name, 1)
+                __probe_result__ = [supply_amount(store, name), low_supplies(store, 5)]
+                """,
+                [1, ["x'); DROP TABLE supplies; --"]],
+                "Store a name that looks like SQL, then read it back and list low supplies",
+                "Placeholders keep values out of the SQL text, so nothing in a name runs.",
+            ),
+        ],
+        [
+            "Create the table with CREATE TABLE IF NOT EXISTS inside open_store.",
+            "Use ? placeholders for every value and with connection: to commit each insert.",
+        ],
+    ),
 )
 
 BUILD_INSTRUCTIONS = {
@@ -511,6 +632,21 @@ BUILD_INSTRUCTIONS = {
         "The tutor checks with fakes, so you do not need real sleeping or network a"
         "ccess.\n"
     ).strip(),
+    "sqlite-records": (
+        "Write four functions that keep supplies in an SQLite database.\n\n"
+        '- `open_store(path)` connects to `path`, which may be a file name or `":memory:"`, '
+        "creates a table named `supplies` with a unique text column `name` and a required "
+        "integer column `amount` if it does not already exist, and returns the connection.\n"
+        "- `add_supply(connection, name, amount)` stores a new supply and commits it. Raise "
+        "`ValueError` for a negative amount or a name that is already stored, leaving the "
+        "existing row unchanged.\n"
+        "- `supply_amount(connection, name)` returns the stored amount, or `None` when the "
+        "name is not stored.\n"
+        "- `low_supplies(connection, limit)` returns the names whose amount is below `limit`, "
+        "sorted by name.\n\n"
+        "Names may contain any text, including quotes. Use `?` placeholders for every value; "
+        "never build SQL text from a value."
+    ),
 }
 
 REPAIR_STAGES = {
@@ -1220,6 +1356,92 @@ REPAIR_STAGES = {
             "Catch only ConnectionError.",
             "The fallback is a callable and should run only after the intended failure.",
         ],
+    ),
+    "sqlite-records": _repair(
+        "Repair the visit log.\n\n"
+        "The `visits` table already exists with text columns `visitor` and `place`.\n\n"
+        "- `record_visit(connection, visitor, place)` saves one row permanently, so it is "
+        "still there after the connection closes. Visitor and place may contain any text, "
+        "including apostrophes.\n"
+        "- `visits_to(connection, place)` returns the visitors recorded for that place, "
+        "sorted by name, or `[]` when there are none.\n\n"
+        "Never insert values into the SQL text itself.",
+        """
+        def record_visit(connection, visitor, place):
+            with connection:
+                connection.execute(
+                    "INSERT INTO visits (visitor, place) VALUES (?, ?)", (visitor, place)
+                )
+
+
+        def visits_to(connection, place):
+            rows = connection.execute(
+                "SELECT visitor FROM visits WHERE place = ? ORDER BY visitor", (place,)
+            ).fetchall()
+            return [visitor for (visitor,) in rows]
+        """,
+        """
+        def record_visit(connection, visitor, place):
+            connection.execute(
+                f"INSERT INTO visits (visitor, place) VALUES ('{visitor}', '{place}')"
+            )
+
+
+        def visits_to(connection, place):
+            rows = connection.execute(
+                f"SELECT visitor FROM visits WHERE place = '{place}' ORDER BY visitor"
+            ).fetchall()
+            return [visitor for (visitor,) in rows]
+        """,
+        [
+            _probe(
+                "A visit is still saved after closing",
+                """
+                import sqlite3
+
+                first = sqlite3.connect("visits.db")
+                first.execute("CREATE TABLE visits (visitor TEXT, place TEXT)")
+                record_visit(first, "Ada", "ridge")
+                first.close()
+                second = sqlite3.connect("visits.db")
+                result = visits_to(second, "ridge")
+                second.close()
+                """,
+                ["Ada"],
+                "A change is permanent only after the transaction is committed.",
+            ),
+            _probe(
+                "Apostrophes are ordinary text",
+                """
+                import sqlite3
+
+                store = sqlite3.connect(":memory:")
+                store.execute("CREATE TABLE visits (visitor TEXT, place TEXT)")
+                record_visit(store, "O'Neil", "Kim's camp")
+                result = visits_to(store, "Kim's camp")
+                """,
+                ["O'Neil"],
+                "A quote inside an f-string ends the SQL text early; pass values with ? instead.",
+            ),
+            _probe(
+                "Visitors are sorted and filtered by place",
+                """
+                import sqlite3
+
+                store = sqlite3.connect(":memory:")
+                store.execute("CREATE TABLE visits (visitor TEXT, place TEXT)")
+                for visitor, place in [("Mo", "cave"), ("Al", "cave"), ("Zed", "ridge")]:
+                    record_visit(store, visitor, place)
+                result = [visits_to(store, "cave"), visits_to(store, "lake")]
+                """,
+                [["Al", "Mo"], []],
+                "Filter by place with a placeholder and sort with ORDER BY.",
+            ),
+        ],
+        (
+            "Try a visitor named O'Neil and read the error.",
+            "Close the connection, reopen it, and check whether the earlier visit is still there.",
+        ),
     ),
 }
 

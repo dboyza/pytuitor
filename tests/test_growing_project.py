@@ -61,9 +61,9 @@ async def test_every_game_contract_and_independent_repair(milestone):
 
 
 def test_recommended_path_and_independent_specialties():
-    assert len(LESSONS) == 75 and not any(lesson.project for lesson in LESSONS)
-    assert len(ACTIVITIES) == 96 and len(MILESTONES) == len(CHAPTERS) == 21
-    assert len({item.lesson.id for item in MILESTONES}) == 21
+    assert len(LESSONS) == 84 and not any(lesson.project for lesson in LESSONS)
+    assert len(ACTIVITIES) == 106 and len(MILESTONES) == len(CHAPTERS) == 22
+    assert len({item.lesson.id for item in MILESTONES}) == 22
     for chapter in CHAPTERS:
         units = chapter_activities(chapter.id)
         assert units[-1].project_id == "lantern-reach"
@@ -333,7 +333,7 @@ async def test_complete_cumulative_game_keeps_all_optional_features_and_exports(
         previous = await checked_snapshot(workspace, milestone, files=files)
         assert workspace.read_checkpoint(previous["id"])["files"] == files
     payload = workspace.read_checkpoint(previous["id"])
-    assert len(payload["capabilities"]) == 21
+    assert len(payload["capabilities"]) == 22
     destination = workspace.export_checkpoint(previous["id"], tmp_path / "complete-game")
     commands = (
         "help\nhelp oren\nforest\ngather\ngather\ngather\ngather\ngather\n"
@@ -363,6 +363,12 @@ async def test_complete_cumulative_game_keeps_all_optional_features_and_exports(
     ):
         assert expected in result.stdout, (expected, result.stdout)
     store.close()
+
+
+def test_every_milestone_has_an_implementation_brief():
+    from pytuitor.content.lantern.briefs import BRIEFS
+
+    assert {item.lesson.id.removeprefix("reach-") for item in MILESTONES} == set(BRIEFS)
 
 
 def test_every_teaching_lesson_has_a_specific_game_connection():

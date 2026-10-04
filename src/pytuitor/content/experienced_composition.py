@@ -12,6 +12,35 @@ from pytuitor.experienced_authoring import (
     unit,
 )
 
+
+def _log_script(logger, call, result, *, traceback=False):
+    """Collect one named logger's records during call, and whether the root was configured."""
+    extra = ", record.exc_info is not None" if traceback else ""
+    return f"""
+        import logging
+
+        records = []
+
+
+        class Collect(logging.Handler):
+            def emit(self, record):
+                records.append([record.levelname, record.getMessage(){extra}])
+
+
+        handler = Collect()
+        target = logging.getLogger({logger!r})
+        target.addHandler(handler)
+        target.setLevel(logging.DEBUG)
+        root_before = list(logging.getLogger().handlers)
+        try:
+            value = {call}
+        finally:
+            target.removeHandler(handler)
+        configured = bool(root_before) or list(logging.getLogger().handlers) != root_before
+        {result} = [value, records, configured]
+    """
+
+
 LESSONS = (
     unit(
         "callable-tools",
@@ -514,6 +543,73 @@ LESSONS = (
             ),
         ],
     ),
+    unit(
+        "logging-basics",
+        "python-composition",
+        "Record what happened with logging",
+        "logging",
+        """
+        import logging
+
+        logger = logging.getLogger("inventory")
+
+
+        def load_counts(lines):
+            counts = {}
+            for number, line in enumerate(lines, start=1):
+                if not line.strip():
+                    continue
+                name, _, amount = line.partition(",")
+                try:
+                    counts[name.strip()] = int(amount)
+                except ValueError:
+                    logger.warning("Skipping line %d: bad count %r", number, amount.strip())
+            logger.info("Loaded %d items", len(counts))
+            return counts
+        """,
+        [
+            probe(
+                "Warn about a bad line and report the total",
+                _log_script(
+                    "inventory",
+                    'load_counts(["rope,3", "lamp, many", "", "map,1"])',
+                    "__probe_result__",
+                ),
+                [
+                    {"rope": 3, "map": 1},
+                    [["WARNING", "Skipping line 2: bad count 'many'"], ["INFO", "Loaded 2 items"]],
+                    False,
+                ],
+                "load_counts(['rope,3', 'lamp, many', '', 'map,1']), collecting the inventory "
+                "logger's records",
+                "Use the inventory logger with %d and %r arguments; never configure logging.",
+            ),
+            probe(
+                "A missing comma is a bad count",
+                _log_script("inventory", 'load_counts(["rope"])', "__probe_result__"),
+                [
+                    {},
+                    [["WARNING", "Skipping line 1: bad count ''"], ["INFO", "Loaded 0 items"]],
+                    False,
+                ],
+                "load_counts(['rope']), collecting the inventory logger's records",
+                "Without a comma the count text is empty, which int() rejects.",
+            ),
+            probe(
+                "Nothing to load",
+                _log_script("inventory", "load_counts([])", "__probe_result__"),
+                [{}, [["INFO", "Loaded 0 items"]], False],
+                "load_counts([]), collecting the inventory logger's records",
+                "Log the INFO summary even when there are no lines.",
+            ),
+            check("Logging is not printing", "(load_counts(['tea,2']), __stdout__)[1]", ""),
+        ],
+        [
+            "Create logger = logging.getLogger('inventory') once, at module level.",
+            "Inside except ValueError, call logger.warning with the line number and the "
+            "stripped count text as arguments.",
+        ],
+    ),
 )
 
 BUILD_INSTRUCTIONS = {
@@ -631,6 +727,22 @@ BUILD_INSTRUCTIONS = {
         "ists must remain usable after the outer iterator advances.\nDo not print o"
         "r read input.\n"
     ).strip(),
+    "logging-basics": (
+        "Write `load_counts(lines)`, a reusable function that reads lines such as "
+        "`rope,3` and returns a dictionary such as `{'rope': 3}`.\n\n"
+        "- Use the text before the first comma as the name, with surrounding spaces removed, "
+        "and the text after it as a whole-number count. A later line with the same name "
+        "replaces the earlier count.\n"
+        "- Skip blank lines silently.\n"
+        "- For a count that `int()` rejects, including a missing comma, skip the line and log "
+        "a WARNING with exactly `Skipping line N: bad count 'TEXT'`. `N` counts lines from 1, "
+        "including blank ones. `'TEXT'` is the representation (`%r`) of the count text with "
+        "surrounding spaces removed.\n"
+        "- After the last line, log INFO `Loaded K items`, where `K` is the number of names "
+        "returned.\n\n"
+        "Send every record through the logger named `inventory`. This is library code: do not "
+        "print, call `logging.basicConfig`, or add handlers."
+    ),
 }
 
 REPAIR_STAGES = {
@@ -1478,6 +1590,74 @@ REPAIR_STAGES = {
             "groupby gives each adjacent run a separate group iterator.",
             "Consume each group to count it before advancing.",
         ],
+    ),
+    "logging-basics": _repair(
+        "Repair `settle(amounts)` in this reusable payments module.\n\n"
+        "`amounts` is a list of strings. Add each whole number to a running total. For an "
+        "amount that `int()` rejects, log at ERROR level with the exception attached, using "
+        "the message `Payment N failed`, where `N` counts from 1.\n\n"
+        "After processing every amount, log INFO `Total: T` and return the total.\n\n"
+        "Send every record through the logger named `payments`, and do not configure logging "
+        "in this module.",
+        """
+        import logging
+
+        logger = logging.getLogger("payments")
+
+
+        def settle(amounts):
+            total = 0
+            for index, amount in enumerate(amounts, start=1):
+                try:
+                    total += int(amount)
+                except ValueError:
+                    logger.exception("Payment %d failed", index)
+            logger.info("Total: %d", total)
+            return total
+        """,
+        """
+        import logging
+
+
+        def settle(amounts):
+            logging.basicConfig(level=logging.DEBUG)
+            total = 0
+            for index, amount in enumerate(amounts, start=1):
+                try:
+                    total += int(amount)
+                except ValueError:
+                    pass
+                else:
+                    continue
+                logging.error("Payment %d failed", index)
+            logging.info("Total: %d", total)
+            return total
+        """,
+        [
+            _probe(
+                "A failed payment keeps its traceback",
+                _log_script("payments", 'settle(["5", "x", "7"])', "result", traceback=True),
+                [12, [["ERROR", "Payment 2 failed", True], ["INFO", "Total: 12", False]], False],
+                "Log through logging.getLogger('payments') and use its exception method inside "
+                "except.",
+            ),
+            _probe(
+                "Valid payments only",
+                _log_script("payments", 'settle(["1", "2"])', "result", traceback=True),
+                [3, [["INFO", "Total: 3", False]], False],
+                "A reusable module must not call basicConfig; the application configures logging.",
+            ),
+            _probe(
+                "No payments",
+                _log_script("payments", "settle([])", "result", traceback=True),
+                [0, [["INFO", "Total: 0", False]], False],
+                "Log the total through the payments logger even when nothing was paid.",
+            ),
+        ],
+        (
+            "Compare logging.error(...) with a named logger's exception method.",
+            "Find the line that configures logging and ask who should own that choice.",
+        ),
     ),
 }
 

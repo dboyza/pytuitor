@@ -26,6 +26,13 @@ SECTIONS = (
         "Choose async, distribution, or language machinery when you need it.",
         True,
     ),
+    Section(
+        "online-python",
+        "Online and third-party",
+        "Install packages, test with pytest, and call web APIs. Exercises and checks run "
+        "offline; the try-it steps in your own terminal need internet.",
+        True,
+    ),
 )
 
 # Each entry is (chapter ID, section ID, title, outcome, prerequisite chapter IDs, units).
@@ -51,7 +58,13 @@ _OUTLINE = (
         "Lists and sets",
         "Process ordered items and compare unique values.",
         ("first-programs",),
-        ("pack-your-bag", "list-positions", "tuples-and-sets", "comparing-sets"),
+        (
+            "pack-your-bag",
+            "list-positions",
+            "summary-builtins",
+            "tuples-and-sets",
+            "comparing-sets",
+        ),
     ),
     (
         "loops-and-dictionaries",
@@ -63,6 +76,7 @@ _OUTLINE = (
             "loop-helpers",
             "nested-collections",
             "word-counts",
+            "dictionary-pairs",
             "editing-collections",
             "repeat-until-done",
         ),
@@ -126,7 +140,7 @@ _OUTLINE = (
         "Classes and tested tools",
         "Model state, name choices, and verify behavior with tests.",
         ("modules-and-library-tools",),
-        ("your-first-class", "named-states", "tests-for-your-code"),
+        ("your-first-class", "object-principles", "named-states", "tests-for-your-code"),
     ),
     (
         "careful-automation",
@@ -140,13 +154,14 @@ _OUTLINE = (
         "python-semantics",
         "python-depth",
         "Python semantics",
-        "Understand truthiness, copying, arguments, and collection idioms.",
+        "Understand truthiness, copying, arguments, collection idioms, and pattern matching.",
         ("functions-and-input", "collection-tools"),
         (
             "python-expressions",
             "objects-not-boxes",
             "call-contracts",
             "collection-idioms",
+            "pattern-matching",
         ),
     ),
     (
@@ -182,17 +197,17 @@ _OUTLINE = (
         "exceptions-and-contexts",
         "python-depth",
         "Exceptions and contexts",
-        "Preserve errors and restore resources reliably.",
+        "Preserve errors, log what happened, and restore resources reliably.",
         ("classes-and-tested-tools", "decorators", "iterators-and-streaming"),
-        ("exception-boundaries", "context-practice", "managed-contexts"),
+        ("exception-boundaries", "logging-basics", "context-practice", "managed-contexts"),
     ),
     (
         "dataclasses-and-types",
         "python-depth",
-        "Dataclasses and types",
-        "Express and test value objects and their lifecycle.",
+        "Dataclasses, types, and storage",
+        "Express and test value objects, then store records in a database.",
         ("classes-and-tested-tools", "python-semantics"),
-        ("ready-to-ship", "data-models", "dataclass-lifecycle"),
+        ("ready-to-ship", "data-models", "dataclass-lifecycle", "sqlite-records"),
     ),
     (
         "object-protocols-and-testing",
@@ -236,6 +251,14 @@ _OUTLINE = (
         "Use descriptors, class hooks, inheritance, and introspection.",
         ("object-protocols-and-testing",),
         ("descriptors", "metaclasses", "method-resolution", "runtime-inspection"),
+    ),
+    (
+        "packages-and-web",
+        "online-python",
+        "Packages, tests, and web APIs",
+        "Install third-party packages, test with pytest, and call web APIs safely.",
+        ("classes-and-tested-tools", "files-and-data"),
+        ("installing-packages", "pytest-basics", "web-requests"),
     ),
 )
 

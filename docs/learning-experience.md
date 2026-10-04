@@ -54,7 +54,7 @@ No task is completed by reading a reference or using a hint.
 ## Optional mixed review
 
 Open **Review** on the dashboard, press **R** there, or search for **Optional review** in the command palette.
-Each of the 21 chapters has three authored tasks: predict output, repair a short program, and write a small program.
+Each of the 22 chapters has three authored tasks: predict output, repair a short program, and write a small program.
 All chapters are available, with preparation shown as advisory.
 Review drafts, choices, assistance, and the current task persist independently of the course resume point.
 Hints and read-only references do not replace drafts.

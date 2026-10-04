@@ -10,7 +10,7 @@ from pytuitor.runner import execute
 
 
 def test_beginner_course_has_six_coherent_chapters():
-    assert len(LESSONS) == 40
+    assert len(LESSONS) == 43
     assert not any(lesson.project for lesson in LESSONS)
     seen = set()
     for lesson in LESSONS:

@@ -16,7 +16,7 @@ OWNED = tuple(lesson for lesson in LESSONS if lesson.id not in EXCLUDED)
 
 
 def test_refresh_covers_exact_owned_units_with_explicit_stage_contracts():
-    assert len(OWNED) == 35
+    assert len(OWNED) == 38
     assert set(BUILD_INSTRUCTIONS) == set(REPAIR_STAGES) == {lesson.id for lesson in OWNED}
     for lesson in OWNED:
         build = lesson.stage_contract("build")

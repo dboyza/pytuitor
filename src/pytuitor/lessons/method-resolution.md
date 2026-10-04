@@ -2,6 +2,7 @@
 
 The **method resolution order (MRO)** is the sequence of classes Python searches to find an attribute or method.
 `Class.__mro__` contains that sequence as a tuple.
+Recall that inheritance creates a subclass from a parent class.
 **Multiple inheritance** means a class has more than one parent, written as `class Combined(First, Second):`.
 It includes each class once in an order compatible with the declared bases.
 `super()` continues lookup after the current class in the actual instance's MRO.

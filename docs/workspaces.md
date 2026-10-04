@@ -35,7 +35,7 @@ Only run code you trust.
 
 ## Working outside the tutor
 
-Every authored lesson needs only the standard library, so the tutor does not create environments or install packages.
+Authored lessons need only the standard library plus the included requests and pytest packages, so the tutor does not create environments or install packages.
 Export a project to a new folder when you want to continue in your own terminal or editor.
 Create a new environment there and install only the dependencies the project actually uses.
 Keep dependency declarations in a project file and record versions for reproducibility.

@@ -7,7 +7,7 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.events import Resize
 from textual.widgets import Button, Collapsible, Footer, Static
 
-from pytuitor.curriculum import BY_ID, CHAPTERS, SECTIONS, chapter_activities
+from pytuitor.curriculum import BY_ID, CHAPTERS, LESSONS, SECTIONS, chapter_activities
 from pytuitor.ui import TutorScreen, brand
 
 
@@ -23,7 +23,8 @@ class Syllabus(TutorScreen):
                     yield Button("Back", id="syllabus-back")
                 with VerticalScroll(id="syllabus-scroll"):
                     yield Static(
-                        f"{len(CHAPTERS)} chapters · 75 lessons · 21 game milestones\n"
+                        f"{len(CHAPTERS)} chapters · {len(LESSONS)} lessons · "
+                        f"{len(CHAPTERS)} game milestones\n"
                         "Lessons: Build + Repair. Game: Extend + Repair.",
                         id="syllabus-summary",
                         classes="muted",

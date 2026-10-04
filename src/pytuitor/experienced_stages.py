@@ -8,6 +8,7 @@ from pytuitor.content import (
     experienced_delivery,
     experienced_design,
     experienced_internals,
+    experienced_online,
     experienced_semantics,
 )
 from pytuitor.models import Lesson, StageContract
@@ -19,6 +20,7 @@ CHAPTER_CONTENT = (
     experienced_concurrency,
     experienced_delivery,
     experienced_internals,
+    experienced_online,
 )
 BUILD_INSTRUCTIONS = {
     key: value for chapter in CHAPTER_CONTENT for key, value in chapter.BUILD_INSTRUCTIONS.items()
@@ -32,6 +34,10 @@ FEEDBACK = {
     "python-expressions": (
         "A missing value, blank text, and the string 0 are different inputs; choose the "
         "fallback after trimming only text."
+    ),
+    "pattern-matching": (
+        "The first matching case wins. Put specific shapes before general ones, and use a "
+        "guard when the shape alone cannot decide."
     ),
     "objects-not-boxes": (
         "A new outer dictionary still shares nested containers. Check which object "
@@ -65,6 +71,10 @@ FEEDBACK = {
         "Creating an iterator must not exhaust its source. Read only enough input to "
         "supply the next requested value."
     ),
+    "logging-basics": (
+        "Use the named logger with arguments rather than an f-string, keep exact messages, "
+        "and leave logging configuration to the application."
+    ),
     "exception-boundaries": (
         "Translate only the intended conversion error, chain its cause, and close the "
         "stream on every exit."
@@ -92,6 +102,10 @@ FEEDBACK = {
     "ready-to-ship": (
         "A test that passes on your implementation may still be ineffective. Check zero, "
         "invalid input, and a deliberately incorrect implementation."
+    ),
+    "sqlite-records": (
+        "Pass every value through ? placeholders and commit each change; a closed connection "
+        "loses anything left uncommitted."
     ),
     "data-models": (
         "A frozen value is replaced by a new instance; restocking must not mutate the original."
@@ -163,6 +177,18 @@ FEEDBACK = {
     "method-resolution": (
         "super follows the actual instance MRO, not a fixed parent. Each cooperating "
         "method contributes once."
+    ),
+    "installing-packages": (
+        "Ask importlib.metadata about the distribution name; importing can fail for an "
+        "installed package whose import name differs."
+    ),
+    "pytest-basics": (
+        "Tests are useful only when they fail for broken code. Cover the rounding case, both "
+        "percent boundaries, and the promised ValueError."
+    ),
+    "web-requests": (
+        "A 404 or 500 reply is still a response. Handle 404 first, raise for other errors, "
+        "send values through params or json=, and always set a timeout."
     ),
     "runtime-inspection": (
         "Read signature parameters, not local variable names; inspection must never "

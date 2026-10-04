@@ -18,12 +18,12 @@ from pytuitor.runner import execute
 
 
 def test_catalog_has_complete_chapters_and_ordered_prerequisites():
-    assert len(LESSONS) == len({lesson.id for lesson in LESSONS}) == 75
+    assert len(LESSONS) == len({lesson.id for lesson in LESSONS}) == 84
     assert not any(lesson.project for lesson in LESSONS)
-    assert Counter(lesson.track for lesson in LESSONS) == {"beginner": 40, "experienced": 35}
-    assert len(CHAPTERS) == 21
-    assert len(SECTIONS) == 5
-    assert [section.optional for section in SECTIONS] == [False, False, False, True, True]
+    assert Counter(lesson.track for lesson in LESSONS) == {"beginner": 43, "experienced": 41}
+    assert len(CHAPTERS) == 22
+    assert len(SECTIONS) == 6
+    assert [section.optional for section in SECTIONS] == [False, False, False, True, True, True]
     seen = set()
     for lesson in LESSONS:
         assert set(lesson.prerequisites) <= seen, lesson.id

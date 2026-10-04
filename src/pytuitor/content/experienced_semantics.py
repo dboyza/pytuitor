@@ -94,6 +94,64 @@ LESSONS = (
             "setdefault(key, []) returns the existing list or inserts a new one.",
         ],
     ),
+    unit(
+        "pattern-matching",
+        "python-semantics",
+        "Match values by their shape",
+        "match & case patterns",
+        """
+        def handle(command):
+            match command:
+                case []:
+                    return "Say something"
+                case ["look"]:
+                    return "You look around"
+                case ["go", direction] if direction in ("north", "south", "east", "west"):
+                    return f"You go {direction}"
+                case ["go", _]:
+                    return "You can't go that way"
+                case ["take"]:
+                    return "Take what?"
+                case ["take", *items]:
+                    return "Taken: " + ", ".join(items)
+                case ["quit" | "exit"]:
+                    return "Goodbye"
+                case _:
+                    return "Unknown command"
+        """,
+        [
+            check("No words", "handle([])", "Say something"),
+            check("Look", "handle(['look'])", "You look around"),
+            check(
+                "Known and unknown directions",
+                "[handle(['go', 'north']), handle(['go', 'up'])]",
+                ["You go north", "You can't go that way"],
+            ),
+            check(
+                "Take nothing, one item, or several",
+                "[handle(['take']), handle(['take', 'rope']), handle(['take', 'rope', 'lamp'])]",
+                ["Take what?", "Taken: rope", "Taken: rope, lamp"],
+            ),
+            check("Two ways to leave", "[handle(['quit']), handle(['exit'])]", ["Goodbye"] * 2),
+            check(
+                "Everything else is unknown",
+                "[handle(['go']), handle(['look', 'up']), handle(['dance']), "
+                "handle(['go', 'north', 'now'])]",
+                ["Unknown command"] * 4,
+            ),
+            check("A tuple has the same shape", "handle(('go', 'east'))", "You go east"),
+            check(
+                "The command is not changed",
+                "(lambda words: (handle(words), words)[1])(['take', 'rope'])",
+                ["take", "rope"],
+            ),
+        ],
+        [
+            "Write one case per command shape, from the most specific to the most general.",
+            "A guard such as if direction in (...) decides between two go cases; "
+            "*items collects the rest.",
+        ],
+    ),
 )
 
 BUILD_INSTRUCTIONS = {
@@ -133,6 +191,22 @@ BUILD_INSTRUCTIONS = {
         "omes `{'team': ['Mina', 'Sol']}`.\nAccept an empty iterable and a one-pass"
         " iterator.\nDo not mutate the input or print.\n"
     ).strip(),
+    "pattern-matching": (
+        "Write `handle(command)`, where `command` is a list or tuple of lowercase words.\n"
+        "Return exactly these strings; a `match` statement is recommended, but an equivalent "
+        "`if` chain is valid:\n\n"
+        "- No words: `Say something`.\n"
+        "- Exactly `look`: `You look around`.\n"
+        "- `go` and one more word that is `north`, `south`, `east`, or `west`: "
+        "`You go DIRECTION`.\n"
+        "- `go` and any other single word: `You can't go that way`.\n"
+        "- Exactly `take`: `Take what?`.\n"
+        "- `take` followed by one or more items: `Taken: ` and the items joined with "
+        "`, ` in order, such as `Taken: rope, lamp`.\n"
+        "- Exactly `quit` or exactly `exit`: `Goodbye`.\n"
+        "- Anything else, including `go` alone or a word after `look`: `Unknown command`.\n\n"
+        "Do not change `command`."
+    ),
 }
 
 REPAIR_STAGES = {
@@ -351,6 +425,69 @@ REPAIR_STAGES = {
             "Use get(word, 0) for a missing count.",
             "Dictionary assignment preserves the first insertion order.",
         ],
+    ),
+    "pattern-matching": _repair(
+        "Repair `route(message)`, which receives one message.\n\n"
+        "- A dictionary whose `kind` is `move` and that has a `to` key: `Moving to PLACE`.\n"
+        "- A dictionary whose `kind` is `move` without a `to` key: `Where to?`.\n"
+        "- A dictionary whose `kind` is `say` and that has a `text` key: that text.\n"
+        "- Anything else, including other kinds, missing keys, or a value that is not a "
+        "dictionary: `Ignored`.\n\n"
+        "Messages may contain extra keys, which do not change the result.",
+        """
+        def route(message):
+            match message:
+                case {"kind": "move", "to": place}:
+                    return f"Moving to {place}"
+                case {"kind": "move"}:
+                    return "Where to?"
+                case {"kind": "say", "text": text}:
+                    return text
+                case _:
+                    return "Ignored"
+        """,
+        """
+        def route(message):
+            match message:
+                case {"kind": "move"}:
+                    return "Where to?"
+                case {"kind": "move", "to": place}:
+                    return f"Moving to {place}"
+                case {"kind": "say", "text": text}:
+                    return text
+        """,
+        [
+            _check(
+                "Move with a destination",
+                "route({'kind': 'move', 'to': 'ridge'})",
+                "Moving to ridge",
+                "Mapping patterns ignore extra keys, so the first move case also fits here.",
+            ),
+            _check(
+                "Move without a destination",
+                "route({'kind': 'move'})",
+                "Where to?",
+                "A move message without a to key still needs its own case.",
+            ),
+            _check(
+                "Extra keys are allowed",
+                "[route({'kind': 'say', 'text': 'hello', 'volume': 3}), "
+                "route({'to': 'cave', 'kind': 'move', 'speed': 2})]",
+                ["hello", "Moving to cave"],
+                "Order the cases from the most keys to the fewest.",
+            ),
+            _check(
+                "Everything else is ignored",
+                "[route({'kind': 'dance'}), route({}), route(['move']), route({'kind': 'say'})]",
+                ["Ignored"] * 4,
+                "A function that reaches its end without return gives None; add a final "
+                "wildcard case.",
+            ),
+        ],
+        (
+            "Call route with a move message that has a to key and see which case runs.",
+            "The first matching case wins, and a match with no fitting case returns None.",
+        ),
     ),
 }
 

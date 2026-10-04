@@ -2,6 +2,7 @@
 
 Python often works best when a function asks an object to perform an operation rather than checking its concrete class.
 This is **duck typing**: the object's supported operations matter more than its class name.
+Duck typing is Python's most common form of polymorphism, one piece of code working with many kinds of object, and it does not require the objects to share a parent class.
 A `typing.Protocol` lists the attributes and methods an object should provide for static type checking.
 An object can satisfy that protocol without inheriting from it.
 

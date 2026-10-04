@@ -33,6 +33,7 @@ def unit(
     hints,
     *,
     files=None,
+    entrypoint="lesson.py",
 ):
     solution_files = {name: code(source) for name, source in files[0].items()} if files else None
     return Lesson(
@@ -53,7 +54,8 @@ def unit(
         code(solution),
         revision=4,
         chapter_id=chapter,
-        files=tuple(solution_files) if solution_files else ("lesson.py",),
+        entrypoint=entrypoint,
+        files=tuple(solution_files) if solution_files else (entrypoint,),
         solution_files=solution_files,
     )
 

@@ -25,11 +25,12 @@ Checks exercise ordinary cases, boundaries, and the chapter's likely misconcepti
 | Decorators | Separate configuration, function decoration, and calls. | Cache correctly or attach metadata without changing the original function; test keyword order and falsy results. |
 | Iterators and streaming | Produce results with bounded consumption. | Implement overlapping windows, interleaving, or incremental averages; guard the source against overconsumption. |
 | Exceptions and contexts | Translate intended errors and restore resources. | Exercise actual with statements, nested state, and failed cleanup; detect suppression, not merely return values. |
-| Dataclasses and types | Model immutable values and validated construction. | Distinguish a fresh instance from shared nested state; test ineffective learner regression tests. |
+| Dataclasses, types, and storage | Model immutable values and validated construction, then store records with placeholders. | Distinguish a fresh instance from shared nested state; test ineffective learner regression tests. |
 | Object protocols and testing | Combine public operations, factories, and structural interfaces. | Honor subclass construction, chunked reads, unsupported operands, and narrowly triggered fallbacks. |
 | Async work | Bound overlapping work and preserve result order. | Race successes or stream chunks while joining cancelled siblings; coordinate probes with events, not speed thresholds. |
 | Distributable tools | Separate reusable functions from CLI behavior and metadata. | Keep parser errors visible, support option order, and verify quiet imports plus actual entry-point output. |
 | Python machinery | Understand per-instance storage and class creation. | Preserve registries on rejected duplicates, support dynamic plugins, and follow a changed MRO during initialization. |
+| Packages, tests, and web APIs | Inspect installed distributions, write pytest tests that fail for broken code, and call an HTTP API. | Separate distribution from import names, repair undiscovered or assertion-free tests, and handle error statuses and timeouts against a local practice server. |
 
 ## Preparation and feedback
 
@@ -37,6 +38,7 @@ Every required construct must be explained in the current teaching or an identif
 Optional depth remains advisory: learners may enter directly, with links back to preparation when needed.
 Async races need explicit teaching about task ownership, completion order, cancellation, and joining.
 Descriptor and metaclass work needs a bridge from instance attributes, properties, and inheritance.
+The four object-oriented principles are defined once in Inheritance and polymorphism and named again where later lessons use them.
 Cooperative initialization needs keyword forwarding and the distinction between call order and return order.
 
 A useful failed check identifies the misconception and the next observation to make.

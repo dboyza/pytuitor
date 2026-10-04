@@ -9,8 +9,8 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
-- The recommended course has 75 lessons and 21 Lantern Reach game milestones; standalone practice projects were retired in favor of the game.
-- One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
+- The course has 84 lessons and 22 Lantern Reach game milestones; standalone practice projects were retired in favor of the game.
+- One syllabus has 22 chapters in six sections; the first three form the core sequence, with optional Python depth, specialized topics, and online and third-party; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Welcome offers Start learning or Browse syllabus; Known topics groups concepts by category.
 - Batch onboarding transitions to avoid dashboard flashes.
@@ -23,6 +23,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 ## Teaching standards
 
 - Explain new terms and syntax before requiring their use; use plain English and standard programming names.
+- Match existing lesson readability: one sentence per line, bold a term once where it is defined, short code lines, lists instead of tables, and length within the existing range.
 - Foundations grows from values/input through collections/functions; Everyday Python and Building programs add files, modules, classes, tests, and automation.
 - Depth lessons build on core concepts and explain Python-specific syntax and behavior.
 - Make blank-editor exercises solvable: specify names, signatures, input handling, output, and edge cases.
@@ -54,7 +55,8 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Preserve drafts across curriculum updates, including renamed or additional required files.
 - Start over is discoverable and confirmed; stop execution/autosave before clearing active progress.
 - Run files previews generated text; saving explicitly backs up the workspace and refuses newer-draft conflicts.
-- The tutor manages no virtual environments or packages; lessons need only the standard library, and `--check-upgrade` is its only network action.
+- The tutor manages no virtual environments or packages, and `--check-upgrade` is its only network action.
+- requests and pytest are runtime dependencies for the optional online chapter; its checks use `__practice_server__` on 127.0.0.1, and lessons label which try-it steps need internet.
 
 ## Code map and pitfalls
 
@@ -66,7 +68,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` lists chapters by section.
 - `project_workspace.py` owns immutable checkpoints and continuation; keep extra inherited capability checks via its active contract and never replace learner source silently.
 - `project_screen.py` owns game history, explicit supplied bases, restoration, temporary checkpoint play, and portable exports.
-- `review_screen.py` and `review_progress.py` own optional review; `content/reviews/` authors 21 mixed sessions.
+- `review_screen.py` and `review_progress.py` own optional review; `content/reviews/` authors 22 mixed sessions.
 - `state.py` owns version 4 profiles, atomic writes, migration backups and locks.
 - Save with file sync and Unix directory sync or Windows write-through replacement; never roll back memory after a committed rename.
 - Build lives in the lesson entry; Repair is nested under `repair`; each stage has a `files` map and compatibility `code` for its entry point.

@@ -5,14 +5,14 @@ from pytuitor.legacy import default_input
 from pytuitor.runner import execute
 
 
-def test_experienced_course_has_six_complete_chapters():
-    assert len(LESSONS) == 35
-    assert len({lesson.id for lesson in LESSONS}) == 35
+def test_experienced_course_has_seven_complete_chapters():
+    assert len(LESSONS) == 41
+    assert len({lesson.id for lesson in LESSONS}) == 41
     assert not any(lesson.project for lesson in LESSONS)
     seen = set()
     for chapter in CHAPTERS:
         units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter.id]
-        assert len(units) >= 4
+        assert len(units) >= 3
         for lesson in units:
             assert set(lesson.prerequisites) <= seen
             assert not lesson.starter

@@ -31,7 +31,8 @@ Resource limits, sanitized child environments, isolated imports, temporary works
 Expose this boundary through the Execution and privacy command and the workspace documentation.
 
 No accounts or learning telemetry are required.
-Lessons and checks stay offline and need only the standard library; the explicit release lookup is the tutor's only network action.
+Lessons and checks stay offline; the explicit release lookup is the tutor's only network action.
+The optional online chapter teaches requests and pytest, which ship as tutor dependencies; its checks use practice servers on 127.0.0.1, and only its try-it steps in the learner's own terminal need internet.
 A shared service that accepts untrusted code would require a separate OS isolation design and is outside this product's deployment contract.
 
 ## Profile and release integrity

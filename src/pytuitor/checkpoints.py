@@ -88,6 +88,18 @@ CHECKPOINTS = {
         "type converts the command-line text before it is stored. "
         "The default applies only when the option is absent.",
     ),
+    "web-requests": (
+        "A server answers a GET request with status 404. "
+        "Your code calls requests.get but never calls raise_for_status(). What happens?",
+        (
+            "requests.get raises HTTPError",
+            "requests.get returns the response normally",
+            "requests retries the request",
+        ),
+        1,
+        "requests.get raises only when no response arrives. A 404 is still a response; "
+        "raise_for_status() is what turns an error status into an exception.",
+    ),
     "method-resolution": (
         "In multiple inheritance, where does super() look for the next method?",
         (

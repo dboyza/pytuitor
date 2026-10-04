@@ -167,7 +167,8 @@ def error_guidance(error: str) -> str:
         (
             "ModuleNotFoundError",
             "Python could not find an imported module. Check the project file name and import "
-            "spelling. Course exercises use only Python's standard library.",
+            "spelling. Course exercises use the standard library plus the included requests and "
+            "pytest packages.",
         ),
         (
             "FileNotFoundError",

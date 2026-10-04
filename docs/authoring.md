@@ -4,7 +4,7 @@
 
 `Lesson.stage_contract("build")` and `Lesson.stage_contract("repair")` provide compatible Build defaults for existing units.
 
-The six First programs units use the `_FOUNDATION_STAGES` table in `src/pytuitor/beginner_course.py` as their canonical active stage content.
+The five First programs units use the `_FOUNDATION_STAGES` table in `src/pytuitor/beginner_course.py` as their canonical active stage content.
 
 The legacy `Lesson` fields remain populated as compatibility projections for imports and saved drafts.
 
@@ -13,7 +13,7 @@ Compatibility defaults support legacy callers; they are not a reason to reuse th
 
 Keep each Repair solvable with concepts already taught, behavior-based, and meaningfully different from its Build scenario.
 
-The remaining 40 beginner units keep `BUILD_INSTRUCTIONS` and `REPAIR_STAGES` in the `src/pytuitor/content/beginner_*.py` chapter modules, assembled by `beginner_stage_refresh.py`.
+The remaining 38 beginner units keep `BUILD_INSTRUCTIONS` and `REPAIR_STAGES` in the `src/pytuitor/content/beginner_*.py` chapter modules, assembled by `beginner_stage_refresh.py`.
 Their Build references and checks remain in `beginner_course.py` and `beginner_extensions.py`; the course assembly projects active contracts into the compatibility fields.
 
 The 41 experienced units keep Build records, complete instructions, independent Repairs, and boundary probes together in `src/pytuitor/content/experienced_*.py`.
@@ -30,6 +30,7 @@ Describe the desired behavior in the prompt; reserve diagnosis and fixes for pro
 Check-specific nudges override the first stage hint; the first hint is the fallback when every case concerns the same defect.
 
 For multi-step checks, `_scenario_check` keeps setup and assertions readable without adding runner APIs.
+Online-chapter checks use the worker's `__practice_server__(respond)`, a JSON server on 127.0.0.1, and `__pytest_run__(path)`, which reimports learner tests so a check can swap in a broken function; never contact the internet from a check.
 Its script assigns `result` in the worker's fresh namespace; give it a plain-language description of the operation and fixture.
 Test observable behavior, including written files, input preservation, and conflicts, rather than source spelling.
 Retain plausible incomplete repairs that must fail and valid alternative implementations that must pass.
@@ -57,7 +58,7 @@ Never regenerate baselines merely to silence an unexplained failure.
 
 ## Growing game content
 
-`content/lantern/` authors Lantern Reach's 21 milestones and the 75 lesson-to-game connections.
+`content/lantern/` authors Lantern Reach's 22 milestones, their implementation briefs in `briefs.py`, and the 84 lesson-to-game connections.
 `project_catalog.py` assembles stable milestone IDs and makes each chapter's lessons the milestone's preparation.
 `ProjectMilestone` defines the supplied earlier-code base and declared capabilities; `Lesson.project_id` adapts its stages into the existing workbench and runner.
 The first milestone starts blank; later Extend stages start from a learner checkpoint or an explicitly labeled supplied earlier version.

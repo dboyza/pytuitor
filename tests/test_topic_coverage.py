@@ -40,14 +40,15 @@ NEW_TOPICS = (
 )
 
 
-def test_coverage_map_links_all_31_topic_families_to_active_lessons():
+def test_coverage_map_links_all_36_topic_families_to_active_lessons():
     document = Path("docs/coverage.md").read_text()
     topics = set(re.findall(r"^\| ([a-z_]+) \|", document, re.MULTILINE))
     assert topics == set(
         "variables strings conditionals loops functions lists tuples dictionaries sets "
         "comprehensions exceptions file_io classes functional decorators generators "
         "context_managers dataclasses type_hints regex testing recursion modules collections "
-        "itertools json datetime enums pathlib oop_advanced async".split()
+        "itertools json datetime enums pathlib oop_advanced async pattern_matching logging "
+        "databases packages web_apis".split()
     )
     active = {lesson.id for lesson in LESSONS}
     for relative in re.findall(r"\]\((\.\./src/[^)]+)\)", document):

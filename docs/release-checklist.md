@@ -5,7 +5,7 @@ A listed check is not evidence that it passed, and a built wheel is not a publis
 
 ## Product and content
 
-- Verify the unified course contains 75 teaching lessons, and 21 game milestones organized into five sections.
+- Verify the unified course contains 84 teaching lessons and 22 game milestones organized into six sections.
 - Verify Start learning opens the first lesson, Browse syllabus opens the outline, and Known topics remains editable from the dashboard.
 - Verify Continue follows the active chapter and section, with optional depth requiring an explicit choice.
 - Verify every Build/Extend reference passes, every original Repair fails meaningfully, and every corrected Repair passes.
@@ -15,7 +15,7 @@ A listed check is not evidence that it passed, and a built wheel is not a publis
 - Complete the [learner study](learner-study.md) and resolve observed blockers, or record an explicit waiver and make no measured teaching-effectiveness claim.
 - Preserve existing profiles, drafts, known topics, and completion information during upgrades; legacy path preferences must not hide course content.
 - Confirm reference-solution reveal does not replace a learner's code.
-- Verify all 21 mixed review sessions, including prediction answers, passing references, failing broken starters, independent drafts, and optional suggestions that never block Continue.
+- Verify all 22 mixed review sessions, including prediction answers, passing references, failing broken starters, independent drafts, and optional suggestions that never block Continue.
 - Verify stage and file positions, selected checks, focused panes, and personal notes survive reopening; changed source or revisions must invalidate saved check evidence.
 
 ## Engineering and terminals
@@ -40,7 +40,7 @@ Before a Windows desktop release, record a Windows 10/11 Windows Terminal smoke 
 Inspect 80 × 24 and 140 × 44 layouts, including errors, dialogs, multi-file controls, the console, and reference comparison.
 Run the reviewed visual baseline tests without update mode.
 Exercise interrupted execution, EOF, infinite loops, excessive output, and full progress reset.
-Confirm offline startup and course completion do not contact package indexes or update services.
+Confirm offline startup and course completion, including the online chapter's checks, do not contact package indexes, external servers, or update services.
 
 ## Installation and supply chain
 

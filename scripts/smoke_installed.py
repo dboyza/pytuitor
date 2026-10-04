@@ -19,13 +19,13 @@ from pytuitor.state import Store
 
 
 async def main():
-    assert len(LESSONS) == 87
-    assert sum(lesson.project for lesson in LESSONS) == 12
-    assert len(CHAPTERS) == 21
-    assert len(SECTIONS) == 5
+    assert len(LESSONS) == 84
+    assert not any(lesson.project for lesson in LESSONS)
+    assert len(CHAPTERS) == 22
+    assert len(SECTIONS) == 6
     assert files("pytuitor").joinpath("theme.tcss").is_file()
     units = (*LESSONS, *(item.lesson for item in MILESTONES))
-    assert len(units) == 108
+    assert len(units) == 106
     for lesson in units:
         assert lesson.body.strip()
         for stage_name in ("build", "repair"):

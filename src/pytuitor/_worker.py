@@ -140,6 +140,72 @@ def cli_check(fn, text):
         sys.stdin = original
 
 
+@contextlib.contextmanager
+def practice_server(respond):
+    """Serve JSON on 127.0.0.1 so web checks never need the internet.
+
+    respond(method, path, query, body) returns (status, data); yields (base_url, requests).
+    """
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    from urllib.parse import parse_qs, urlsplit
+
+    seen = []
+
+    class Handler(BaseHTTPRequestHandler):
+        def answer(self):
+            parts = urlsplit(self.path)
+            raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            try:
+                body = json.loads(raw) if raw else None
+            except ValueError:
+                body = raw.decode("utf-8", "replace")
+            query = {key: values[-1] for key, values in parse_qs(parts.query).items()}
+            seen.append({"method": self.command, "path": parts.path, "query": query, "body": body})
+            status, data = respond(self.command, parts.path, query, body)
+            payload = json.dumps(data).encode()
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        do_GET = do_POST = do_PUT = do_DELETE = answer
+
+        def log_message(self, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        yield f"http://127.0.0.1:{server.server_address[1]}", seen
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def pytest_run(*paths):
+    """Run learner test files with pytest; return (exit code, collected count, report)."""
+    import pytest
+
+    # Re-import learner tests each run so a check can swap in a deliberately broken module.
+    for name in [name for name in sys.modules if name.split(".")[0].startswith("test_")]:
+        del sys.modules[name]
+    os.environ["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+
+    class Counter:
+        collected = 0
+
+        def pytest_collection_modifyitems(self, items):
+            self.collected = len(items)
+
+    counter = Counter()
+    report = io.StringIO()
+    with contextlib.redirect_stdout(report):
+        code = pytest.main(["-q", "-p", "no:cacheprovider", *paths], plugins=[counter])
+    return int(code), counter.collected, report.getvalue()
+
+
 class Tee:
     def __init__(self, target, limit):
         self.target = target
@@ -284,6 +350,8 @@ def main():
             "__cli_check__": cli_check,
             "__concurrency_check__": concurrency_check,
             "__expect__": expect,
+            "__practice_server__": practice_server,
+            "__pytest_run__": pytest_run,
         }
 
     if not request["checks"]:

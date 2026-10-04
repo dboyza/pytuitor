@@ -12,7 +12,7 @@ Offline, with no account required.</p>
   <a href="#development">Development</a> ·
   <a href="https://github.com/dboyza/pytuitor/issues">Report an issue</a>
 </p>
-<p align="center"><strong>75 lessons</strong> &nbsp; / &nbsp; <strong>21 game milestones</strong> &nbsp; / &nbsp; <strong>21 chapters</strong></p>
+<p align="center"><strong>84 lessons</strong> &nbsp; / &nbsp; <strong>22 game milestones</strong> &nbsp; / &nbsp; <strong>22 chapters</strong></p>
 
 ## Start learning
 
@@ -46,7 +46,7 @@ Start as a complete beginner or deepen your existing Python knowledge.
 - **Build, then repair.**
   Write a lesson program from scratch, then debug a broken one; complete both stages to finish the unit.
 - **Grow your own game.**
-  Build [Lantern Reach](docs/lantern-reach.md), an expedition and settlement adventure, through 21 cumulative milestones.
+  Build [Lantern Reach](docs/lantern-reach.md), an expedition and settlement adventure, through 22 cumulative milestones.
   Continue your own code, revisit working checkpoints, and export a game that runs without Pytuitor.
 - **Get useful feedback.**
   Run code with interactive input and compare checked results with expected behavior.
@@ -62,16 +62,17 @@ See the [learning experience guide](docs/learning-experience.md) for workspace r
 
 ### A course that grows with you
 
-The 21 chapters span five sections.
-The first three form the core sequence; the last two offer optional depth.
+The 22 chapters span six sections.
+The first three form the core sequence; the last three are optional.
 
 | Section | What you will explore |
 | --- | --- |
-| Foundations | Values, input, decisions, collections, loops, and functions |
+| Foundations | Values, input, decisions, collections, built-in summaries, loops, and functions |
 | Everyday Python | Files, structured data, regular expressions, and library tools |
-| Building programs | Modules, classes, tests, and automation |
-| Python depth | Python-specific behavior, composition, and object protocols |
+| Building programs | Modules, classes and the four object-oriented principles, tests, and automation |
+| Python depth | Python-specific behavior, pattern matching, logging, SQLite, and object protocols |
 | Specialized topics | Async programming, distribution, and language machinery |
+| Online and third-party | Packages, pytest, and web APIs; checks stay offline, but the try-it steps need internet |
 
 Each chapter ends with a Lantern Reach milestone: Extend your game, then Repair a separate incident.
 See the [curriculum map](docs/curriculum.md) for chapters, milestones, and preparation.

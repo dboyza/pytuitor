@@ -70,6 +70,26 @@ BUILD_INSTRUCTIONS = {
         "nittest.main()` outside a function or class definition because Check manag"
         "es the test run."
     ),
+    "object-principles": (
+        "In `lesson.py`, define three classes and one function.\n\n"
+        "**`Ticket(price)`**\n\n"
+        "- Raise `ValueError` when `price` is negative; otherwise keep the price inside the "
+        "object. A price of 0 is allowed.\n"
+        "- `cost()` returns the price.\n"
+        "- `label()` returns `Ticket: COST`, using the result of `cost()`.\n\n"
+        "**`ChildTicket(price)`** is a subclass of `Ticket`.\n\n"
+        "- It overrides `cost()` to return half the price, rounded down with `//`.\n"
+        "- It inherits `label()` unchanged, so `ChildTicket(9).label()` is `Ticket: 4`.\n\n"
+        "**`GroupTicket(price, people)`** is a subclass of `Ticket`.\n\n"
+        "- Its `__init__()` calls `super().__init__(price)`, so a negative price still raises "
+        "`ValueError`. It also raises `ValueError` when `people` is less than 1.\n"
+        "- It overrides `cost()` to return the price multiplied by `people`.\n"
+        "- It overrides `label()` to return `Group of PEOPLE: COST`, such as "
+        "`Group of 3: 15`.\n\n"
+        "**`total_cost(tickets)`** returns the sum of `cost()` for every ticket in the list, "
+        "without checking which class each ticket belongs to. An empty list costs 0.\n\n"
+        "Printing is optional; checks create tickets and call your methods."
+    ),
 }
 
 REPAIR_STAGES = {
@@ -498,6 +518,131 @@ REPAIR_STAGES = {
         (
             "The supplied tests miss values exactly on the boundary. Add those cases first.",
             "An inclusive range includes low and high: compare with <= at both ends.",
+        ),
+    ),
+    "object-principles": _stage(
+        (
+            "Repair the shape classes in `lesson.py`.\n\n"
+            "- `Shape(name)` stores `name`. Its `area()` is an abstract method that raises "
+            "`NotImplementedError`. Its `describe()` returns `NAME: AREA` using `area()`.\n"
+            "- `Rectangle(width, height)` is a subclass of `Shape` named `Rectangle`, whose "
+            "area is width multiplied by height.\n"
+            "- `Square(side)` is a subclass of `Rectangle` with equal sides, named `Square`.\n"
+            "- `total_area(shapes)` returns the sum of every shape's area; an empty list gives "
+            "0.\n\n"
+            "Keep the family tree: `Square` inherits from `Rectangle`, which inherits from "
+            "`Shape`."
+        ),
+        """
+        class Shape:
+            def __init__(self, name):
+                self.name = name
+
+            def area(self):
+                raise NotImplementedError("Each shape must define area()")
+
+            def describe(self):
+                return f"{self.name}: {self.area()}"
+
+
+        class Rectangle(Shape):
+            def __init__(self, width, height):
+                super().__init__("Rectangle")
+                self.width = width
+                self.height = height
+
+            def area(self):
+                return self.width * self.height
+
+
+        class Square(Rectangle):
+            def __init__(self, side):
+                super().__init__(side, side)
+                self.name = "Square"
+
+
+        def total_area(shapes):
+            total = 0
+            for shape in shapes:
+                total = total + shape.area()
+            return total
+        """,
+        """
+        class Shape:
+            def __init__(self, name):
+                self.name = name
+
+            def area(self):
+                raise NotImplementedError("Each shape must define area()")
+
+            def describe(self):
+                return f"{self.name}: {self.area()}"
+
+
+        class Rectangle(Shape):
+            def __init__(self, width, height):
+                super().__init__("Rectangle")
+                self.width = width
+                self.height = height
+
+            def area_of(self):
+                return self.width * self.height
+
+
+        class Square(Rectangle):
+            def __init__(self, side):
+                self.side = side
+                self.name = "Square"
+
+
+        def total_area(shapes):
+            total = 0
+            for shape in shapes:
+                total = total + shape.area()
+            return total
+        """,
+        (
+            _check(
+                "A rectangle's area",
+                "[Rectangle(2, 3).area(), Rectangle(2, 3).describe()]",
+                [6, "Rectangle: 6"],
+                nudge="An override must use exactly the parent's method name.",
+            ),
+            _check(
+                "A square reuses Rectangle",
+                "[Square(4).area(), Square(4).describe()]",
+                [16, "Square: 16"],
+                nudge="Square's __init__ must let Rectangle set up width and height.",
+            ),
+            _check(
+                "The family tree is unchanged",
+                "[issubclass(Square, Rectangle), issubclass(Rectangle, Shape)]",
+                [True, True],
+            ),
+            _check(
+                "Total of mixed shapes",
+                "[total_area([Rectangle(1, 2), Square(3)]), total_area([])]",
+                [11, 0],
+            ),
+            _scenario_check(
+                "A plain Shape stays abstract",
+                """
+                try:
+                    Shape("blob").area()
+                    result = "no error"
+                except NotImplementedError:
+                    result = "NotImplementedError"
+                """,
+                "NotImplementedError",
+                description="Shape('blob').area() raises NotImplementedError",
+                nudge="Leave Shape.area() abstract; each subclass provides its own area().",
+            ),
+        ),
+        (
+            "Run Rectangle(2, 3).area() and read which class's area() raised the error.",
+            "Compare the method names in Shape and Rectangle, then compare Square's __init__ "
+            "with Rectangle's.",
+            "super().__init__(side, side) lets Rectangle store both sides.",
         ),
     ),
 }

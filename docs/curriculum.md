@@ -1,7 +1,7 @@
 # Curriculum map
 
-The release candidate has 75 lessons and 21 cumulative Lantern Reach milestones across 21 chapters.
-The first three sections form the recommended sequence; Python depth and Specialized topics are optional.
+The release candidate has 84 lessons and 22 cumulative Lantern Reach milestones across 22 chapters in six sections.
+The first three sections form the recommended sequence; Python depth, Specialized topics, and Online and third-party are optional.
 Start learning begins with Foundations, and learners can open any chapter directly.
 Each chapter lists useful preparation without locking access.
 Lessons use blank Build followed by Repair.
@@ -33,6 +33,7 @@ Useful preparation: First programs.
 
 - **Lists and loops**: Work through a collection and calculate a total.
 - **Finding items in a list**: Indexes, length, and empty collections.
+- **Summarizing lists**: Use sum, max, min, any, and all on a whole list.
 - **Tuples, sets, and unpacking**: Group a fixed pair and recognize unique items.
 - **Comparing sets**: Find shared, missing, and combined values.
 
@@ -45,6 +46,7 @@ Useful preparation: Lists and sets.
 - **Numbering and pairing items**: Use range, enumerate, and zip to organize loops.
 - **Working with nested lists**: Traverse rows and columns without losing empty rows.
 - **Dictionaries and counts**: Associate keys with values.
+- **Looping over dictionary pairs**: Visit keys and values together with items().
 - **Editing lists and dictionaries**: Insert, remove, sort, and delete deliberately.
 - **Repeating until done**: While loops and stopping conditions.
 
@@ -124,6 +126,7 @@ Model state, name choices, and verify behavior with tests.
 Useful preparation: Modules and library tools.
 
 - **Your first class**: Keep state and related operations together.
+- **Inheritance and polymorphism**: Encapsulation, abstraction, inheritance, and polymorphism.
 - **Named states with enums**: Represent a fixed set of meaningful values.
 - **Writing automated tests**: Use unittest to check expected results.
 
@@ -142,7 +145,7 @@ Explore Python's behavior, composition, and object protocols.
 
 ### Python semantics
 
-Understand truthiness, copying, arguments, and collection idioms.
+Understand truthiness, copying, arguments, collection idioms, and pattern matching.
 
 Useful preparation: Functions and input, Collection tools.
 
@@ -150,6 +153,7 @@ Useful preparation: Functions and input, Collection tools.
 - **Objects and copying**: Identity, aliasing, and mutability.
 - **Make call sites readable**: Positional & keyword arguments.
 - **Group without losing order**: Dictionaries, sets & comprehensions.
+- **Match values by their shape**: match & case patterns.
 
 ### Recursion and functional tools
 
@@ -184,29 +188,31 @@ Useful preparation: Python semantics.
 
 ### Exceptions and contexts
 
-Preserve errors and restore resources reliably.
+Preserve errors, log what happened, and restore resources reliably.
 
 Useful preparation: Classes and tested tools, Decorators, Iterators and streaming.
 
 - **Exceptions with context**: Custom exceptions & chaining.
+- **Record what happened with logging**: Loggers, levels & exceptions.
 - **Restore temporary state**: Exception-safe context managers.
 - **Implement the context protocol**: Class-based context managers.
 
-### Dataclasses and types
+### Dataclasses, types, and storage
 
-Express and test value objects and their lifecycle.
+Express and test value objects, then store records in a database.
 
 Useful preparation: Classes and tested tools, Python semantics.
 
 - **Types and tests**: Types, tests, and project boundaries.
 - **Model a small value object**: Classes & dataclasses.
 - **Dataclass defaults and updates**: Dataclass factories & post-init.
+- **Store records in SQLite**: sqlite3 tables, placeholders & transactions.
 
 ### Object protocols and testing
 
 Define typed interfaces and verify behavior at boundaries.
 
-Useful preparation: Dataclasses and types, Decorators.
+Useful preparation: Dataclasses, types, and storage, Decorators.
 
 - **Unions and generic contracts**: Union types & TypeVar generics.
 - **Objects that fit Python**: Properties & special methods.
@@ -250,6 +256,22 @@ Useful preparation: Object protocols and testing.
 - **Register classes deliberately**: Metaclasses & class creation.
 - **Method lookup and inheritance**: Inheritance & super.
 - **Inspect without executing**: Inspect function parameters.
+
+## Online and third-party (optional)
+
+Install packages, test with pytest, and call web APIs.
+Pytuitor includes requests and pytest, and every exercise and check runs offline against practice servers on your own computer.
+Each lesson's "Try it in your own terminal" steps install packages or call real APIs and need an internet connection.
+
+### Packages, tests, and web APIs
+
+Install third-party packages, test with pytest, and call web APIs safely.
+
+Useful preparation: Files and structured data, Classes and tested tools.
+
+- **Install and inspect packages**: pip, virtual environments & requirements.
+- **Test with pytest**: pytest tests, parametrize & raises.
+- **Call a web API with requests**: HTTP, JSON APIs & requests.
 
 ## Teaching and validation
 

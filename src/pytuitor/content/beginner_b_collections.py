@@ -110,6 +110,37 @@ BUILD_INSTRUCTIONS = {
         "int `0`.\nCheck supplies the stopping zero automatically.\nWhen using Run,"
         " remember to type it yourself."
     ),
+    "summary-builtins": (
+        "Read one line of space-separated whole numbers, with any prompt, and store them as "
+        "integers in a list named `scores`.\nThe line may be empty.\n\n"
+        "Create these variables:\n\n"
+        "- `total`: the sum of the scores, which is `0` when there are none.\n"
+        "- `passes`: a list of booleans, one per score in input order, each `True` when that "
+        "score is 50 or more.\n"
+        "- `anyone_passed`: `True` when at least one score is 50 or more.\n"
+        "- `everyone_passed`: `True` when every score is 50 or more. With no scores this is "
+        "`True`, because no score fails.\n\n"
+        "When there is at least one score, also create `highest` and `lowest`, then print "
+        "exactly these five lines (shown for input `64 88 20`):\n\n"
+        "```text\nTotal: 172\nHighest: 88\nLowest: 20\nAnyone passed: True\n"
+        "Everyone passed: False\n```\n\n"
+        "When there are no scores, print only `No scores`."
+    ),
+    "dictionary-pairs": (
+        "Read two lines, with any prompts: supply names separated by spaces, then whole-number "
+        "amounts separated by spaces, in the same order.\nPair them with `zip()`; if one line "
+        "has extra items, ignore them. Either line may be empty.\n\n"
+        "Build a dictionary named `stock` that maps each name to its amount. A repeated name "
+        "adds its amounts together and keeps the position where it first appeared.\n\n"
+        "Then loop over the pairs in `stock` order:\n\n"
+        "- Print each supply as `NAME: AMOUNT`.\n"
+        "- Collect every name whose amount is below 3 in a list named `low`, in `stock` "
+        "order.\n\n"
+        "Finally, set `total` to the sum of all amounts and print `Total: TOTAL` as the last "
+        "line.\n\n"
+        "For names `rope lamp rope` and amounts `2 5 4`, `stock` is `{'rope': 6, 'lamp': 5}`, "
+        "the output is `rope: 6`, `lamp: 5`, and `Total: 11`, and `low` is `[]`."
+    ),
 }
 
 REPAIR_STAGES = {
@@ -647,5 +678,154 @@ REPAIR_STAGES = {
             "Only the input value 99 stops this loop.",
         ),
         stdin="5\n-2\n99\n",
+    ),
+    "summary-builtins": _stage(
+        (
+            "Repair the weather summary.\nIt reads one line of space-separated whole-number "
+            "temperatures; there is always at least one.\n\n"
+            "It must set `warmest` and `coldest`, set `freezing` to a list of booleans that are "
+            "`True` for temperatures **at or below** 0, and set `any_freezing` to `True` when "
+            "at least one temperature is at or below 0.\n\n"
+            "It prints `Range: COLDEST to WARMEST`, then `Frost warning` only when "
+            "`any_freezing` is `True`."
+        ),
+        """
+        temperatures = []
+        for word in input("Temperatures: ").split():
+            temperatures.append(int(word))
+        warmest = max(temperatures)
+        coldest = min(temperatures)
+        freezing = []
+        for temperature in temperatures:
+            freezing.append(temperature <= 0)
+        any_freezing = any(freezing)
+        print(f"Range: {coldest} to {warmest}")
+        if any_freezing:
+            print("Frost warning")
+        """,
+        """
+        temperatures = []
+        for word in input("Temperatures: ").split():
+            temperatures.append(int(word))
+        warmest = max(temperatures)
+        coldest = min(temperatures)
+        freezing = []
+        for temperature in temperatures:
+            freezing.append(temperature < 0)
+        any_freezing = all(freezing)
+        print(f"Range: {coldest} to {warmest}")
+        if any_freezing:
+            print("Frost warning")
+        """,
+        (
+            _check(
+                "One freezing morning",
+                "[warmest, coldest, freezing, any_freezing]",
+                [8, -2, [False, True, False], True],
+                stdin="3 -2 8\n",
+                output="Range: -2 to 8\nFrost warning",
+                nudge="One freezing day is enough for a warning: which function asks that?",
+            ),
+            _check(
+                "Exactly zero counts as freezing",
+                "[freezing, any_freezing]",
+                [[True, False], True],
+                stdin="0 5\n",
+                nudge="At or below 0 includes 0 itself.",
+            ),
+            _check(
+                "A warm week",
+                "[warmest, coldest, freezing, any_freezing, 'Frost' in __stdout__]",
+                [9, 4, [False, False], False, False],
+                stdin="4 9\n",
+            ),
+            _check(
+                "Every day freezing",
+                "[warmest, coldest, any_freezing]",
+                [-1, -3, True],
+                stdin="-1 -3\n",
+            ),
+        ),
+        (
+            "Compare what any() and all() return for [False, True, False].",
+            "Read the boundary again: at or below 0 needs <=, not <.",
+        ),
+        stdin="3 -2 8\n",
+    ),
+    "dictionary-pairs": _stage(
+        (
+            "Repair the scoreboard.\nIt reads player names on one line and whole-number "
+            "points on the next, in the same order. There is at least one player and every "
+            "name is unique.\n\n"
+            "It must print each player as `NAME: POINTS` in input order, set `best` to the "
+            "highest **points value**, set `leaders` to every player with that value in input "
+            "order, and print `Best: BEST` as the last line."
+        ),
+        """
+        names = input("Players: ").split()
+        values = input("Points: ").split()
+        points = {}
+        for name, value in zip(names, values):
+            points[name] = int(value)
+        for name, value in points.items():
+            print(f"{name}: {value}")
+        best = max(points.values())
+        leaders = []
+        for name, value in points.items():
+            if value == best:
+                leaders.append(name)
+        print(f"Best: {best}")
+        """,
+        """
+        names = input("Players: ").split()
+        values = input("Points: ").split()
+        points = {}
+        for name, value in zip(names, values):
+            points[name] = int(value)
+        for name, value in points:
+            print(f"{name}: {value}")
+        best = max(points)
+        leaders = []
+        for name, value in points.items():
+            if value == best:
+                leaders.append(name)
+        print(f"Best: {best}")
+        """,
+        (
+            _check(
+                "Clear winner",
+                "[best, leaders]",
+                [9, ["Ben"]],
+                stdin="Ada Ben Cy\n3 9 4\n",
+                output="Ada: 3\nBen: 9\nCy: 4\nBest: 9",
+                nudge="Read the error: a loop over the dictionary itself receives only keys.",
+            ),
+            _check(
+                "Shared lead",
+                "[best, leaders]",
+                [7, ["Zoe", "Amir"]],
+                stdin="Zoe Amir Lin\n7 7 2\n",
+            ),
+            _check(
+                "Alphabetical order is not points",
+                "[best, leaders]",
+                [10, ["Ann"]],
+                stdin="Ann Zed\n10 1\n",
+                nudge="max(points) compares names. Which method gives the points?",
+            ),
+            _check(
+                "Single player",
+                "[best, leaders]",
+                [0, ["Mo"]],
+                stdin="Mo\n0\n",
+                output="Mo: 0\nBest: 0",
+            ),
+        ),
+        (
+            "Run it and read the error message, then compare looping over points with "
+            "points.items().",
+            "Decide whether best should come from the keys or the values.",
+        ),
+        stdin="Ada Ben Cy\n3 9 4\n",
     ),
 }
