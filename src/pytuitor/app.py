@@ -217,13 +217,8 @@ class TutorApp(App):
             )
             yield SystemCommand(
                 "Workspace tools",
-                "Files, environment, export, reset, and notes",
+                "Files, export, reset, and notes",
                 screen.workspace_tools,
-            )
-            yield SystemCommand(
-                "Project environment",
-                "Create a venv or explicitly install a package",
-                screen.action_environment,
             )
             yield SystemCommand(
                 "Add project file",

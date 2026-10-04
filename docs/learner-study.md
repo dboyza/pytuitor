@@ -47,9 +47,8 @@ Allow about 45 minutes and use an experienced programmer's existing knowledge wi
 5. Complete a Repair stage and explain the Python-specific behavior that caused the defect.
 6. Use progressive hints, then deliberately reveal a reference solution and return to the untouched draft.
 7. Open a project with more than one file, edit a supporting module, and verify Run and Check use the current files.
-8. Create an environment and inspect the package-installation explanation without installing anything.
-9. Explicitly choose Specialized topics, open a lesson about descriptors, metaclasses, or internals, and identify its prerequisite knowledge.
-10. Browse the syllabus, explain the next chapter's learning outcomes, and distinguish the core progression from optional depth.
+8. Explicitly choose Specialized topics, open a lesson about descriptors, metaclasses, or internals, and identify its prerequisite knowledge.
+9. Browse the syllabus, explain the next chapter's learning outcomes, and distinguish the core progression from optional depth.
 
 ## Acceptance notes
 

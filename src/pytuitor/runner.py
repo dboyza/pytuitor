@@ -102,7 +102,6 @@ async def execute(
     console: ConsoleSession | None = None,
     on_check: Callable[[CheckEvent], None] | None = None,
     files: dict[str, str] | None = None,
-    python: Path | None = None,
     stage: StageContract | None = None,
 ) -> RunResult:
     from pytuitor.workspace import validate_files
@@ -173,7 +172,7 @@ async def execute(
         try:
             with output_path.open("wb") as output:
                 tree = await start_process(
-                    str(python or sys.executable),
+                    sys.executable,
                     "-I",
                     str(Path(__file__).with_name("_worker.py")),
                     str(root),

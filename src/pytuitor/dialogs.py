@@ -62,7 +62,7 @@ class KeyboardHelp(ModalScreen):
                 "Enter               Send the answer you typed\n"
                 "Ctrl+D              End input (EOF)\n\n"
                 "On some keyboards, hold Fn to use the F-keys.\n"
-                "The command palette also lists project file, environment, "
+                "The command palette also lists project file, "
                 "solution, export and reset actions.",
                 markup=False,
             )
@@ -150,11 +150,10 @@ class ExecutionInfo(ModalScreen):
             yield Static(
                 "Your lessons and progress stay local. Run and Check execute Python as your "
                 "user, with access to your files and network. Only run code you trust.\n\n"
-                "Temporary workspaces, time limits, output limits, and virtual environments "
-                "help contain mistakes. They are not an operating-system security sandbox.\n\n"
+                "Temporary workspaces, time limits, and output limits help contain mistakes. "
+                "They are not an operating-system security sandbox.\n\n"
                 "The tutor does not require accounts, send learning telemetry, or download "
-                "packages during lessons. Installing a named package and checking for upgrades "
-                "are explicit network actions."
+                "packages.\n\nOnly the pytuitor --check-upgrade command goes online."
             )
             yield Button("Back to learning", id="close-execution-info")
 

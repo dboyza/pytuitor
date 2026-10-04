@@ -1,9 +1,8 @@
-"""Opt-in learning aids and project environment controls."""
+"""Opt-in learning aids and project file controls."""
 
 from difflib import unified_diff
-from pathlib import Path
 
-from textual import on, work
+from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
@@ -11,12 +10,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Select, Static, TextArea
 
 from pytuitor.models import Lesson, StageContract
-from pytuitor.workspace import (
-    WorkspaceError,
-    create_environment,
-    environment_python,
-    install_package,
-)
+from pytuitor.workspace import WorkspaceError
 
 
 class SolutionDialog(ModalScreen):
@@ -132,88 +126,6 @@ class FileDialog(ModalScreen[str | None]):
         self.dismiss(None)
 
 
-class EnvironmentDialog(ModalScreen):
-    BINDINGS = [Binding("escape", "close", "Close")]
-
-    def __init__(self, path: Path):
-        super().__init__()
-        self.path = path
-        self.busy = False
-
-    def compose(self) -> ComposeResult:
-        with Vertical(classes="dialog", id="environment-dialog"):
-            yield Static("Project environment", classes="title")
-            yield Static(
-                "Create an offline virtual environment to keep project packages separate. "
-                "Course exercises need no extra packages.\n\n"
-                "Install package downloads third-party wheels and dependencies from PyPI. "
-                "Only install packages you trust."
-            )
-            with Horizontal(classes="environment-actions"):
-                yield Button(
-                    "Create environment", id="create-environment", disabled=self.path.exists()
-                )
-                yield Button("Close", id="close-environment")
-            with Horizontal(classes="environment-actions"):
-                yield Input(placeholder="Package or package==version", id="package-name")
-                yield Button(
-                    "Install package", id="install-package", disabled=not self.path.exists()
-                )
-            with VerticalScroll(id="environment-output"):
-                yield Static(
-                    "Using this project's environment."
-                    if self.path.exists()
-                    else "Using the tutor's Python until you create an environment.",
-                    id="environment-result",
-                    markup=False,
-                )
-
-    def show_result(self, text: str) -> None:
-        if self.is_mounted and self.query("#environment-result"):
-            self.query_one("#environment-result", Static).update(text)
-
-    def set_busy(self, busy: bool) -> None:
-        self.busy = busy
-        if not self.is_mounted or not self.query("#create-environment"):
-            return
-        self.query_one("#close-environment", Button).label = "Cancel / close" if busy else "Close"
-        self.query_one("#create-environment", Button).disabled = busy or self.path.exists()
-        self.query_one("#install-package", Button).disabled = busy or not self.path.exists()
-
-    @on(Button.Pressed, "#create-environment")
-    @work(exclusive=True)
-    async def create(self) -> None:
-        self.set_busy(True)
-        self.show_result("Creating an isolated environment…")
-        try:
-            await create_environment(self.path)
-            self.show_result("Ready. Run and Check now use this environment.")
-        except (OSError, WorkspaceError) as exc:
-            self.show_result(str(exc))
-        finally:
-            self.set_busy(False)
-
-    @on(Button.Pressed, "#install-package")
-    @work(exclusive=True)
-    async def install(self) -> None:
-        requirement = self.query_one("#package-name", Input).value.strip()
-        self.set_busy(True)
-        self.show_result("Installing the requested package from PyPI…")
-        try:
-            output = await install_package(environment_python(self.path), requirement)
-            self.show_result(output)
-        except (OSError, WorkspaceError) as exc:
-            self.show_result(str(exc))
-        finally:
-            self.set_busy(False)
-
-    @on(Button.Pressed, "#close-environment")
-    def action_close(self) -> None:
-        if self.busy:
-            self.workers.cancel_node(self)
-        self.dismiss()
-
-
 def error_guidance(error: str) -> str:
     """Explain the next debugging action without rewriting the learner's program."""
     for kind, guidance in (
@@ -255,7 +167,7 @@ def error_guidance(error: str) -> str:
         (
             "ModuleNotFoundError",
             "Python could not find an imported module. Check the project file name and import "
-            "spelling. Third-party packages belong in the project environment.",
+            "spelling. Course exercises use only Python's standard library.",
         ),
         (
             "FileNotFoundError",

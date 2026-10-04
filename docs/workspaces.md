@@ -30,30 +30,12 @@ Exports reject symbolic-link destinations and ancestors, including Windows junct
 Keep binary data and large datasets outside the editor.
 
 These checks protect file management from accidental traversal or replacement.
-Learner code still runs as your user; process isolation and virtual environments are not an operating-system security sandbox.
-Only run code and install packages you trust.
-
-## Virtual environments
-
-Creating an environment uses Python's built-in `venv` module and does not download packages.
-The environment belongs to the learner's local profile and is separate from the Python environment that runs the tutor.
-The tutor never creates or updates an environment merely because a lesson was opened.
-If creation fails or is cancelled, its incomplete directory is removed.
-
-Package installation is an explicit operation that requires a network connection.
-Enter one package name, optionally with an exact version such as `rich==13.9.4`.
-Check the spelling and publisher before installing; similar names can belong to different projects.
-The tutor uses PyPI, accepts wheels only, disables interactive prompts, and does not accept URLs, filesystem paths, additional pip options, or shell commands.
-A pinned top-level version does not pin all transitive dependencies.
-Packages are third-party executable code even when distributed as wheels.
-All authored lessons can be completed with the standard library, without installing third-party packages.
-
-Environment commands have a time limit and an output limit.
-Cancelling an operation stops its subprocess tree, using a process group on Unix or a kill-on-close Job Object on Windows.
-An interrupted package installation can leave some dependencies installed; recreating the environment is the clean recovery when its state is uncertain.
+Learner code still runs as your user; process isolation is not an operating-system security sandbox.
+Only run code you trust.
 
 ## Working outside the tutor
 
+Every authored lesson needs only the standard library, so the tutor does not create environments or install packages.
 Export a project to a new folder when you want to continue in your own terminal or editor.
 Create a new environment there and install only the dependencies the project actually uses.
 Keep dependency declarations in a project file and record versions for reproducibility.

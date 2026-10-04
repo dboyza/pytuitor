@@ -9,9 +9,10 @@ import sys
 import pytest
 
 from pytuitor.curriculum import LESSONS
+from pytuitor.execution_policy import start_process
 from pytuitor.runner import execute
 from pytuitor.state import Store
-from pytuitor.workspace import WorkspaceError, _run_command, export_workspace, validate_files
+from pytuitor.workspace import WorkspaceError, export_workspace, validate_files
 
 
 @pytest.mark.parametrize(
@@ -63,7 +64,22 @@ async def test_process_tree_stops_descendants(tmp_path, process_is_running, canc
         "stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); "
         + ("time.sleep(60)" if cancel else f"exec({wait_for_child!r})")
     )
-    task = asyncio.create_task(_run_command(sys.executable, "-c", parent))
+    tree = await start_process(
+        sys.executable,
+        "-c",
+        parent,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    async def run():
+        try:
+            await tree.process.wait()
+        finally:
+            await tree.close()
+
+    task = asyncio.create_task(run())
     async with asyncio.timeout(15):
         while not pid_file.exists():
             await asyncio.sleep(0.02)
@@ -76,6 +92,7 @@ async def test_process_tree_stops_descendants(tmp_path, process_is_running, canc
         pid = int(pid_file.read_text())
         while process_is_running(pid):
             await asyncio.sleep(0.02)
+    assert not process_is_running(tree.process.pid)
 
 
 def test_profile_lock_is_released_after_process_crash(tmp_path):
@@ -151,9 +168,9 @@ async def test_windows_controller_crash_stops_its_worker(tmp_path, process_is_ru
     controller = (
         "import asyncio, os, sys\n"
         "from pathlib import Path\n"
-        "from pytuitor.workspace import _run_command\n"
+        "from pytuitor.execution_policy import start_process\n"
         "async def main():\n"
-        f"    asyncio.create_task(_run_command(sys.executable, '-c', {worker!r}))\n"
+        f"    await start_process(sys.executable, '-c', {worker!r})\n"
         f"    while not Path({str(pid_file)!r}).exists():\n"
         "        await asyncio.sleep(.01)\n"
         "    os._exit(7)\n"

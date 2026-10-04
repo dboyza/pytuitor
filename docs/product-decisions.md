@@ -28,11 +28,10 @@ Keep this distinct from the tested color-independent status messages.
 
 The supported execution model is a local, single-user tutor running trusted code under the user's own permissions.
 Resource limits, sanitized child environments, isolated imports, temporary workspaces, and child-process cleanup reduce accidental interference; they do not prevent arbitrary filesystem or network access by learner code.
-Virtual environments separate packages, not operating-system permissions.
 Expose this boundary through the Execution and privacy command and the workspace documentation.
 
 No accounts or learning telemetry are required.
-Ordinary lessons and checks stay offline; package installation and release lookup remain explicit network actions.
+Lessons and checks stay offline and need only the standard library; the explicit release lookup is the tutor's only network action.
 A shared service that accepts untrusted code would require a separate OS isolation design and is outside this product's deployment contract.
 
 ## Profile and release integrity

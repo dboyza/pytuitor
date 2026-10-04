@@ -91,8 +91,8 @@ When your program asks a question, type in the console and press **Enter**.
 
 </details>
 
-For separate profiles, multi-file projects, exports, resets, and optional environments, see [workspace behavior](docs/workspaces.md) and [installation](docs/install.md).
-Learner code runs locally with resource limits; subprocesses and virtual environments are not an operating-system security sandbox.
+For separate profiles, multi-file projects, exports, and resets, see [workspace behavior](docs/workspaces.md) and [installation](docs/install.md).
+Learner code runs locally with resource limits; subprocesses are not an operating-system security sandbox.
 
 ## Development
 

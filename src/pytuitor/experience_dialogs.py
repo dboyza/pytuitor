@@ -19,7 +19,6 @@ class WorkspaceTools(ModalScreen[str | None]):
             yield Static("Your draft stays open while you choose an action.", classes="muted")
             for action, label in (
                 ("add-file", "Add file"),
-                ("environment", "Project environment"),
                 ("note", "Note for next time"),
                 ("export", "Export this stage"),
                 ("reset", "Back up and reset stage"),

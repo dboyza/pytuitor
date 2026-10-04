@@ -39,7 +39,7 @@ Run the native ConPTY journeys with Windows PowerShell 5.1 and PowerShell 7.
 Before a Windows desktop release, record a Windows 10/11 Windows Terminal smoke check for installation, display, keyboard input, resizing, and upgrades.
 Inspect 80 × 24 and 140 × 44 layouts, including errors, dialogs, multi-file controls, the console, and reference comparison.
 Run the reviewed visual baseline tests without update mode.
-Exercise interrupted execution, EOF, infinite loops, excessive output, cancelled environment creation, failed package installation, and full progress reset.
+Exercise interrupted execution, EOF, infinite loops, excessive output, and full progress reset.
 Confirm offline startup and course completion do not contact package indexes or update services.
 
 ## Installation and supply chain

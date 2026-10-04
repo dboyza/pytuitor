@@ -1,17 +1,7 @@
-import asyncio
-import sys
-
 import pytest
 
 from pytuitor import workspace
-from pytuitor.workspace import (
-    WorkspaceError,
-    create_environment,
-    environment_python,
-    export_workspace,
-    install_package,
-    validate_files,
-)
+from pytuitor.workspace import WorkspaceError, export_workspace, validate_files
 
 
 @pytest.mark.parametrize(
@@ -72,83 +62,3 @@ def test_rejects_symlink_parent_and_destination(tmp_path):
         with pytest.raises(WorkspaceError, match="symbolic"):
             export_workspace(destination, {"main.py": ""})
     assert not list(original.iterdir())
-
-
-async def test_creates_real_offline_environment_and_does_not_replace_it(tmp_path):
-    path = tmp_path / "environment"
-    python = await create_environment(path)
-    assert python == environment_python(path)
-    result = await workspace._run_command(
-        str(python), "-I", "-c", "import sys; print(sys.prefix != sys.base_prefix)"
-    )
-    assert result == "True"
-    with pytest.raises(WorkspaceError, match="already exists"):
-        await create_environment(path)
-
-
-@pytest.mark.parametrize("requirement", ["--help", "a b", "https://a/b.whl", "./a", "a>=1", "a;ls"])
-async def test_install_rejects_options_paths_urls_and_shell_syntax(tmp_path, requirement):
-    with pytest.raises(WorkspaceError, match="one package"):
-        await install_package(tmp_path / "python", requirement)
-
-
-async def test_install_uses_explicit_isolated_wheel_only_command(tmp_path, monkeypatch):
-    python = tmp_path / "bin/python"
-    python.parent.mkdir()
-    python.touch()
-    (tmp_path / "pyvenv.cfg").touch()
-    commands = []
-
-    async def run(*arguments):
-        commands.append(arguments)
-        return "installed"
-
-    monkeypatch.setattr(workspace, "_run_command", run)
-    assert await install_package(python, "rich==13.9.4") == "installed"
-    command = commands[0]
-    assert command[-1] == "rich==13.9.4"
-    assert "--only-binary=:all:" in command
-    assert "--isolated" in command
-    assert "https://pypi.org/simple" in command
-
-
-async def test_timeout_and_output_limit_are_reported():
-    with pytest.raises(WorkspaceError, match="timed out"):
-        await workspace._run_command(
-            sys.executable, "-c", "import time; time.sleep(20)", timeout=0.1
-        )
-    with pytest.raises(WorkspaceError, match="too much output"):
-        await workspace._run_command(sys.executable, "-c", "print('x' * 100000)")
-
-
-async def test_cancellation_removes_partial_environment(tmp_path, monkeypatch):
-    started = asyncio.Event()
-
-    async def wait(*arguments):
-        started.set()
-        await asyncio.Future()
-
-    monkeypatch.setattr(workspace, "_run_command", wait)
-    destination = tmp_path / "environment"
-    task = asyncio.create_task(create_environment(destination))
-    await asyncio.wait_for(started.wait(), 2)
-    task.cancel()
-    with pytest.raises(asyncio.CancelledError):
-        await task
-    assert not destination.exists()
-
-
-async def test_cancellation_kills_real_subprocess(tmp_path, process_is_running):
-    pid_file = tmp_path / "pid"
-    source = (
-        "import os, pathlib, time; pathlib.Path(%r).write_text(str(os.getpid())); time.sleep(20)"
-    )
-    task = asyncio.create_task(workspace._run_command(sys.executable, "-c", source % str(pid_file)))
-    async with asyncio.timeout(5):
-        while not pid_file.exists():
-            await asyncio.sleep(0.02)
-    pid = int(pid_file.read_text(encoding="utf-8"))
-    task.cancel()
-    with pytest.raises(asyncio.CancelledError):
-        await task
-    assert not process_is_running(pid)

@@ -190,7 +190,6 @@ LessonScreen.narrow #active-file { margin-top: 0; }
 #solution-dialog { height: 90%; }
 #solution-code { height: 1fr; min-height: 10; }
 #solution { margin-top: 1; }
-#environment-result { height: auto; margin: 1 0; }
 #chapter-picker { height: 3; margin: 0; }
 #chapter-outcome { height: auto; max-height: 2; }
 #run-files-dialog { height: 90%; }
@@ -198,11 +197,6 @@ LessonScreen.narrow #active-file { margin-top: 0; }
 #run-files-dialog, #solution-dialog { padding: 1 2; }
 #run-files-dialog .actions { height: 3; margin: 0; }
 #run-file-code, #solution-code { min-height: 3; }
-#environment-dialog { height: 90%; padding: 1 2; }
-.environment-actions { height: 3; margin-top: 1; }
-.environment-actions Button { margin-right: 1; }
-#package-name { width: 1fr; }
-#environment-output { height: 1fr; min-height: 2; }
 
 #check-summary { height: auto; max-height: 3; color: #ffd343; padding: 0 1; }
 #solution-actions { height: 3; }

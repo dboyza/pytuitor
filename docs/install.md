@@ -119,5 +119,5 @@ Game milestones and immutable working checkpoints have their own records; see [L
 Old drafts remain available when a lesson changes, with an explicit reset option.
 The previous application may not understand a newer profile, so use the backup with a separate `--data-dir` when testing a downgrade.
 
-Project virtual environments and dependency installation are described in [workspace behavior](workspaces.md).
+Course exercises need only the standard library; manage third-party packages in your own projects, as described in [workspace behavior](workspaces.md#working-outside-the-tutor).
 Third-party packages run with your user's permissions, so install only packages you trust.

@@ -19,7 +19,6 @@ from pytuitor.file_tree import FileTree
 from pytuitor.learning_progress import load_report, report_is_current, safe_view, saved_report
 from pytuitor.learning_tools import (
     DeleteFileDialog,
-    EnvironmentDialog,
     FileDialog,
     RunFilesDialog,
     SolutionDialog,
@@ -29,7 +28,7 @@ from pytuitor.models import StageContract
 from pytuitor.progress_types import CheckEvent, DraftState, StageName
 from pytuitor.runner import ConsoleSession, execute
 from pytuitor.ui import CodeEditor, TutorScreen, brand
-from pytuitor.workspace import WorkspaceError, environment_python, export_workspace, validate_files
+from pytuitor.workspace import WorkspaceError, export_workspace, validate_files
 
 
 class ConsoleInput(Input):
@@ -363,7 +362,6 @@ class LessonScreen(TutorScreen):
     def workspace_tool_chosen(self, action):
         actions = {
             "add-file": self.action_add_file,
-            "environment": self.action_environment,
             "note": self.action_note,
             "export": self.action_export,
             "reset": self.action_reset,
@@ -565,14 +563,6 @@ class LessonScreen(TutorScreen):
         self.app.push_screen(
             SolutionDialog(self.lesson, self.stage_contract(), self.capture_editor())
         )
-
-    @property
-    def environment_path(self):
-        return self.store.directory / "environments" / self.lesson.id
-
-    @on(Button.Pressed, "#environment")
-    def action_environment(self) -> None:
-        self.app.push_screen(EnvironmentDialog(self.environment_path))
 
     def stage_entry(self) -> DraftState:
         root = self.store.entry(self.lesson)
@@ -985,9 +975,6 @@ class LessonScreen(TutorScreen):
                 check=check,
                 files=source,
                 stage=contract,
-                python=environment_python(self.environment_path)
-                if self.environment_path.exists()
-                else None,
                 console=self.console,
                 on_check=lambda case: self.show_check(case) if serial == self.run_serial else None,
             )

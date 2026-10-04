@@ -1,40 +1,24 @@
-"""Bounded project files and explicit, isolated environment operations.
+"""Bounded project files and safe exports.
 
 These helpers protect tutor-owned paths from accidental traversal and replacement.
-A virtual environment and a subprocess are not an operating-system security sandbox.
 """
 
 from __future__ import annotations
 
-import asyncio
 import contextlib
 import os
 import re
 import shutil
-import sys
 import tempfile
 import unicodedata
 from pathlib import Path, PurePosixPath
 
-from pytuitor.execution_policy import (
-    OUTPUT_BYTES,
-    clean_environment,
-    start_process,
-)
 from pytuitor.platform_files import is_link
 
 MAX_FILES = 32
 MAX_FILE_BYTES = 256 * 1024
 MAX_WORKSPACE_BYTES = 1024 * 1024
-MAX_COMMAND_OUTPUT = OUTPUT_BYTES
-COMMAND_TIMEOUT = 180.0
 _RESERVED = {".git", ".venv", "__pycache__"}
-_REQUIREMENT = re.compile(
-    r"[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?"
-    r"(?:==[0-9]+(?:\.[0-9]+)*(?:(?:a|b|rc)[0-9]+)?"
-    r"(?:\.post[0-9]+)?(?:\.dev[0-9]+)?"
-    r"(?:\+[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*)?)?"
-)
 
 
 class WorkspaceError(ValueError):
@@ -162,87 +146,3 @@ def _export_validated(destination: Path, checked: dict[str, str]) -> Path:
         raise WorkspaceError(f"Could not export the workspace: {error.strerror}.") from error
     finally:
         shutil.rmtree(staging, ignore_errors=True)
-
-
-def environment_python(path: Path) -> Path:
-    """Return the platform interpreter path; existence is checked by operations."""
-    return Path(path) / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-
-
-async def _run_command(*arguments: str, timeout: float = COMMAND_TIMEOUT) -> str:
-    environment = clean_environment(tempfile.gettempdir())
-    tree = await start_process(
-        *arguments,
-        stdin=asyncio.subprocess.DEVNULL,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT,
-        env=environment,
-    )
-    process = tree.process
-    output = bytearray()
-    try:
-        async with asyncio.timeout(timeout):
-            assert process.stdout is not None
-            while chunk := await process.stdout.read(8192):
-                output.extend(chunk)
-                if len(output) > MAX_COMMAND_OUTPUT:
-                    raise WorkspaceError("The environment command produced too much output.")
-            await process.wait()
-        text = output.decode("utf-8", errors="replace").strip()
-        if process.returncode:
-            raise WorkspaceError(text or f"Environment command exited with {process.returncode}.")
-        return text
-    except TimeoutError as error:
-        raise WorkspaceError("The environment command timed out. You can try again.") from error
-    finally:
-        await tree.close()
-
-
-async def create_environment(path: Path) -> Path:
-    """Create an offline stdlib venv in a new directory and return its Python."""
-    destination = _destination(path)
-    try:
-        destination.mkdir(mode=0o700)
-    except OSError as error:
-        raise WorkspaceError(f"Could not create environment: {error.strerror}.") from error
-    try:
-        await _run_command(sys.executable, "-I", "-m", "venv", str(destination))
-        python = environment_python(destination)
-        if not python.is_file():
-            raise WorkspaceError("The environment did not contain a Python interpreter.")
-        return python
-    except BaseException:
-        shutil.rmtree(destination, ignore_errors=True)
-        raise
-
-
-async def install_package(python: Path, requirement: str) -> str:
-    """Explicitly install a named wheel from PyPI into a tutor-created venv.
-
-    No URL, local path, index override, shell syntax, or source build is accepted.
-    Installed third-party code must still be trusted by the learner.
-    """
-    if (
-        not isinstance(requirement, str)
-        or len(requirement) > 200
-        or not _REQUIREMENT.fullmatch(requirement)
-    ):
-        raise WorkspaceError("Enter one package name, optionally pinned like rich==13.9.4.")
-    python = Path(python).absolute()
-    if not python.is_file() or not (python.parent.parent / "pyvenv.cfg").is_file():
-        raise WorkspaceError("Create a project virtual environment before installing packages.")
-    return await _run_command(
-        str(python),
-        "-I",
-        "-m",
-        "pip",
-        "--isolated",
-        "--disable-pip-version-check",
-        "--no-input",
-        "install",
-        "--no-cache-dir",
-        "--only-binary=:all:",
-        "--index-url",
-        "https://pypi.org/simple",
-        requirement,
-    )

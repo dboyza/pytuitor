@@ -54,8 +54,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Preserve drafts across curriculum updates, including renamed or additional required files.
 - Start over is discoverable and confirmed; stop execution/autosave before clearing active progress.
 - Run files previews generated text; saving explicitly backs up the workspace and refuses newer-draft conflicts.
-- Project environments are optional; creation is offline and package installation is an explicit network action.
-- Install named wheels into a project venv, without shell interpolation, source builds, or automatic downloads.
+- The tutor manages no virtual environments or packages; lessons need only the standard library, and `--check-upgrade` is its only network action.
 
 ## Code map and pitfalls
 
@@ -63,7 +62,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
 - Stage contracts live in `content/` chapter modules and the five Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
 - `lesson_screen.py` owns stage/editor/console execution; `file_tree.py` renders workspace files; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
-- `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
+- `learning_tools.py` owns file and reference dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
 - `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` lists chapters by section.
 - `project_workspace.py` owns immutable checkpoints and continuation; keep extra inherited capability checks via its active contract and never replace learner source silently.
 - `project_screen.py` owns game history, explicit supplied bases, restoration, temporary checkpoint play, and portable exports.
@@ -75,11 +74,10 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Checks receive fresh namespaces, local imports, working directories, supplied stdin, and individual execution time budgets.
 - Compare the entire file snapshot before marking an asynchronous check successful.
 - Input-wait time must not consume execution timeout; kill descendant processes during cancellation.
-- Process isolation, venvs, and resource limits are not an OS security sandbox.
+- Process isolation and resource limits are not an OS security sandbox.
 - Guard async UI callbacks against cancellation, changed drafts, and unmounted screens.
 - Keep pane selection and restored focus synchronous; delayed view restoration must not steal newer focus, and stale bubbled focus notifications must be ignored.
-- `workspace.py` validates paths and limits, exports without overwrite, and manages explicit environment commands.
-- Create venvs at their final path; moving them breaks interpreter paths and shebangs.
+- `workspace.py` validates paths and limits, and exports without overwrite.
 - OptionList custom click handlers need `prevent_default()` to suppress inherited activation.
 
 ## Working and verification

@@ -29,7 +29,7 @@ Exceptions, cancellation, and edits made during a check still prevent a stale su
 
 The workbench keeps Run, Check, and the next required action prominent.
 Stop appears while execution is active.
-Occasional file, environment, note, export, and reset actions live under Tools and remain available in the command palette.
+Occasional file, note, export, and reset actions live under Tools and remain available in the command palette.
 
 ## See the game grow
 
