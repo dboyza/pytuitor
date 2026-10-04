@@ -10,8 +10,8 @@ from pytuitor.runner import execute
 
 
 def test_beginner_course_has_six_coherent_chapters():
-    assert len(LESSONS) == 46
-    assert sum(lesson.project for lesson in LESSONS) == 6
+    assert len(LESSONS) == 40
+    assert not any(lesson.project for lesson in LESSONS)
     seen = set()
     for lesson in LESSONS:
         assert set(lesson.prerequisites) <= seen
@@ -22,11 +22,7 @@ def test_beginner_course_has_six_coherent_chapters():
     for chapter in CHAPTERS:
         units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter.id]
         assert len(units) >= 5
-        assert units[-1].project
-        assert set(units[-1].concepts) == {
-            concept for lesson in units[:-1] for concept in lesson.concepts
-        }
-    assert sum(lesson.project and len(lesson.files) > 1 for lesson in LESSONS) >= 2
+    assert any(len(lesson.files) > 1 for lesson in LESSONS)
 
 
 @pytest.mark.parametrize("lesson", LESSONS, ids=lambda lesson: lesson.id)

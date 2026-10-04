@@ -110,16 +110,6 @@ BUILD_INSTRUCTIONS = {
         "int `0`.\nCheck supplies the stopping zero automatically.\nWhen using Run,"
         " remember to type it yourself."
     ),
-    "supply-report": (
-        "Read one space-separated input line.\nCreate `counts`, a dictionary counti"
-        "ng each word, and `order`, a list containing each distinct word once in th"
-        "e order it first appeared.\nPrint one line per word in `order`, formatted "
-        "`word: count`.\nPrint `No supplies` if the input is empty.\nFor `rope lamp"
-        " rope map lamp`, print:\n\n```text\nrope: 2\nlamp: 2\nmap: 1\n```\n\nPrese"
-        "rve capitalization and do not alphabetize the report.\nYou do not need to "
-        "define your own functions yet.\nCreate the empty list and dictionary befor"
-        "e the loop, then decide which changes happen inside it."
-    ),
 }
 
 REPAIR_STAGES = {
@@ -657,59 +647,5 @@ REPAIR_STAGES = {
             "Only the input value 99 stops this loop.",
         ),
         stdin="5\n-2\n99\n",
-    ),
-    "supply-report": _stage(
-        (
-            "Repair the delivery report. Read one line of space-separated items and cou"
-            "nt them in stock. Create names as the sorted list of distinct items. Print"
-            ' one "name: count" line per name in alphabetical order, or "No delivery" f'
-            "or empty input. Preserve case. Unlike Build, this report sorts the names."
-        ),
-        """
-        stock = {}
-        for item in input("Delivery: ").split():
-            stock[item] = stock.get(item, 0) + 1
-        names = sorted(stock.keys())
-        if len(names) == 0:
-            print("No delivery")
-        else:
-            for name in names:
-                print(f"{name}: {stock[name]}")
-        """,
-        """
-        stock = {}
-        for item in input("Delivery: ").split():
-            stock[item] = 1
-        names = list(stock.keys())
-        if len(names) == 0:
-            print("No delivery")
-        else:
-            for name in names:
-                print(f"{name}: {stock[name]}")
-        """,
-        (
-            _check(
-                "Repeated delivery",
-                "[stock, names]",
-                [{"rope": 2, "lamp": 2, "map": 1}, ["lamp", "map", "rope"]],
-                stdin="rope lamp rope map lamp\n",
-                output="lamp: 2\nmap: 1\nrope: 2",
-            ),
-            _check(
-                "Empty delivery", "[stock, names]", [{}, []], stdin="\n", output=("No delivery")
-            ),
-            _check(
-                "Case matters",
-                "[stock, names]",
-                [{"ada": 2, "Ada": 1}, ["Ada", "ada"]],
-                stdin="ada Ada ada\n",
-                output="Ada: 1\nada: 2",
-            ),
-        ),
-        (
-            "Count every occurrence before printing.",
-            "Sort the distinct names, then look up their final counts.",
-        ),
-        stdin="rope lamp rope map lamp\n",
     ),
 }

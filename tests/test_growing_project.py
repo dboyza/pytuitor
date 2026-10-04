@@ -9,7 +9,7 @@ import pytest
 from textual.widgets import Button, OptionList, TextArea
 
 from pytuitor.app import TutorApp
-from pytuitor.curriculum import ACTIVITIES, CHAPTERS, LESSONS, PRACTICE, chapter_activities
+from pytuitor.curriculum import ACTIVITIES, CHAPTERS, LESSONS, chapter_activities
 from pytuitor.project_catalog import BY_MILESTONE, MILESTONES
 from pytuitor.project_screen import CheckpointPlayer, ProjectScreen
 from pytuitor.project_workspace import ProjectError, ProjectWorkspace
@@ -61,7 +61,7 @@ async def test_every_game_contract_and_independent_repair(milestone):
 
 
 def test_recommended_path_and_independent_specialties():
-    assert len(LESSONS) == 87 and len(PRACTICE) == 12
+    assert len(LESSONS) == 75 and not any(lesson.project for lesson in LESSONS)
     assert len(ACTIVITIES) == 96 and len(MILESTONES) == len(CHAPTERS) == 21
     assert len({item.lesson.id for item in MILESTONES}) == 21
     for chapter in CHAPTERS:
@@ -170,6 +170,7 @@ async def test_replace_base_backs_up_both_stages_and_retains_checkpoints(tmp_pat
 
 
 def test_v3_migration_preserves_every_old_lesson_record(tmp_path):
+    # ticket-desk was a removed practice project; its draft stays and resume falls back.
     original = {
         "version": 3,
         "onboarded": True,
@@ -189,6 +190,7 @@ def test_v3_migration_preserves_every_old_lesson_record(tmp_path):
     assert store.data["version"] == 4
     assert store.data["lessons"] == original["lessons"]
     assert store.data["projects"] == {}
+    assert store.next_lesson().id == "first-light"
     store.save()
     assert (tmp_path / "profile-before-v4.json").read_text() == raw
     store.close()
@@ -366,9 +368,7 @@ async def test_complete_cumulative_game_keeps_all_optional_features_and_exports(
 def test_every_teaching_lesson_has_a_specific_game_connection():
     from pytuitor.content.lantern.connections import GAME_CONNECTIONS
 
-    assert set(GAME_CONNECTIONS) == {lesson.id for lesson in LESSONS if not lesson.project}
-    practice_ids = {lesson.id for lesson in PRACTICE}
-    assert all(not practice_ids.intersection(item.lesson.prerequisites) for item in MILESTONES)
+    assert set(GAME_CONNECTIONS) == {lesson.id for lesson in LESSONS}
 
 
 async def test_game_history_exports_full_workspace_at_file_limit(tmp_path):

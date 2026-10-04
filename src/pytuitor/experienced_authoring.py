@@ -32,7 +32,6 @@ def unit(
     checks,
     hints,
     *,
-    project=False,
     files=None,
 ):
     solution_files = {name: code(source) for name, source in files[0].items()} if files else None
@@ -41,7 +40,7 @@ def unit(
         "experienced",
         title,
         concept,
-        35 if project else 20,
+        20,
         (concept,),
         lesson_text(lesson_id),
         "",
@@ -52,7 +51,6 @@ def unit(
         0,
         "",
         code(solution),
-        project=project,
         revision=4,
         chapter_id=chapter,
         files=tuple(solution_files) if solution_files else ("lesson.py",),
@@ -60,8 +58,8 @@ def unit(
     )
 
 
-def legacy(lesson_id, chapter, *, project=False):
-    return replace(LEGACY[lesson_id], chapter_id=chapter, revision=4, project=project)
+def legacy(lesson_id, chapter):
+    return replace(LEGACY[lesson_id], chapter_id=chapter, revision=4)
 
 
 def probe(label, source, expected, description, nudge):

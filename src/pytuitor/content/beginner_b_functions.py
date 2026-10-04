@@ -58,17 +58,6 @@ BUILD_INSTRUCTIONS = {
         'id because `int()` accepts them.\n`"3.5"` and `""` are invalid.\nThe input'
         " will always be a string; no input prompts or printed output are required."
     ),
-    "lantern-quest": (
-        "Define `play(moves)` for a list of move strings.\nReturn `(place, coins)` "
-        'after processing every move.\n\n- Start in `"forest"` with `0` coins.\n- `'
-        '"east"` moves from the forest to the cave.\n- `"west"` moves from the cave'
-        ' to the forest.\n- `"take"` in the cave collects `5` coins once per game.'
-        "\n- Other moves do nothing; returning to the cave does not refill the trea"
-        'sure.\n\nFor `["east", "take", "west"]`, return `("forest", 5)`.\nFor an e'
-        'mpty list, return `("forest", 0)`.\nChecks call your function directly.\nT'
-        'o try it with Run, you may add `print(play(["east", "take", "west"]))` bel'
-        "ow the definition."
-    ),
 }
 
 REPAIR_STAGES = {
@@ -271,60 +260,6 @@ REPAIR_STAGES = {
         (
             "Catch ValueError around int(text).",
             "After conversion, reject both negative and above-cap values.",
-        ),
-    ),
-    "lantern-quest": _stage(
-        (
-            "Repair a separate cave route. explore(moves) starts at camp with zero gems"
-            ", moves north to the ruins and south back to camp, and collects three gems"
-            " once when search is used in the ruins. Return (place, gems). Other moves "
-            "do nothing."
-        ),
-        """
-        def explore(moves):
-            place = "camp"
-            gems = 0
-            found = False
-            for move in moves:
-                if place == "camp" and move == "north":
-                    place = "ruins"
-                elif place == "ruins" and move == "south":
-                    place = "camp"
-                elif place == "ruins" and move == "search" and not found:
-                    gems += 3
-                    found = True
-            return place, gems
-        """,
-        """
-        def explore(moves):
-            place = "camp"
-            gems = 0
-            found = False
-            for move in moves:
-                if place == "camp" and move == "north":
-                    place = "ruins"
-                elif place == "ruins" and move == "south":
-                    place = "camp"
-                elif place == "ruins" and move == "search":
-                    gems += 3
-                    found = True
-            return place, gems
-        """,
-        (
-            _check("Find gems", "explore(['north', 'search', 'south'])", ("camp", 3)),
-            _check("One search", "explore(['north', 'search', 'search'])", ("ruins", 3)),
-            _check("Stay put", "explore(['search'])", ("camp", 0)),
-            _check("Unknown move", "explore(['north', 'wait'])", ("ruins", 0)),
-            _check(
-                ("Return visit"),
-                ("explore(['north', 'search', 'south', 'north', 'search'])"),
-                (("ruins"), 3),
-            ),
-            _check("No moves", "explore([])", ("camp", 0)),
-        ),
-        (
-            "Keep a boolean found flag outside the loop.",
-            "Require both the place and the move before changing state.",
         ),
     ),
 }

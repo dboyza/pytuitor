@@ -7,20 +7,13 @@ from pytuitor.content.lantern.core import CORE
 from pytuitor.content.lantern.depth import DEPTH
 from pytuitor.content.lantern.foundations import FOUNDATIONS
 from pytuitor.content.lantern.specialized import SPECIALIZED
-from pytuitor.course_map import CHAPTER_UNITS, PROJECT_PREPARATION
+from pytuitor.course_map import CHAPTER_UNITS
 from pytuitor.models import ProjectDefinition
 
 MILESTONES = tuple(
     replace(
         milestone,
-        lesson=replace(
-            milestone.lesson,
-            prerequisites=tuple(
-                identifier
-                for identifier in CHAPTER_UNITS[milestone.lesson.chapter_id]
-                if identifier not in PROJECT_PREPARATION
-            ),
-        ),
+        lesson=replace(milestone.lesson, prerequisites=CHAPTER_UNITS[milestone.lesson.chapter_id]),
     )
     for milestone in (*FOUNDATIONS, *CORE, *DEPTH, *SPECIALIZED)
 )

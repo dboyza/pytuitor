@@ -1,6 +1,6 @@
 """Stage contracts for b-data."""
 
-from pytuitor.beginner_authoring import _check, _scenario_check, _stage
+from pytuitor.beginner_authoring import _check, _stage
 
 BUILD_INSTRUCTIONS = {
     "text-files": (
@@ -55,21 +55,6 @@ BUILD_INSTRUCTIONS = {
         "id tags such as `[user:Ada]`, `[user:]`, and `[user:ab2]` remain unchanged"
         ' and contribute no names.\nEmpty input returns `([], "")`.\nThe input is a'
         "lways a string; do not print."
-    ),
-    "expense-report": (
-        "Define `summarize_expenses(source, destination)`.\nRead a UTF-8 CSV file w"
-        "ith headers `category,amount` from `source`.\nAmounts are nonnegative inte"
-        "ger cents, so you can add them exactly without decimal rounding.\nGroup am"
-        "ounts by category into a dictionary, write that dictionary as JSON to `des"
-        "tination`, and return it.\nThe destination's parent folder already exists."
-        "\nA header-only file produces `{}`.\nPreserve category text exactly, inclu"
-        "ding commas represented by CSV quoting.\nDo not change the source file.\n"
-        "\nFor these CSV rows:\n\n```text\ncategory,amount\ntravel,250\nfood,600\nt"
-        'ravel,150\n```\n\nReturn and save `{"travel": 400, "food": 600}`.\nJSON wh'
-        "itespace and key order do not matter.\nThe tools you have practiced fit to"
-        "gether here: `csv.DictReader` reads rows, a dictionary keeps each category"
-        "'s running total, and `json.dump` saves the result.\nThe function receives"
-        " paths from its caller, so it does not need input prompts."
     ),
 }
 
@@ -359,161 +344,6 @@ REPAIR_STAGES = {
         (
             "Trace how many matches the replacement call changes.",
             "re.sub replaces every match by default; count=1 limits it to the first match.",
-        ),
-    ),
-    "expense-report": _stage(
-        (
-            "Repair a separate expense counter. category_counts(source, destination) mu"
-            "st count the number of rows in each category, save that dictionary as JSON"
-            ", and return it. Repeated categories must increase their existing count."
-        ),
-        """
-        import csv
-        import json
-
-        def category_counts(source, destination):
-            counts = {}
-            with open(source, newline="", encoding="utf-8") as handle:
-                for row in csv.DictReader(handle):
-                    category = row["category"]
-                    counts[category] = counts.get(category, 0) + 1
-            with open(destination, "w", encoding="utf-8") as handle:
-                json.dump(counts, handle)
-            return counts
-        """,
-        """
-        import csv
-        import json
-
-        def category_counts(source, destination):
-            counts = {}
-            with open(source, newline="", encoding="utf-8") as handle:
-                for row in csv.DictReader(handle):
-                    counts[row["category"]] = 1
-            with open(destination, "w", encoding="utf-8") as handle:
-                json.dump(counts, handle)
-            return counts
-        """,
-        (
-            _check(
-                "Repeated categories",
-                (
-                    "(__import__('pathlib').Path('expenses.csv').write_text('category,amount\\n"
-                    "travel,250\\nfood,600\\ntravel,150\\n', encoding='utf-8'), category_counts"
-                    "('expenses.csv', 'counts.json'))[1]"
-                ),
-                {"travel": 2, "food": 1},
-            ),
-            _check(
-                "Empty report",
-                (
-                    "(__import__('pathlib').Path('expenses.csv').write_text('category,amount\\n"
-                    "', encoding='utf-8'), category_counts('expenses.csv', 'counts.json'))[1]"
-                ),
-                {},
-            ),
-            _scenario_check(
-                "Saved JSON and original CSV",
-                (
-                    "\n                import json\n                from pathlib import Path\n"
-                    '\n                text = \'category,amount\\n"café, snacks",20\\ntravel,7'
-                    '\\n"café, snacks",30\\n\'\n                Path("expenses.csv").write_text'
-                    '(text, encoding="utf-8")\n                report = category_counts("expens'
-                    'es.csv", "counts.json")\n                saved = json.loads(Path("counts.j'
-                    'son").read_text(encoding="utf-8"))\n                result = [\n          '
-                    '          report,\n                    saved,\n                    Path("e'
-                    'xpenses.csv").read_text(encoding="utf-8") == text,\n                ]\n   '
-                    "             "
-                ),
-                [{"café, snacks": 2, "travel": 1}, {"café, snacks": 2, "travel": 1}, True],
-                description="C"
-                "o"
-                "u"
-                "n"
-                "t"
-                " "
-                "r"
-                "e"
-                "p"
-                "e"
-                "a"
-                "t"
-                "e"
-                "d"
-                " "
-                "q"
-                "u"
-                "o"
-                "t"
-                "e"
-                "d"
-                " "
-                "U"
-                "n"
-                "i"
-                "c"
-                "o"
-                "d"
-                "e"
-                " "
-                "c"
-                "a"
-                "t"
-                "e"
-                "g"
-                "o"
-                "r"
-                "i"
-                "e"
-                "s"
-                ";"
-                " "
-                "s"
-                "a"
-                "v"
-                "e"
-                " "
-                "m"
-                "a"
-                "t"
-                "c"
-                "h"
-                "i"
-                "n"
-                "g"
-                " "
-                "J"
-                "S"
-                "O"
-                "N"
-                " "
-                "a"
-                "n"
-                "d"
-                " "
-                "p"
-                "r"
-                "e"
-                "s"
-                "e"
-                "r"
-                "v"
-                "e"
-                " "
-                "t"
-                "h"
-                "e"
-                " "
-                "C"
-                "S"
-                "V"
-                ".",
-                nudge="Check both the returned mapping and the file written to destination.",
-            ),
-        ),
-        (
-            "Read each row before writing JSON.",
-            "Use get(category, 0) + 1 so earlier rows are retained.",
         ),
     ),
 }

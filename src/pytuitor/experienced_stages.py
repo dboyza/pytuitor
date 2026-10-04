@@ -45,10 +45,6 @@ FEEDBACK = {
         "Replacing a group loses previous names; appending every occurrence loses "
         "uniqueness. Preserve first-seen order for both."
     ),
-    "index-records": (
-        "Check for duplicate keys before assignment and copy nested records instead of "
-        "retaining caller-owned containers."
-    ),
     "callable-tools": (
         "Sorting should use the supplied key and remain stable; closures must remember "
         "their own factor."
@@ -93,10 +89,6 @@ FEEDBACK = {
         "Adjacent runs are not global groups. Consume each run before advancing and allow"
         " equal unhashable labels."
     ),
-    "stream-report": (
-        "Skip stripped blank and comment lines before conversion, and yield each running "
-        "total before reading farther."
-    ),
     "ready-to-ship": (
         "A test that passes on your implementation may still be ineffective. Check zero, "
         "invalid input, and a deliberately incorrect implementation."
@@ -128,10 +120,6 @@ FEEDBACK = {
         "Retry only the documented error, pause between attempts rather than after the "
         "last one, and preserve the final failure."
     ),
-    "typed-inventory": (
-        "Validate every record before calculating quantity times price; keep reusable "
-        "functions in the supporting module."
-    ),
     "coroutine-basics": (
         "Calling a coroutine does not run it. Await cooperative work for each value, "
         "including zero."
@@ -147,10 +135,6 @@ FEEDBACK = {
     "async-streams": (
         "Use async iteration, strip before deciding whether to keep text, and propagate "
         "source errors."
-    ),
-    "concurrent-batch": (
-        "The semaphore limits active worker calls; the task group must also cancel and "
-        "join siblings when one fails."
     ),
     "module-boundaries": (
         "A reusable module must import quietly and define the actual reusable behavior in"
@@ -168,10 +152,6 @@ FEEDBACK = {
         "Only a missing file gets defaults. A malformed document or a non-object JSON "
         "value is a different failure."
     ),
-    "signal-from-noise": (
-        "Normalize the level, require a message, and count only known levels. Keep "
-        "imports quiet and main responsible for output."
-    ),
     "descriptors": (
         "A descriptor is shared by a class, but stored values belong to individual "
         "instances. Class access has no instance."
@@ -187,10 +167,6 @@ FEEDBACK = {
     "runtime-inspection": (
         "Read signature parameters, not local variable names; inspection must never "
         "execute the function."
-    ),
-    "plugin-system": (
-        "Dispatch through the registry so later plugins work, and distinguish inherited "
-        "kinds from explicit registrations."
     ),
 }
 

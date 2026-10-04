@@ -9,14 +9,14 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 
 - Use Textual with an OpenCode feel, Python blue/yellow accents, and unchanged gray backgrounds.
 - Serve motivated complete beginners and programmers seeking Python depth.
-- The recommended course has 75 lessons and 21 Lantern Reach game milestones; 12 original projects remain optional practice.
+- The recommended course has 75 lessons and 21 Lantern Reach game milestones; standalone practice projects were retired in favor of the game.
 - One syllabus has 21 chapters in five sections; the first three form the core sequence, with optional Python depth and specialized topics; see [the curriculum map](docs/curriculum.md).
 - Keep authored learning and checks offline, progress local, and accounts unnecessary.
 - Welcome offers Start learning or Browse syllabus; Known topics groups concepts by category.
 - Batch onboarding transitions to avoid dashboard flashes.
-- Known topics are skipped by Continue but remain accessible; project concepts describe their relevant preparation.
+- Known topics are skipped by Continue but remain accessible.
 - Dashboard browses all chapters; Continue resumes the active chapter, then the core sequence or explicitly selected optional section.
-- Lessons and optional practice use blank Build then Repair; game milestones use cumulative Extend then independent Repair, with both required for completion.
+- Lessons use blank Build then Repair; game milestones use cumulative Extend then independent Repair, with both required for completion.
 - Prerequisites advise without blocking; references require explicit reveal and never replace drafts.
 - Learner studies are user-run; automated tests do not establish teaching effectiveness.
 
@@ -61,10 +61,10 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 
 - `models.py` defines contracts; `beginner_course.py`, `beginner_extensions.py`, and `experienced_course.py` author courses; `curriculum.py` assembles catalog; `legacy.py` preserves original contracts.
 - `lessons/*.md` contains prose; update [the curriculum map](docs/curriculum.md) when scope changes.
-- Stage contracts live in `content/` chapter modules and the six Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
+- Stage contracts live in `content/` chapter modules and the five Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
 - `lesson_screen.py` owns stage/editor/console execution; `file_tree.py` renders workspace files; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file, reference, and environment dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
-- `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` separates optional practice.
+- `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` lists chapters by section.
 - `project_workspace.py` owns immutable checkpoints and continuation; keep extra inherited capability checks via its active contract and never replace learner source silently.
 - `project_screen.py` owns game history, explicit supplied bases, restoration, temporary checkpoint play, and portable exports.
 - `review_screen.py` and `review_progress.py` own optional review; `content/reviews/` authors 21 mixed sessions.

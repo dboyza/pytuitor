@@ -1,12 +1,11 @@
 # Curriculum map
 
-The release candidate has 75 lessons and 21 cumulative Lantern Reach milestones across 21 chapters, plus 12 optional standalone projects.
+The release candidate has 75 lessons and 21 cumulative Lantern Reach milestones across 21 chapters.
 The first three sections form the recommended sequence; Python depth and Specialized topics are optional.
 Start learning begins with Foundations, and learners can open any chapter directly.
 Each chapter lists useful preparation without locking access.
-Lessons and optional standalone projects use blank Build followed by Repair.
+Lessons use blank Build followed by Repair.
 Each chapter ends with Extend and independent Repair for the growing [Lantern Reach game](lantern-reach.md).
-Existing standalone project IDs, drafts, and achievements remain available as optional practice in the syllabus.
 Use the [topic index](coverage.md) to find lessons by Python subject.
 
 Optional mixed review adds one three-task session per chapter without changing required completion.
@@ -25,7 +24,6 @@ Read input, calculate, and choose what happens.
 - **Numbers from input**: Convert text and calculate whole-number results.
 - **Decimal measurements**: Read decimal input and format a calculated measurement.
 - **Making decisions**: Comparisons, booleans, if, elif, and else.
-- **Optional practice - Project: the ticket desk**: Combine input, arithmetic, and decisions.
 
 ### Lists and sets
 
@@ -49,7 +47,6 @@ Useful preparation: Lists and sets.
 - **Dictionaries and counts**: Associate keys with values.
 - **Editing lists and dictionaries**: Insert, remove, sort, and delete deliberately.
 - **Repeating until done**: While loops and stopping conditions.
-- **Optional practice - Project: supply report**: Summarize a collection without changing it.
 
 ### Functions and input
 
@@ -61,7 +58,6 @@ Useful preparation: Loops and dictionaries.
 - **Cleaning strings**: Methods, whitespace, and reusable transformations.
 - **Function options**: Default arguments, keyword calls, and local variables.
 - **Handling invalid input**: Exceptions and deliberate recovery.
-- **Optional practice - Build a text adventure**: Build a tiny branching adventure.
 
 ## Everyday Python
 
@@ -77,7 +73,6 @@ Useful preparation: Functions and input.
 - **Paths and folders**: Build file paths without joining strings by hand.
 - **Saving structured data**: JSON, dictionaries, and lists on disk.
 - **Working with CSV tables**: Read headers and quoted fields correctly.
-- **Optional practice - Project: an expense report**: Transform CSV records into a JSON summary.
 
 ### Text patterns
 
@@ -124,14 +119,13 @@ Build tested tools and automate work safely.
 
 ### Classes and tested tools
 
-Model state, name choices, and verify a multi-file application.
+Model state, name choices, and verify behavior with tests.
 
 Useful preparation: Modules and library tools.
 
 - **Your first class**: Keep state and related operations together.
 - **Named states with enums**: Represent a fixed set of meaningful values.
 - **Writing automated tests**: Use unittest to check expected results.
-- **Optional practice - Project: a task list workspace**: Keep task rules in a reusable Python module.
 
 ### Careful automation
 
@@ -141,7 +135,6 @@ Useful preparation: Files and structured data, Modules and library tools, Collec
 
 - **Validating a tool’s inputs**: State acceptable inputs before touching files.
 - **Copying without overwriting**: Preview work and protect existing data.
-- **Optional practice - Project: a careful notes archiver**: Preview a multi-file automation tool before it writes.
 
 ## Python depth (optional)
 
@@ -157,7 +150,6 @@ Useful preparation: Functions and input, Collection tools.
 - **Objects and copying**: Identity, aliasing, and mutability.
 - **Make call sites readable**: Positional & keyword arguments.
 - **Group without losing order**: Dictionaries, sets & comprehensions.
-- **Optional practice - Project: a record index**: Record indexing project.
 
 ### Recursion and functional tools
 
@@ -189,7 +181,6 @@ Useful preparation: Python semantics.
 - **Consume only what you need**: Iterator composition.
 - **Combine and bound iterators**: Chain, islice, zip_longest & product.
 - **Group consecutive values**: Consecutive grouping with itertools.
-- **Optional practice - Project: a streaming report**: Lazy pipeline project.
 
 ### Exceptions and contexts
 
@@ -222,7 +213,6 @@ Useful preparation: Dataclasses and types, Decorators.
 - **Factories and abstract interfaces**: Class methods, static methods & ABCs.
 - **Program to a small protocol**: Structural typing & protocols.
 - **Inject effects for reliable tests**: Dependency injection & mocking.
-- **Optional practice - Project: an inventory library**: Typed multi-file project.
 
 ## Specialized topics (optional)
 
@@ -238,7 +228,6 @@ Useful preparation: Exceptions and contexts, Iterators and streaming.
 - **Context managers and async**: Resources, exceptions, and async.
 - **Give tasks a shared lifetime**: Task groups & cancellation.
 - **Consume an async stream**: Async iteration.
-- **Optional practice - Project: bounded async work**: Bounded concurrency project.
 
 ### Build distributable tools
 
@@ -250,7 +239,6 @@ Useful preparation: Classes and tested tools, Files and structured data.
 - **Understand package metadata**: Virtual environments & packaging.
 - **Define a predictable CLI**: Argument parsing & exit behavior.
 - **Read data with explicit paths**: Pathlib & structured files.
-- **Optional practice - Build a log analyzer**: Build a log-analysis CLI.
 
 ### Understand the machinery
 
@@ -262,14 +250,10 @@ Useful preparation: Object protocols and testing.
 - **Register classes deliberately**: Metaclasses & class creation.
 - **Method lookup and inheritance**: Inheritance & super.
 - **Inspect without executing**: Inspect function parameters.
-- **Optional practice - Project: an extensible formatter**: Plugin architecture project.
 
 ## Teaching and validation
 
 Every chapter ends with a cumulative game milestone, scaled to the chapter's scope.
-Standalone projects listed above are optional independent practice, not additional requirements for Continue.
-Projects remain where their required concepts have been introduced, including preparation from earlier chapters.
-Recursion is optional depth rather than a prerequisite for an introductory text adventure.
 Generator and class context managers follow generators, decorators, and classes.
 Packaging does not require async, and language machinery does not require packaging.
 
@@ -279,7 +263,7 @@ Repair has its own behavior contract and a deliberately defective implementation
 Checks report expected and actual behavior; reference solutions never replace learner drafts.
 Stable lesson IDs preserve saved drafts and historical completion across curriculum updates.
 A changed stage contract increases its revision and requires fresh checks.
-Game milestone progress is separate and is never awarded from historical standalone project completion.
+Drafts from the retired standalone projects stay in the profile file but no longer appear in the course.
 
 See the [authoring guide](authoring.md) and [challenge criteria](teaching-criteria.md) for terminology, prerequisite, and exercise standards.
 Automated checks establish executable consistency.

@@ -184,8 +184,8 @@ async def test_known_topics_preferences_preserve_selection(tmp_path):
         assert isinstance(app.screen, Dashboard)
 
 
-@pytest.mark.parametrize("lesson_id", ["lantern-quest", "signal-from-noise"])
-async def test_capstone_run_check_and_export(tmp_path, lesson_id):
+@pytest.mark.parametrize("lesson_id", ["small-superpowers", "ready-to-ship"])
+async def test_syllabus_lesson_run_check_and_export(tmp_path, lesson_id):
     app = TutorApp(tmp_path)
     app.store.data["onboarded"] = True
     lesson = BY_ID[lesson_id]
@@ -194,7 +194,6 @@ async def test_capstone_run_check_and_export(tmp_path, lesson_id):
         await pilot.press("s")
         chapter = app.screen.query_one(f"#syllabus-{lesson.chapter_id}", Collapsible)
         chapter.collapsed = False
-        chapter.query_one("Collapsible", Collapsible).collapsed = False
         await pilot.pause()
         button = next(item for item in chapter.query(".open-unit") if item.name == lesson.id)
         button.focus()

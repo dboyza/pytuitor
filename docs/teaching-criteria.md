@@ -1,7 +1,7 @@
 # Chapter challenge criteria
 
 These are authoring and review criteria, not measured claims about learner difficulty.
-Lesson and standalone-project Build stages ask the learner to combine taught ideas from a blank editor.
+Lesson Build stages ask the learner to combine taught ideas from a blank editor.
 Game milestones use Extend to add chapter concepts to an earlier version; see the [game authoring guidance](authoring.md#growing-game-content).
 Repair must require a different decision, data flow, or observable behavior; changing names alone does not qualify.
 Worked examples teach the ingredients without supplying the complete required program.

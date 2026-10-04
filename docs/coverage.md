@@ -2,8 +2,8 @@
 
 Use this index to find lessons by Python topic.
 For the recommended sequence and advisory prerequisites, see the [curriculum map](curriculum.md).
-Pytuitor has 75 teaching lessons, 21 cumulative Lantern Reach milestones, and 12 optional independent projects.
-Lessons and independent projects use blank Build followed by Repair; game milestones use cumulative Extend followed by an independent Repair.
+Pytuitor has 75 teaching lessons, and 21 cumulative Lantern Reach milestones.
+Lessons use blank Build followed by Repair; game milestones use cumulative Extend followed by an independent Repair.
 See [the growing game guide](lantern-reach.md) for continuity, checkpoints, and optional extensions.
 
 Each linked lesson contains an explanation, worked examples, a required exercise, and executable checks.
@@ -36,12 +36,12 @@ The focus column describes what is taught across those lessons; not every API me
 | modules | [Your own modules](../src/pytuitor/lessons/your-own-modules.md), [Module boundaries](../src/pytuitor/lessons/module-boundaries.md), [Numeric tools](../src/pytuitor/lessons/numeric-tools.md), [Randomness](../src/pytuitor/lessons/repeatable-randomness.md) | Imports, reusable modules, math/statistics, independent seeded generators |
 | collections | [Counting and grouping](../src/pytuitor/lessons/counting-and-grouping.md), [Queues](../src/pytuitor/lessons/queues-with-deque.md) | Counter, defaultdict, deque, ordering and mutation boundaries |
 | itertools | [Iterator tools](../src/pytuitor/lessons/iterator-tools.md), [Iterator recipes](../src/pytuitor/lessons/iterator-recipes.md), [Adjacent groups](../src/pytuitor/lessons/adjacent-groups.md) | islice, chain, zip_longest, product, groupby and one-pass group lifetimes |
-| json | [Structured data](../src/pytuitor/lessons/json-records.md), [Expense report](../src/pytuitor/lessons/expense-report.md) | JSON reading/writing and structured-data transformation |
+| json | [Structured data](../src/pytuitor/lessons/json-records.md) | JSON reading/writing and structured-data transformation |
 | datetime | [Dates and deadlines](../src/pytuitor/lessons/dates-and-deadlines.md), [Dates and times](../src/pytuitor/lessons/date-time-formats.md) | Date arithmetic, parsing, formatting, combining clock/calendar values, leap days |
 | enums | [Named states](../src/pytuitor/lessons/named-states.md) | Named members, value conversion, validated state transitions |
-| pathlib | [Paths and folders](../src/pytuitor/lessons/paths-and-folders.md), [Resource paths](../src/pytuitor/lessons/resource-paths.md), [Notes archiver](../src/pytuitor/lessons/notes-archiver.md) | Path composition, file queries, explicit roots, safe automation |
+| pathlib | [Paths and folders](../src/pytuitor/lessons/paths-and-folders.md), [Resource paths](../src/pytuitor/lessons/resource-paths.md) | Path composition, file queries, explicit roots, safe automation |
 | oop_advanced | [Class construction](../src/pytuitor/lessons/class-construction.md), [Descriptors](../src/pytuitor/lessons/descriptors.md), [Metaclasses](../src/pytuitor/lessons/metaclasses.md), [Method resolution](../src/pytuitor/lessons/method-resolution.md) | Abstract interfaces, class/static methods, descriptors, class hooks, cooperative inheritance |
-| async | [Coroutines](../src/pytuitor/lessons/coroutine-basics.md), [Task groups](../src/pytuitor/lessons/task-groups.md), [Async streams](../src/pytuitor/lessons/async-streams.md), [Bounded work](../src/pytuitor/lessons/concurrent-batch.md) | Await, resource lifetimes, cancellation, async iteration, bounded concurrency |
+| async | [Coroutines](../src/pytuitor/lessons/coroutine-basics.md), [Task groups](../src/pytuitor/lessons/task-groups.md), [Async streams](../src/pytuitor/lessons/async-streams.md) | Await, resource lifetimes, cancellation, async iteration |
 
 ## Curriculum choices
 
@@ -50,6 +50,5 @@ One syllabus groups the curriculum into Foundations, Everyday Python, Building p
 The first three sections are recommended, while depth and specialized chapters are optional.
 Descriptors, class hooks, and cooperative inheritance remain available for learners who need language machinery.
 Each of the 21 chapters ends with a cumulative game milestone.
-Optional standalone projects combine relevant taught concepts and appear after their required preparation.
 See the [curriculum map](curriculum.md) for chapter order and advisory prerequisites.
 The topic map is a maintenance aid; learner studies are required to assess retention and transfer to unfamiliar problems.

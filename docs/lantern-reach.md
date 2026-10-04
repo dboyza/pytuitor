@@ -13,9 +13,6 @@ Choose a milestone to see its story and starting-code origin, then open it with 
 The syllabus also lists each milestone at the end of its chapter.
 Continue follows the recommended lessons and milestones; optional sections still require an explicit choice.
 
-The original 12 projects remain under **Optional independent practice** in their syllabus chapters.
-Their existing drafts and achievements are preserved, and they do not block recommended course progression.
-
 ## Extend, check, and repair
 
 Ordinary lessons begin with blank Build exercises.

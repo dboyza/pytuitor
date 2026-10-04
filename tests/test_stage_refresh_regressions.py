@@ -15,11 +15,11 @@ from pytuitor.runner import execute
     "identifier",
     [
         "pack-your-bag",
-        "task-workspace",
+        "your-own-modules",
         "comparing-sets",
         "first-light",
         "typed-contracts",
-        "plugin-system",
+        "module-boundaries",
     ],
 )
 async def test_old_passes_are_invalidated_without_losing_drafts(tmp_path, identifier):
@@ -56,8 +56,10 @@ async def test_old_passes_are_invalidated_without_losing_drafts(tmp_path, identi
 
 
 @pytest.mark.parametrize("size", [(80, 24), (140, 44)])
-@pytest.mark.parametrize("identifier", ["supply-report", "task-workspace", "notes-archiver"])
-async def test_refreshed_projects_through_both_editors_and_saved_stages(tmp_path, size, identifier):
+@pytest.mark.parametrize("identifier", ["your-own-modules", "module-boundaries"])
+async def test_refreshed_multifile_lessons_through_both_editors_and_saved_stages(
+    tmp_path, size, identifier
+):
     lesson = BY_ID[identifier]
     app = TutorApp(tmp_path)
     app.store.data.update(onboarded=True, last_lesson=identifier)
@@ -110,7 +112,6 @@ def test_collection_repairs_use_only_the_syntax_taught_so_far():
         "word-counts",
         "editing-collections",
         "repeat-until-done",
-        "supply-report",
     ):
         stage = BY_ID[identifier].stage_contract("repair")
         for sources in (stage.starter_files, stage.reference_files):
@@ -156,7 +157,6 @@ MUTANTS = [
         "for item in items:",
         "items.reverse()\n    for item in items:",
     ),
-    ("expense-report", "lesson.py", "json.dump(counts, handle)", "pass"),
     ("numeric-tools", "lesson.py", "return min(values)", "values.sort()\n    return min(values)"),
     ("repeatable-randomness", "lesson.py", 'raise ValueError("invalid draw")', "return []"),
     (
@@ -172,9 +172,6 @@ MUTANTS = [
         "queue = deque(arrivals)\n    queue.extend(waiting)",
         "queue = deque(waiting)\n    queue.extend(arrivals)",
     ),
-    ("notes-archiver", "selection.py", " and not path.is_symlink()", ""),
-    ("notes-archiver", "lesson.py", "skipped.append(name)", "planned.append(name)"),
-    ("notes-archiver", "lesson.py", 'open(target, "xb")', 'open(target, "wb")'),
     (
         "tests-for-your-code",
         "lesson.py",

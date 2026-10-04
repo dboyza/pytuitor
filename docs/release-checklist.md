@@ -5,7 +5,7 @@ A listed check is not evidence that it passed, and a built wheel is not a publis
 
 ## Product and content
 
-- Verify the unified course contains 75 teaching lessons, 21 game milestones, and 12 optional practice projects organized into five sections.
+- Verify the unified course contains 75 teaching lessons, and 21 game milestones organized into five sections.
 - Verify Start learning opens the first lesson, Browse syllabus opens the outline, and Known topics remains editable from the dashboard.
 - Verify Continue follows the active chapter and section, with optional depth requiring an explicit choice.
 - Verify every Build/Extend reference passes, every original Repair fails meaningfully, and every corrected Repair passes.

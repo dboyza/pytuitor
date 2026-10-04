@@ -199,15 +199,7 @@ class Dashboard(TutorScreen):
             label = "known · skipped" if status == "familiar" else status
             kind = "game milestone · " if lesson.project_id else ""
             if self.size.width < 100:
-                detail = (
-                    "known"
-                    if status == "familiar"
-                    else "game"
-                    if lesson.project_id
-                    else "project"
-                    if lesson.project and not lesson.title.lower().startswith("project:")
-                    else ""
-                )
+                detail = "known" if status == "familiar" else "game" if lesson.project_id else ""
                 if detail:
                     text.append(f" · {detail}", style="#8f999c")
             else:

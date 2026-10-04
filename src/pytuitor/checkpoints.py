@@ -80,6 +80,14 @@ CHECKPOINTS = {
         1,
         "A successful result can be falsy. Only the documented exception triggers fallback.",
     ),
+    "cli-contracts": (
+        "An option is declared with type=int and default=10. "
+        "What does parsing ['data.txt', '--limit', '5'] store as limit?",
+        ("The string '5'", "The integer 5", "The default 10"),
+        1,
+        "type converts the command-line text before it is stored. "
+        "The default applies only when the option is absent.",
+    ),
     "method-resolution": (
         "In multiple inheritance, where does super() look for the next method?",
         (

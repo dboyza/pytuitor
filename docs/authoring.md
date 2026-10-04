@@ -58,7 +58,7 @@ Never regenerate baselines merely to silence an unexplained failure.
 ## Growing game content
 
 `content/lantern/` authors Lantern Reach's 21 milestones and the 75 lesson-to-game connections.
-`project_catalog.py` assembles stable milestone IDs and chapter preparation without turning optional practice into required preparation.
+`project_catalog.py` assembles stable milestone IDs and makes each chapter's lessons the milestone's preparation.
 `ProjectMilestone` defines the supplied earlier-code base and declared capabilities; `Lesson.project_id` adapts its stages into the existing workbench and runner.
 The first milestone starts blank; later Extend stages start from a learner checkpoint or an explicitly labeled supplied earlier version.
 Repair is authored separately and never becomes the next milestone's source.

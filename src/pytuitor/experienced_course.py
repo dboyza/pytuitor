@@ -94,22 +94,4 @@ LESSONS = tuple(
 )
 
 
-# Known concepts also describe chapter projects, so familiar-topic skipping remains coherent.
-LESSONS = tuple(
-    replace(
-        lesson,
-        concepts=tuple(
-            dict.fromkeys(
-                concept
-                for previous in LESSONS
-                if previous.chapter_id == lesson.chapter_id and not previous.project
-                for concept in previous.concepts
-            )
-        ),
-    )
-    if lesson.project
-    else lesson
-    for lesson in LESSONS
-)
-
 LESSONS = apply_checkpoints(LESSONS)

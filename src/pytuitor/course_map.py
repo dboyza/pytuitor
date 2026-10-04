@@ -43,7 +43,6 @@ _OUTLINE = (
             "numbers-from-input",
             "decimal-measurements",
             "choose-a-door",
-            "ticket-desk",
         ),
     ),
     (
@@ -66,7 +65,6 @@ _OUTLINE = (
             "word-counts",
             "editing-collections",
             "repeat-until-done",
-            "supply-report",
         ),
     ),
     (
@@ -80,7 +78,6 @@ _OUTLINE = (
             "clean-labels",
             "function-options",
             "handle-invalid-input",
-            "lantern-quest",
         ),
     ),
     (
@@ -89,7 +86,7 @@ _OUTLINE = (
         "Files and structured data",
         "Read, transform, and save text, JSON, and CSV.",
         ("functions-and-input",),
-        ("text-files", "paths-and-folders", "json-records", "csv-tables", "expense-report"),
+        ("text-files", "paths-and-folders", "json-records", "csv-tables"),
     ),
     (
         "text-patterns",
@@ -127,9 +124,9 @@ _OUTLINE = (
         "classes-and-tested-tools",
         "building-programs",
         "Classes and tested tools",
-        "Model state, name choices, and verify a multi-file application.",
+        "Model state, name choices, and verify behavior with tests.",
         ("modules-and-library-tools",),
-        ("your-first-class", "named-states", "tests-for-your-code", "task-workspace"),
+        ("your-first-class", "named-states", "tests-for-your-code"),
     ),
     (
         "careful-automation",
@@ -137,7 +134,7 @@ _OUTLINE = (
         "Careful automation",
         "Validate inputs and protect files while automating work.",
         ("files-and-data", "modules-and-library-tools", "collection-tools"),
-        ("validate-boundaries", "copy-with-care", "notes-archiver"),
+        ("validate-boundaries", "copy-with-care"),
     ),
     (
         "python-semantics",
@@ -150,7 +147,6 @@ _OUTLINE = (
             "objects-not-boxes",
             "call-contracts",
             "collection-idioms",
-            "index-records",
         ),
     ),
     (
@@ -180,7 +176,6 @@ _OUTLINE = (
             "iterator-tools",
             "iterator-recipes",
             "adjacent-groups",
-            "stream-report",
         ),
     ),
     (
@@ -211,7 +206,6 @@ _OUTLINE = (
             "class-construction",
             "structural-typing",
             "test-doubles",
-            "typed-inventory",
         ),
     ),
     (
@@ -220,7 +214,7 @@ _OUTLINE = (
         "Coordinate async work",
         "Schedule work and clean up on cancellation.",
         ("exceptions-and-contexts", "iterators-and-streaming"),
-        ("coroutine-basics", "clean-exits", "task-groups", "async-streams", "concurrent-batch"),
+        ("coroutine-basics", "clean-exits", "task-groups", "async-streams"),
     ),
     (
         "distributable-tools",
@@ -233,7 +227,6 @@ _OUTLINE = (
             "package-metadata",
             "cli-contracts",
             "resource-paths",
-            "signal-from-noise",
         ),
     ),
     (
@@ -242,7 +235,7 @@ _OUTLINE = (
         "Understand the machinery",
         "Use descriptors, class hooks, inheritance, and introspection.",
         ("object-protocols-and-testing",),
-        ("descriptors", "metaclasses", "method-resolution", "runtime-inspection", "plugin-system"),
+        ("descriptors", "metaclasses", "method-resolution", "runtime-inspection"),
     ),
 )
 
@@ -251,34 +244,3 @@ CHAPTERS = tuple(
     for identifier, section, title, outcome, prerequisites, _ in _OUTLINE
 )
 CHAPTER_UNITS = {entry[0]: entry[5] for entry in _OUTLINE}
-
-# Projects integrate the concepts their exercise actually uses, including earlier chapters.
-PROJECT_PREPARATION = {
-    "ticket-desk": ("names-and-voices", "numbers-from-input", "choose-a-door"),
-    "supply-report": ("pack-your-bag", "list-positions", "word-counts"),
-    "lantern-quest": ("choose-a-door", "pack-your-bag", "tuples-and-sets", "small-superpowers"),
-    "expense-report": ("text-files", "paths-and-folders", "json-records", "csv-tables"),
-    "task-workspace": (
-        "clean-labels",
-        "your-own-modules",
-        "your-first-class",
-        "tests-for-your-code",
-    ),
-    "notes-archiver": (
-        "paths-and-folders",
-        "your-own-modules",
-        "validate-boundaries",
-        "copy-with-care",
-    ),
-    "index-records": ("objects-not-boxes", "call-contracts", "collection-idioms"),
-    "stream-report": ("clean-labels", "handle-invalid-input", "lazy-by-design", "iterator-tools"),
-    "typed-inventory": ("your-own-modules", "ready-to-ship", "typed-contracts"),
-    "concurrent-batch": ("coroutine-basics", "clean-exits", "task-groups", "async-streams"),
-    "signal-from-noise": (
-        "module-boundaries",
-        "package-metadata",
-        "cli-contracts",
-        "resource-paths",
-    ),
-    "plugin-system": ("descriptors", "metaclasses", "method-resolution", "runtime-inspection"),
-}

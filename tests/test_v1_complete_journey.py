@@ -14,10 +14,10 @@ async def fill_workspace(screen, pilot, files):
         await pilot.pause()
 
 
-async def test_project_build_and_repair_keep_course_progress(tmp_path):
+async def test_multifile_build_and_repair_keep_course_progress(tmp_path):
     app = TutorApp(tmp_path)
     app.store.data["onboarded"] = True
-    lesson = BY_ID["task-workspace"]
+    lesson = BY_ID["your-own-modules"]
     async with app.run_test(size=(80, 24)) as pilot:
         app.screen.open_lesson(lesson)
         await pilot.pause()

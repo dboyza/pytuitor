@@ -94,47 +94,6 @@ LESSONS = (
             "setdefault(key, []) returns the existing list or inserts a new one.",
         ],
     ),
-    unit(
-        "index-records",
-        "python-semantics",
-        "Project: a record index",
-        "Record indexing project",
-        """
-        from copy import deepcopy
-
-        def index_records(records):
-            result = {}
-            for record in records:
-                key = record["id"]
-                if key in result:
-                    raise ValueError("Duplicate id")
-                result[key] = deepcopy(record)
-            return result
-        """,
-        [
-            check(
-                "Index records",
-                "index_records([{'id': 'a', 'tags': ['cli']}, {'id': 'b', 'tags': []}])",
-                {"a": {"id": "a", "tags": ["cli"]}, "b": {"id": "b", "tags": []}},
-            ),
-            check(
-                "Nested copy is independent",
-                ("(lambda r: index_records([r])['a']['tags'] is r['tags'])({'id':'a','tags':[]})"),
-                False,
-            ),
-            check(
-                "Reject duplicate ids",
-                "__raises_value_error__(index_records, [{'id':'a'}, {'id':'a'}])",
-                True,
-            ),
-            check("Empty iterator", "index_records(iter([]))", {}),
-        ],
-        [
-            "Build the index incrementally so you can detect duplicates.",
-            "Copy the whole record deeply after validating its identifier.",
-        ],
-        project=True,
-    ),
 )
 
 BUILD_INSTRUCTIONS = {
@@ -173,21 +132,6 @@ BUILD_INSTRUCTIONS = {
         "\nFor example, `[('team', 'Mina'), ('team', 'Sol'), ('team', 'Mina')]` bec"
         "omes `{'team': ['Mina', 'Sol']}`.\nAccept an empty iterable and a one-pass"
         " iterator.\nDo not mutate the input or print.\n"
-    ).strip(),
-    "index-records": (
-        "\nWrite `index_records(records)`.\nThe input is a finite iterable of dicti"
-        'onaries.\nEvery record has an `"id"` key with a string value; all remainin'
-        "g fields contain values supported by `copy.deepcopy`.\nReturn a dictionary"
-        " mapping each identifier to a deeply independent copy of its record, inclu"
-        "ding its identifier.\nPreserve identifier insertion order.\nIf an identifi"
-        "er occurs twice, raise `ValueError`, even when both records have equal con"
-        "tents.\nDo not mutate any input record.\nAn empty iterable returns `{}`.\n"
-        "No input prompts or printed output are required.\n\nFor example, `[{'id': "
-        "'r7', 'tags': ['urgent']}]` produces `{'r7': {'id': 'r7', 'tags': ['urgent"
-        "']}}`.\nAppending a tag to that result must not change the source list.\nU"
-        "se `from copy import deepcopy` to access the copying function.\nA dictiona"
-        "ry comprehension alone would silently overwrite duplicate identifiers, so "
-        "consider where validation belongs.\n"
     ).strip(),
 }
 
@@ -407,75 +351,6 @@ REPAIR_STAGES = {
             "Use get(word, 0) for a missing count.",
             "Dictionary assignment preserves the first insertion order.",
         ],
-    ),
-    "index-records": _repair(
-        (
-            "Define first_by_key(records, key). Return a new dictionary containing the "
-            "first record for each key, deep-copied so later caller changes cannot alte"
-            "r the result. Accept a finite one-pass iterable of dictionaries. Call key "
-            "exactly once per record; its result is hashable. Keep first-seen key order"
-            " and return {} for empty input."
-        ),
-        """
-        from copy import deepcopy
-
-        def first_by_key(records, key):
-            result = {}
-            for record in records:
-                value = key(record)
-                if value not in result:
-                    result[value] = deepcopy(record)
-            return result
-        """,
-        """
-        def first_by_key(records, key):
-            return {key(record): record for record in records}
-        """,
-        [
-            _check(
-                "Keep first record",
-                "first_by_key([{'id': 'a', 'n': 1}, {'id': 'a', 'n': 2}], lambda r: r['id'])",
-                {"a": {"id": "a", "n": 1}},
-                "Only store a key the first time it appears.",
-            ),
-            _check(
-                "Copy records",
-                "(lambda r: first_by_key([r], lambda x: x['id'])['a'] is r)({'id': 'a'})",
-                False,
-                "Copy each selected record before storing it.",
-            ),
-            _probe(
-                "Copy nested records and call key once",
-                (
-                    """
-                records = [
-                    {"id": 2, "nested": []},
-                    {"id": 2, "nested": [1]},
-                    {"id": 1, "nested": []},
-                ]
-                calls = []
-
-
-                def identify(record):
-                    calls.append(record["id"])
-                    return record["id"]
-
-
-                selected = first_by_key(iter(records), identify)
-                selected[2]["nested"].append(7)
-                result = (
-                    list(selected),
-                    calls,
-                    records[0]["nested"],
-                    first_by_key([], identify),
-                )
-                """
-                ),
-                ([2, 1], [2, 2, 1], [], {}),
-                "Copy nested values and evaluate the key once even for duplicates.",
-            ),
-        ],
-        ["Check membership before assignment.", "deepcopy protects nested record data too."],
     ),
 }
 

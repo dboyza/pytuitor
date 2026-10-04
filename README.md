@@ -74,7 +74,6 @@ The first three form the core sequence; the last two offer optional depth.
 | Specialized topics | Async programming, distribution, and language machinery |
 
 Each chapter ends with a Lantern Reach milestone: Extend your game, then Repair a separate incident.
-The 12 original standalone projects remain available as optional practice in the syllabus, with existing progress preserved.
 See the [curriculum map](docs/curriculum.md) for chapters, milestones, and preparation.
 
 <details>

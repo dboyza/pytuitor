@@ -101,7 +101,7 @@ async def test_integrated_learning_visuals(tmp_path, monkeypatch, size):
         await pilot.press("escape")
         assert screen.capture_editor() == before
         await pilot.press("ctrl+b")
-        app.screen.open_lesson(BY_ID["notes-archiver"])
+        app.screen.open_lesson(BY_ID["loop-helpers"])
         await pilot.pause()
         screen = app.screen
         await pilot.press("f4")

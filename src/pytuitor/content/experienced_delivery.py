@@ -1,6 +1,6 @@
 """Build and Repair contracts for python-delivery."""
 
-from pytuitor.experienced_authoring import _check, _probe, _repair, check, legacy, unit
+from pytuitor.experienced_authoring import _check, _probe, _repair, check, unit
 
 LESSONS = (
     unit(
@@ -169,24 +169,9 @@ LESSONS = (
             "After parsing JSON, verify that the top-level value is a dictionary.",
         ],
     ),
-    legacy(
-        "signal-from-noise",
-        "python-delivery",
-        project=True,
-    ),
 )
 
 BUILD_INSTRUCTIONS = {
-    "signal-from-noise": (
-        "\nDefine `summarize(lines)` returning a dictionary with exactly `INFO`, `W"
-        "ARNING`, and `ERROR` counts, initially zero.\nEach valid line contains a l"
-        "evel, whitespace, and a nonempty message.\nStrip surrounding whitespace, n"
-        "ormalize only the level to uppercase, and ignore blank lines, unknown leve"
-        "ls, and missing messages.\nConsume the finite iterable once.\nDefine `main"
-        "()` to read `sys.stdin` and print the summary as one JSON object.\nCall it"
-        ' under `if __name__ == "__main__":` so importing the module prints nothing'
-        " and reads no input.\n"
-    ).strip(),
     "module-boundaries": (
         "\nThe workspace has `lesson.py` and `tools.py`.\nImplement `normalize(text"
         ")` in tools.py, then import it into lesson.py.\nReturn the words of text i"
@@ -478,87 +463,6 @@ REPAIR_STAGES = {
         [
             "Keep the missing-file fallback narrow.",
             "Do not turn malformed JSON into a missing file result.",
-        ],
-    ),
-    "signal-from-noise": _repair(
-        (
-            "Define summarize_durations(lines) for lines containing a category and inte"
-            "ger seconds. Return INFO, WARNING, and ERROR totals, ignoring malformed or"
-            " unknown lines, and add main(). Accept exactly two whitespace-separated fi"
-            "elds: category and signed integer seconds, including negatives and zero. N"
-            "ormalize category case. Ignore extra fields or invalid integers. Initializ"
-            "e all three totals to zero and consume a finite iterable once. main() must"
-            " read sys.stdin and print one JSON object; invoke it under a main guard an"
-            "d keep imports quiet."
-        ),
-        """
-        import json
-        import sys
-
-        def summarize_durations(lines):
-            totals = {'INFO': 0, 'WARNING': 0, 'ERROR': 0}
-            for line in lines:
-                parts = line.strip().split()
-                if len(parts) == 2 and parts[0].upper() in totals:
-                    try:
-                        seconds = int(parts[1])
-                    except ValueError:
-                        continue
-                    totals[parts[0].upper()] += seconds
-            return totals
-
-        def main():
-            print(json.dumps(summarize_durations(sys.stdin)))
-
-        if __name__ == '__main__':
-            main()
-        """,
-        """
-        def summarize_durations(lines):
-            return {'INFO': 0, 'WARNING': 0, 'ERROR': 0}
-        """,
-        [
-            _check(
-                "Add durations",
-                "summarize_durations(['info 2', 'WARNING 3', 'error 4'])",
-                {"INFO": 2, "WARNING": 3, "ERROR": 4},
-                "Normalize levels and add the integer duration.",
-            ),
-            _check(
-                "Ignore malformed",
-                "summarize_durations(['INFO nope', 'DEBUG 5', 'ERROR 1'])",
-                {"INFO": 0, "WARNING": 0, "ERROR": 1},
-                "Validate both the level and the integer field.",
-            ),
-            _probe(
-                "Quiet import and working main entry point",
-                (
-                    """
-                import contextlib, importlib, io, json, sys
-                from unittest.mock import patch
-
-                output = io.StringIO()
-                with contextlib.redirect_stdout(output):
-                    module = importlib.import_module("lesson")
-                quiet = output.getvalue() == ""
-                with patch.object(
-                    sys, "stdin", io.StringIO("info -2\\nERROR 3\\nINFO 1 extra\\n")
-                ):
-                    with contextlib.redirect_stdout(output):
-                        module.main()
-                result = (quiet, json.loads(output.getvalue()))
-                """
-                ),
-                (True, {"INFO": -2, "WARNING": 0, "ERROR": 3}),
-                (
-                    "Keep imports quiet; main must read the provided standard input and seriali"
-                    "ze the computed totals."
-                ),
-            ),
-        ],
-        [
-            "Keep all output categories initialized.",
-            ("A main guard prevents output during imports."),
         ],
     ),
 }

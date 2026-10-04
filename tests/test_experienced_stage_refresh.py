@@ -6,9 +6,9 @@ from pytuitor.experienced_course import LESSONS
 from pytuitor.runner import execute
 
 
-def test_experienced_stage_refresh_owns_exactly_41_units():
-    assert len(LESSONS) == 41
-    assert len({lesson.id for lesson in LESSONS}) == 41
+def test_experienced_stage_refresh_owns_exactly_35_units():
+    assert len(LESSONS) == 35
+    assert len({lesson.id for lesson in LESSONS}) == 35
     assert all(lesson.build_stage is not None for lesson in LESSONS)
     assert all(lesson.repair_stage is not None for lesson in LESSONS)
     assert all(

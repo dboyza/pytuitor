@@ -84,8 +84,7 @@ async def test_returning_learner_keeps_progress_and_discovers_added_lessons(tmp_
             chapter = app.screen.query_one(f"#syllabus-{chapter_id}", Collapsible)
             units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter_id]
             assert chapter.collapsed
-            lessons = sum(not unit.project for unit in units)
-            assert f"{lessons} lesson" in chapter.title
+            assert f"{len(units)} lesson" in chapter.title
             assert "game milestone" in chapter.title
         await pilot.press("escape", "c")
         assert app.screen.lesson.id == NEW_LESSONS[0]

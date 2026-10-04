@@ -217,75 +217,6 @@ LESSONS = (
         ),
     ),
     Lesson(
-        "lantern-quest",
-        "beginner",
-        "Build a text adventure",
-        "Build a tiny branching adventure",
-        20,
-        ("Beginner project",),
-        lesson_text("lantern-quest"),
-        (
-            "def play(moves):\n"
-            '    place, coins, collected = "forest", 0, False\n'
-            "    for move in moves:\n"
-            "        collected = False\n"
-            '        if place == "forest" and move == "east":\n'
-            '            place = "cave"\n'
-            '        elif place == "cave" and move == "west":\n'
-            '            place = "forest"\n'
-            '        elif place == "cave" and move == "take" and not '
-            "collected:\n"
-            "            coins += 5\n"
-            "            collected = True\n"
-            "    return place, coins\n"
-            "\n"
-            'print(play(input("Moves: ").split()))\n'
-        ),
-        tuple(
-            Check(
-                f"play({moves!r})",
-                f"list(play({moves!r}))",
-                expected,
-                "Track location and whether the treasure has already been collected.",
-            )
-            for moves, expected in [
-                ([], ["forest", 0]),
-                (["take"], ["forest", 0]),
-                (["east", "take", "west"], ["forest", 5]),
-                (["east", "take", "take"], ["cave", 5]),
-                (["east", "take", "west", "east", "take"], ["cave", 5]),
-            ]
-        ),
-        (
-            "Loop over moves and combine place and move in each condition.",
-            "Set collected = False before the loop. "
-            "On a valid take, add 5 and set collected = True.",
-        ),
-        "Where should collected = False go?",
-        ("Before the loop", "Inside every loop iteration", "After return"),
-        0,
-        (
-            "State must survive between moves. Resetting inside the loop "
-            "would let you collect repeatedly."
-        ),
-        code("""
-        def play(moves):
-            place, coins, collected = "forest", 0, False
-            for move in moves:
-                if place == "forest" and move == "east":
-                    place = "cave"
-                elif place == "cave" and move == "west":
-                    place = "forest"
-                elif place == "cave" and move == "take" and not collected:
-                    coins += 5
-                    collected = True
-            return place, coins
-
-        print(play(input("Moves: ").split()))
-        """),
-        project=True,
-    ),
-    Lesson(
         "objects-not-boxes",
         "experienced",
         "Objects and copying",
@@ -678,102 +609,10 @@ LESSONS = (
                     raise AssertionError("Invalid count accepted")
         """),
     ),
-    Lesson(
-        "signal-from-noise",
-        "experienced",
-        "Build a log analyzer",
-        "Build a log-analysis CLI",
-        25,
-        ("Experienced project",),
-        lesson_text("signal-from-noise"),
-        (
-            "import json\n"
-            "import sys\n"
-            "\n"
-            "def summarize(lines):\n"
-            '    counts = {"INFO": 0, "WARNING": 0, "ERROR": 0}\n'
-            "    for line in lines:\n"
-            "        parts = line.strip().split(maxsplit=1)\n"
-            "        if len(parts) == 2 and parts[0] in counts:\n"
-            "            counts[parts[0]] += 1\n"
-            "    return counts\n"
-            "\n"
-            "def main():\n"
-            "    print(json.dumps(summarize(sys.stdin)))\n"
-            "\n"
-            'if __name__ == "__main__":\n'
-            "    main()\n"
-        ),
-        (
-            Check(
-                "Mixed levels and malformed lines",
-                (
-                    "summarize(iter(['info boot', 'ERROR failed', ' error again ', "
-                    "'DEBUG trace', '', 'INFO']))"
-                ),
-                {"INFO": 1, "WARNING": 0, "ERROR": 2},
-                "Split at most once and require a message.",
-            ),
-            Check(
-                "Empty stream",
-                "summarize(iter([]))",
-                {"INFO": 0, "WARNING": 0, "ERROR": 0},
-                "Set all three counters to zero before reading.",
-            ),
-            Check(
-                "Whitespace",
-                "summarize([' WARNING   low disk ', 'INFO   ', 'error\\tbroken'])",
-                {"INFO": 0, "WARNING": 1, "ERROR": 1},
-                "str.split(maxsplit=1) handles whitespace.",
-            ),
-            Check(
-                "CLI emits JSON",
-                "__cli_check__(main, 'INFO boot\\nERROR failed\\n')",
-                {"INFO": 1, "WARNING": 0, "ERROR": 1},
-                "Read sys.stdin and print json.dumps of the summary.",
-                description=(
-                    "Call main() with keyboard input 'INFO boot\\nERROR failed\\n'; "
-                    "parse its printed JSON report."
-                ),
-            ),
-        ),
-        (
-            "Start with the three counters. Split each stripped line with maxsplit=1.",
-            "If len(parts) == 2 and parts[0].upper() in counts, increment that counter.",
-        ),
-        "Why separate summarize from main?",
-        ("Python requires it", "Pure logic is easier to reuse and test", "It creates threads"),
-        1,
-        (
-            "Separating computation from I/O lets you test streams directly "
-            "and reuse the same logic elsewhere."
-        ),
-        code("""
-        import json
-        import sys
-
-        def summarize(lines):
-            counts = {"INFO": 0, "WARNING": 0, "ERROR": 0}
-            for line in lines:
-                parts = line.strip().split(maxsplit=1)
-                if len(parts) == 2 and parts[0].upper() in counts:
-                    counts[parts[0].upper()] += 1
-            return counts
-
-        def main():
-            print(json.dumps(summarize(sys.stdin)))
-
-        if __name__ == "__main__":
-            main()
-        """),
-        project=True,
-    ),
 )
 
 BY_ID = {lesson.id: lesson for lesson in LESSONS}
-CONCEPTS = tuple(
-    dict.fromkeys(c for lesson in LESSONS if not lesson.project for c in lesson.concepts)
-)
+CONCEPTS = tuple(dict.fromkeys(c for lesson in LESSONS for c in lesson.concepts))
 TRACKS = {
     "beginner": "Beginner",
     "experienced": "Experienced",
@@ -790,6 +629,4 @@ def default_input(lesson: Lesson) -> str:
         "names-and-voices": "Ada\n",
         "choose-a-door": "gold\n",
         "pack-your-bag": "2 5 1\n",
-        "lantern-quest": "east take west\n",
-        "signal-from-noise": "INFO boot\nWARNING low disk\nERROR timeout\n",
     }.get(lesson.id, "")

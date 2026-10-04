@@ -7,7 +7,7 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.events import Resize
 from textual.widgets import Button, Collapsible, Footer, Static
 
-from pytuitor.curriculum import BY_ID, CHAPTERS, PRACTICE, SECTIONS, chapter_activities
+from pytuitor.curriculum import BY_ID, CHAPTERS, SECTIONS, chapter_activities
 from pytuitor.ui import TutorScreen, brand
 
 
@@ -24,8 +24,7 @@ class Syllabus(TutorScreen):
                 with VerticalScroll(id="syllabus-scroll"):
                     yield Static(
                         f"{len(CHAPTERS)} chapters · 75 lessons · 21 game milestones\n"
-                        "Lessons: Build + Repair. Game: Extend + "
-                        "Repair. 12 optional practice projects.",
+                        "Lessons: Build + Repair. Game: Extend + Repair.",
                         id="syllabus-summary",
                         classes="muted",
                     )
@@ -95,20 +94,6 @@ class Syllabus(TutorScreen):
                                             name=lesson.id,
                                             classes="open-unit",
                                         )
-                                    practice = [
-                                        item for item in PRACTICE if item.chapter_id == chapter.id
-                                    ]
-                                    if practice:
-                                        with Collapsible(
-                                            title="Optional independent practice", collapsed=True
-                                        ):
-                                            for item in practice:
-                                                yield Static(item.title, markup=False)
-                                                yield Button(
-                                                    "Open practice",
-                                                    name=item.id,
-                                                    classes="open-unit",
-                                                )
         yield Footer(show_command_palette=False)
 
     def chapter_action(self, chapter_id: str) -> str:

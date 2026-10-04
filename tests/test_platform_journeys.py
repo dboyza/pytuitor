@@ -8,7 +8,7 @@ import sys
 
 import pytest
 
-from pytuitor.curriculum import BY_ID, LESSONS
+from pytuitor.curriculum import LESSONS
 from pytuitor.runner import execute
 from pytuitor.state import Store
 from pytuitor.workspace import WorkspaceError, _run_command, export_workspace, validate_files
@@ -45,25 +45,6 @@ async def test_unicode_paths_input_output_and_generated_files(tmp_path):
     assert result.files["résumé.txt"] == "Zoë 🐍\n"
     destination = export_workspace(tmp_path / "project café", result.files)
     assert (destination / "résumé.txt").read_text(encoding="utf-8") == "Zoë 🐍\n"
-
-
-@pytest.mark.parametrize("stage_name", ["build", "repair"])
-async def test_archiver_checks_work_without_symlink_privileges(stage_name):
-    lesson = BY_ID["notes-archiver"]
-    stage = lesson.stage_contract(stage_name)
-    files = dict(stage.reference_files)
-    files[lesson.entrypoint] = (
-        "from pathlib import Path\n"
-        "def denied(*args, **kwargs):\n    raise PermissionError('No symlink privilege')\n"
-        "Path.symlink_to = denied\n" + files[lesson.entrypoint]
-    )
-    result = await execute(lesson, files[lesson.entrypoint], files=files, stage=stage)
-    assert result.passed, result
-    # Find the author-defined selector file, without assuming its filename.
-    selection = next(name for name, code in files.items() if "not path.is_symlink()" in code)
-    files[selection] = files[selection].replace(" and not path.is_symlink()", "")
-    result = await execute(lesson, files[lesson.entrypoint], files=files, stage=stage)
-    assert not result.passed, "A selector accepting links must still fail without symlink privilege"
 
 
 @pytest.mark.parametrize("cancel", [False, True], ids=["parent-exits", "cancelled"])

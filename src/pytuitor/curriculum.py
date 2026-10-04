@@ -4,7 +4,7 @@ from dataclasses import replace
 
 from pytuitor.beginner_course import CHAPTERS as BEGINNER_CHAPTERS
 from pytuitor.beginner_course import LESSONS as BEGINNER_LESSONS
-from pytuitor.course_map import CHAPTER_UNITS, PROJECT_PREPARATION
+from pytuitor.course_map import CHAPTER_UNITS
 from pytuitor.course_map import CHAPTERS as CHAPTERS
 from pytuitor.course_map import SECTIONS as SECTIONS
 from pytuitor.experienced_course import CHAPTERS as EXPERIENCED_CHAPTERS
@@ -24,26 +24,8 @@ def _assemble_lessons() -> tuple[Lesson, ...]:
     for chapter in CHAPTERS:
         previous = tuple(CHAPTER_UNITS[item][-1] for item in chapter.prerequisites)
         for identifier in CHAPTER_UNITS[chapter.id]:
-            authored = _AUTHORED_BY_ID[identifier]
-            preparation = PROJECT_PREPARATION.get(identifier)
-            concepts = (
-                tuple(
-                    dict.fromkeys(
-                        concept
-                        for item in preparation
-                        for concept in _AUTHORED_BY_ID[item].concepts
-                    )
-                )
-                if preparation
-                else authored.concepts
-            )
             units.append(
-                replace(
-                    authored,
-                    chapter_id=chapter.id,
-                    prerequisites=preparation or previous,
-                    concepts=concepts,
-                )
+                replace(_AUTHORED_BY_ID[identifier], chapter_id=chapter.id, prerequisites=previous)
             )
             previous = (identifier,)
     return tuple(units)
@@ -55,18 +37,15 @@ BY_ID = {
     lesson.id: lesson
     for lesson in (*LEGACY_LESSONS, *LESSONS, *(item.lesson for item in MILESTONES))
 }
-PRACTICE = tuple(lesson for lesson in LESSONS if lesson.project)
 ACTIVITIES = tuple(
     unit
     for chapter in CHAPTERS
     for unit in (
-        *(lesson for lesson in LESSONS if lesson.chapter_id == chapter.id and not lesson.project),
+        *(lesson for lesson in LESSONS if lesson.chapter_id == chapter.id),
         BY_CHAPTER[chapter.id].lesson,
     )
 )
-CONCEPTS = tuple(
-    dict.fromkeys(c for lesson in LESSONS if not lesson.project for c in lesson.concepts)
-)
+CONCEPTS = tuple(dict.fromkeys(c for lesson in LESSONS for c in lesson.concepts))
 TRACKS = {"beginner": "Beginner", "experienced": "Experienced", "custom": "Custom"}
 
 
@@ -89,7 +68,7 @@ def chapter_lessons(chapter_id: str) -> list[Lesson]:
 
 
 def chapter_activities(chapter_id: str) -> list[Lesson]:
-    """Recommended lessons and the cumulative milestone, excluding optional practice."""
+    """Recommended lessons followed by the cumulative milestone."""
     return [lesson for lesson in ACTIVITIES if lesson.chapter_id == chapter_id]
 
 

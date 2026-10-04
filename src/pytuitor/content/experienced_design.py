@@ -416,51 +416,6 @@ LESSONS = (
             ),
         ],
     ),
-    unit(
-        "typed-inventory",
-        "python-design",
-        "Project: an inventory library",
-        "Typed multi-file project",
-        "from inventory import total_value\n",
-        [
-            check(
-                "Inventory valuation",
-                "total_value([{'quantity': 3, 'price': 2.5}, {'quantity': 2, 'price': 4.0}])",
-                15.5,
-            ),
-            check("Empty stock", "total_value(iter([]))", 0),
-            check(
-                "Reject negative quantity",
-                "__raises_value_error__(total_value, [{'quantity': -1, 'price': 2}])",
-                True,
-            ),
-            check(
-                "Reject negative price",
-                "__raises_value_error__(total_value, [{'quantity': 1, 'price': -2}])",
-                True,
-            ),
-        ],
-        [
-            "Keep the public calculation in inventory.py, then import it in lesson.py.",
-            "Validate each row before adding quantity times price to the total.",
-        ],
-        project=True,
-        files=(
-            {
-                "lesson.py": "from inventory import total_value\n",
-                "inventory.py": (
-                    "\n            from typing import Iterable, TypedDict\n\n            class "
-                    "Stock(TypedDict):\n                quantity: int\n                price: f"
-                    "loat\n\n            def total_value(rows: Iterable[Stock]) -> float:\n    "
-                    "            total = 0.0\n                for row in rows:\n               "
-                    '     if row["quantity"] < 0 or row["price"] < 0:\n                        '
-                    'raise ValueError("Stock values must be nonnegative")\n                    '
-                    'total += row["quantity"] * row["price"]\n                return total\n   '
-                    "         "
-                ),
-            },
-        ),
-    ),
 )
 
 BUILD_INSTRUCTIONS = {
@@ -555,21 +510,6 @@ BUILD_INSTRUCTIONS = {
         " then returns 12 with three allowed attempts, return 12 after one pause.\n"
         "The tutor checks with fakes, so you do not need real sleeping or network a"
         "ccess.\n"
-    ).strip(),
-    "typed-inventory": (
-        "\nIn `inventory.py`, define a `Stock` TypedDict with `quantity: int` and `"
-        "price: float` and implement `total_value(rows)`.\nAnnotate the function's "
-        "iterable argument and numeric return value.\nEach row contains those two k"
-        "eys, with a finite numeric price and integer quantity.\nReturn the sum of "
-        "quantity times price across the rows, without rounding.\nReject a negative"
-        " quantity or price with `ValueError`.\nZero values and an empty iterable a"
-        "re valid.\nDo not mutate rows, print, or read input.\nFor three units pric"
-        "ed at 4.5 and one unit priced at 2, return 15.5.\n\nIn `lesson.py`, import"
-        " `total_value` from inventory so the tutor can call it.\nKeep the implemen"
-        "tation in its own module; the entry file is the public bridge.\nThe behavi"
-        "or checks run offline without a third-party type checker.\nReview the anno"
-        "tations as part of your code review rather than treating passing runtime c"
-        "hecks as proof of type correctness.\n"
     ).strip(),
 }
 
@@ -1280,79 +1220,6 @@ REPAIR_STAGES = {
             "Catch only ConnectionError.",
             "The fallback is a callable and should run only after the intended failure.",
         ],
-    ),
-    "typed-inventory": _repair(
-        (
-            "In inventory.py define available_units(items), summing quantities for reco"
-            "rds whose status is 'available'. Import it from lesson.py. Negative quanti"
-            "ties raise ValueError. Each record has string status and numeric quantity."
-            " Validate quantities even for held or unknown statuses, then count only ex"
-            "act available matches. Accept finite one-pass iterables; return zero for e"
-            "mpty input. Keep both modules quiet when imported."
-        ),
-        """
-        from inventory import available_units
-        """,
-        """
-        from inventory import available_units
-        """,
-        [
-            _check(
-                "Available total",
-                "available_units(["
-                "{'quantity': 2, 'status': 'available'}, "
-                "{'quantity': 4, 'status': 'held'}])",
-                2,
-                "Count only records with the available status.",
-            ),
-            _check(
-                "Reject negative",
-                "__raises_value_error__(available_units, "
-                "[{'quantity': -1, 'status': 'available'}])",
-                True,
-                "Validate each quantity before adding it.",
-            ),
-            _probe(
-                "Validate held stock and empty input",
-                (
-                    """
-                result = [available_units(iter([]))]
-                try:
-                    available_units([{"quantity": -1, "status": "held"}])
-                except ValueError:
-                    result.append(True)
-                else:
-                    result.append(False)
-                """
-                ),
-                [0, True],
-                "Validate each quantity before filtering by status.",
-            ),
-        ],
-        [
-            "Keep the reusable function in inventory.py.",
-            "Filter by status, then accumulate quantities.",
-        ],
-        files=(
-            {
-                "lesson.py": "from inventory import available_units\n",
-                "inventory.py": (
-                    "\n                def available_units(items):\n                    total ="
-                    " 0\n                    for item in items:\n                        quanti"
-                    "ty = item['quantity']\n                        if quantity < 0:\n         "
-                    "                   raise ValueError('Negative quantity')\n                "
-                    "        if item['status'] == 'available':\n                            tot"
-                    "al += quantity\n                    return total\n                "
-                ),
-            },
-            {
-                "lesson.py": "from inventory import available_units\n",
-                "inventory.py": (
-                    "\n                def available_units(items):\n                    return "
-                    "sum(item['quantity'] for item in items)\n                "
-                ),
-            },
-        ),
     ),
 }
 

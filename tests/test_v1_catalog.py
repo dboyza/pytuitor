@@ -18,23 +18,18 @@ from pytuitor.runner import execute
 
 
 def test_catalog_has_complete_chapters_and_ordered_prerequisites():
-    assert len(LESSONS) == len({lesson.id for lesson in LESSONS}) == 87
-    assert sum(lesson.project for lesson in LESSONS) == 12
-    assert Counter(lesson.track for lesson in LESSONS) == {"beginner": 46, "experienced": 41}
+    assert len(LESSONS) == len({lesson.id for lesson in LESSONS}) == 75
+    assert not any(lesson.project for lesson in LESSONS)
+    assert Counter(lesson.track for lesson in LESSONS) == {"beginner": 40, "experienced": 35}
     assert len(CHAPTERS) == 21
     assert len(SECTIONS) == 5
     assert [section.optional for section in SECTIONS] == [False, False, False, True, True]
     seen = set()
-    taught_concepts = set()
     for lesson in LESSONS:
         assert set(lesson.prerequisites) <= seen, lesson.id
         assert lesson.body.strip() and lesson.checks and lesson.hints
         assert lesson.entrypoint in lesson.files
         assert set(lesson.concepts) <= set(CONCEPTS)
-        if lesson.project:
-            assert set(lesson.concepts) <= taught_concepts
-        else:
-            taught_concepts.update(lesson.concepts)
         seen.add(lesson.id)
     seen_chapters = set()
     for chapter in CHAPTERS:
@@ -42,10 +37,6 @@ def test_catalog_has_complete_chapters_and_ordered_prerequisites():
         assert 2 <= len(units) <= 6
         assert chapter.section_id in {section.id for section in SECTIONS}
         assert set(chapter.prerequisites) <= seen_chapters
-        projects = [unit for unit in units if unit.project]
-        assert len(projects) <= 1
-        if projects:
-            assert units[-1].project
         seen_chapters.add(chapter.id)
     assert tuple(unit for chapter in CHAPTERS for unit in chapter_lessons(chapter.id)) == LESSONS
     section_order = [section.id for section in SECTIONS]
@@ -100,7 +91,6 @@ def test_stage_contracts_have_required_files_and_content():
         "numbers-from-input",
         "decimal-measurements",
         "choose-a-door",
-        "ticket-desk",
     ),
 )
 async def test_foundations_have_independent_stage_references(identifier):

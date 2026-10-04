@@ -6,20 +6,19 @@ from pytuitor.runner import execute
 
 
 def test_experienced_course_has_six_complete_chapters():
-    assert len(LESSONS) == 41
-    assert len({lesson.id for lesson in LESSONS}) == 41
-    assert sum(lesson.project for lesson in LESSONS) == 6
+    assert len(LESSONS) == 35
+    assert len({lesson.id for lesson in LESSONS}) == 35
+    assert not any(lesson.project for lesson in LESSONS)
     seen = set()
     for chapter in CHAPTERS:
         units = [lesson for lesson in LESSONS if lesson.chapter_id == chapter.id]
-        assert len(units) >= 5
-        assert [lesson.project for lesson in units] == [False] * (len(units) - 1) + [True]
+        assert len(units) >= 4
         for lesson in units:
             assert set(lesson.prerequisites) <= seen
             assert not lesson.starter
             assert lesson.body and lesson.hints
             seen.add(lesson.id)
-    assert sum(lesson.project and len(lesson.files) > 1 for lesson in LESSONS) >= 2
+    assert any(len(lesson.files) > 1 for lesson in LESSONS)
 
 
 @pytest.mark.parametrize("lesson", LESSONS, ids=lambda lesson: lesson.id)

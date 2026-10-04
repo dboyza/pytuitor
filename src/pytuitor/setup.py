@@ -28,7 +28,7 @@ class Onboarding(TutorScreen):
                 dict.fromkeys(
                     concept
                     for lesson in LESSONS
-                    if lesson.chapter_id in chapters and not lesson.project
+                    if lesson.chapter_id in chapters
                     for concept in lesson.concepts
                 )
             )

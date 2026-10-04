@@ -514,51 +514,6 @@ LESSONS = (
             ),
         ],
     ),
-    unit(
-        "stream-report",
-        "python-composition",
-        "Project: a streaming report",
-        "Lazy pipeline project",
-        """
-        def running_totals(lines):
-            total = 0
-            for line in lines:
-                text = line.strip()
-                if not text or text.startswith("#"):
-                    continue
-                total += int(text)
-                yield total
-        """,
-        [
-            check(
-                "Ignore comments and blanks",
-                "list(running_totals([' 3 ', '# adjustment', '', '-1', '5']))",
-                [3, 2, 7],
-            ),
-            check(
-                "Consume incrementally",
-                (
-                    "list(__import__('itertools').islice(running_totals(__import__('itert"
-                    "ools').repeat('2')), 3))"
-                ),
-                [2, 4, 6],
-            ),
-            check(
-                "Reject malformed numbers",
-                "__raises_value_error__(lambda x: list(running_totals(x)), ['oops'])",
-                True,
-            ),
-            check("Empty stream", "list(running_totals([]))", []),
-        ],
-        [
-            (
-                "Separate filtering from integer conversion; invalid non-comment lines sh"
-                "ould still raise."
-            ),
-            "Keep a running total and yield after each accepted number.",
-        ],
-        project=True,
-    ),
 )
 
 BUILD_INSTRUCTIONS = {
@@ -675,20 +630,6 @@ BUILD_INSTRUCTIONS = {
         "ns('aba', str))` is `[('a', ['a']), ('b', ['b']), ('a', ['a'])]`.\nSaved l"
         "ists must remain usable after the outer iterator advances.\nDo not print o"
         "r read input.\n"
-    ).strip(),
-    "stream-report": (
-        "\nDefine the generator `running_totals(lines)`.\nEach input item is a stri"
-        "ng.\nStrip surrounding whitespace; ignore empty strings and strings whose "
-        "first non-whitespace character is `#`.\nEvery other string must be convert"
-        "ed with `int` and added to the running total.\nYield the new total after e"
-        "very accepted integer.\nLet `ValueError` propagate when a non-comment stri"
-        "ng is not a valid integer.\nDo not ignore malformed data or round decimal "
-        "strings.\nAn empty source yields nothing.\nAccept a one-pass or infinite s"
-        "ource without exhausting it before the first result.\nDo not print or read"
-        " input.\n\nFor example, `['10', ' # corrected', '-3', ' 2 ']` yields `10`,"
-        " `7`, then `9`.\nA comment or blank line produces no result.\n`str.startsw"
-        "ith('#')` checks the prefix after stripping.\n`continue` skips the remaini"
-        "ng statements in the current loop iteration.\n"
     ).strip(),
 }
 
@@ -1536,76 +1477,6 @@ REPAIR_STAGES = {
         [
             "groupby gives each adjacent run a separate group iterator.",
             "Consume each group to count it before advancing.",
-        ],
-    ),
-    "stream-report": _repair(
-        (
-            "Define running_average(lines) as a lazy generator. Ignore blanks and comme"
-            "nts, convert other lines to integers, and yield the average after each acc"
-            "epted value. Strip surrounding whitespace before recognizing # comments. A"
-            "ccept signed and zero integers; invalid numeric lines raise ValueError at "
-            "the point consumed. Empty or comment-only input yields nothing. Do not con"
-            "sume ahead of the next accepted value."
-        ),
-        """
-        def running_average(lines):
-            total = count = 0
-            for line in lines:
-                text = line.strip()
-                if not text or text.startswith('#'):
-                    continue
-                total += int(text)
-                count += 1
-                yield total / count
-        """,
-        """
-        def running_average(lines):
-            values = [int(line) for line in lines]
-            return iter([sum(values) / len(values)]) if values else iter([])
-        """,
-        [
-            _check(
-                "Incremental averages",
-                "list(running_average(['2', ' # note', '4']))",
-                [2.0, 3.0],
-                "Update total and count for each accepted line, yielding each step.",
-            ),
-            _check(
-                "Skip annotations",
-                "list(running_average(['', '# x']))",
-                [],
-                "Strip before checking blanks and comments.",
-            ),
-            _probe(
-                "Lazy averages and invalid numeric input",
-                (
-                    """
-                def source():
-                    yield "0"
-                    yield "-2"
-                    raise AssertionError("eager read")
-
-
-                stream = running_average(source())
-                result = [next(stream), next(stream)]
-                try:
-                    list(running_average(["bad"]))
-                except ValueError:
-                    result.append(True)
-                else:
-                    result.append(False)
-                """
-                ),
-                [0, -1, True],
-                (
-                    "Yield each accumulated average before asking for the next line, and preser"
-                    "ve conversion errors."
-                ),
-            ),
-        ],
-        [
-            "Keep total and count outside the loop.",
-            "Yield after each valid value rather than after collecting all input.",
         ],
     ),
 }

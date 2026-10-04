@@ -1,8 +1,7 @@
-"""The beginner course: small programs, dependable tools, and six projects."""
+"""The beginner course: small programs and dependable tools."""
 
 from dataclasses import replace
 
-from pytuitor.beginner_authoring import _scenario_check
 from pytuitor.beginner_extensions import INSERT_AFTER
 from pytuitor.beginner_extensions import LESSONS as EXTRA_LESSONS
 from pytuitor.beginner_stage_refresh import BUILD_INSTRUCTIONS, REPAIR_STAGES
@@ -67,7 +66,6 @@ def exercise(
     checks,
     hints,
     *,
-    project=False,
     files=None,
     entrypoint="lesson.py",
     stdin="",
@@ -77,7 +75,7 @@ def exercise(
         "beginner",
         title,
         subtitle,
-        35 if project else 15,
+        15,
         (title,),
         lesson_text(identifier),
         repair,
@@ -88,7 +86,6 @@ def exercise(
         0,
         "",
         solution,
-        project=project,
         revision=4,
         chapter_id=chapter,
         files=tuple(files[0]) if files else ("lesson.py",),
@@ -345,45 +342,6 @@ add(
     """),
 )
 
-add(
-    "supply-report",
-    "Project: supply report",
-    "Summarize a collection without changing it",
-    "b-collections",
-    (
-        code("""
-            counts = {}
-            order = []
-            for word in input("Supplies: ").split():
-                if word not in counts:
-                    order.append(word)
-                counts[word] = counts.get(word, 0) + 1
-            if len(order) == 0:
-                print("No supplies")
-            else:
-                for word in order:
-                    print(f"{word}: {counts[word]}")
-        """)
-    ),
-    (""),
-    (
-        case(
-            "Repeated supplies",
-            "[counts, order]",
-            [{"rope": 2, "lamp": 2, "map": 1}, ["rope", "lamp", "map"]],
-            stdin="rope lamp rope map lamp\n",
-            output="rope: 2\nlamp: 2\nmap: 1",
-        ),
-        case("Empty delivery", "[counts, order]", [{}, []], stdin="\n", output="No supplies"),
-    ),
-    (
-        "Add a word to order only when it is not already in counts.",
-        "Finish counting before printing, so each output line shows the final count.",
-    ),
-    project=True,
-    stdin="rope lamp rope map lamp\n",
-)
-
 reuse("small-superpowers", "b-functions")
 
 add(
@@ -533,12 +491,6 @@ add(
         "Catch ValueError around the int() conversion.",
         "After successful conversion, reject numbers smaller than zero.",
     ),
-)
-
-reuse(
-    "lantern-quest",
-    "b-functions",
-    stdin="east take west\n",
 )
 
 add(
@@ -787,69 +739,6 @@ add(
 )
 
 add(
-    "expense-report",
-    "Project: an expense report",
-    "Transform CSV records into a JSON summary",
-    "b-data",
-    (
-        code("""
-            import csv
-            import json
-
-            def summarize_expenses(source, destination):
-                totals = {}
-                with open(source, newline="", encoding="utf-8") as handle:
-                    for row in csv.DictReader(handle):
-                        category = row["category"]
-                        totals[category] = totals.get(category, 0) + int(row["amount"])
-                with open(destination, "w", encoding="utf-8") as handle:
-                    json.dump(totals, handle)
-                return totals
-        """)
-    ),
-    (""),
-    tuple(
-        case(
-            label,
-            (
-                f"(__import__('pathlib').Path('expenses.csv').write_text({text!r}, "
-                "encoding='utf-8'), (lambda result: [result, __import__('json').loads("
-                "__import__('pathlib').Path('summary.json').read_text()), "
-                "__import__('pathlib').Path('expenses.csv').read_text()])"
-                "(summarize_expenses('expenses.csv', 'summary.json')))[1]"
-            ),
-            [expected, expected, text],
-        )
-        for label, text, expected in (
-            (
-                "Repeated categories",
-                code("""
-                    category,amount
-                    travel,250
-                    food,600
-                    travel,150
-                """),
-                {"travel": 400, "food": 600},
-            ),
-            ("Empty report", "category,amount\n", {}),
-            (
-                "Quoted category",
-                code("""
-                category,amount
-                "books, used",50
-            """),
-                {"books, used": 50},
-            ),
-        )
-    ),
-    (
-        "Read every CSV row and add its amount to the category total before saving JSON.",
-        'Use totals.get(category, 0) + int(row["amount"]) so earlier rows are retained.',
-    ),
-    project=True,
-)
-
-add(
     "your-own-modules",
     "Writing your own modules",
     "Share functions across Python files",
@@ -1061,82 +950,6 @@ add(
     (
         "Implement the three return cases before writing tests for each one.",
         "Use assertEqual with an input below, inside, and above a 0 to 10 range.",
-    ),
-)
-
-add(
-    "task-workspace",
-    "Project: a task list workspace",
-    "Keep task rules in a reusable Python module",
-    "b-tools",
-    (
-        code("""
-            from tasks import TaskList
-
-            def build_report(titles):
-                tasks = TaskList()
-                for title in titles:
-                    tasks.add(title)
-                return tasks.pending()
-        """)
-    ),
-    (""),
-    (
-        case(
-            "Clean titles and remove repeats",
-            "build_report([' Read ', '', 'Read', 'Walk'])",
-            ["Read", "Walk"],
-        ),
-        case("Empty input", "build_report([])", []),
-        case("Case is preserved", "build_report(['Read', 'read'])", ["Read", "read"]),
-        case(
-            "Returned list is independent",
-            (
-                "(lambda t: (t.add('Read'), t.pending().append('Injected'), t.pend"
-                "ing())[2])(TaskList())"
-            ),
-            ["Read"],
-        ),
-        case(
-            "Instances are independent",
-            "(lambda a,b: (a.add('Mine'), b.pending())[1])(TaskList(), TaskList())",
-            [],
-        ),
-    ),
-    (
-        "Put whitespace cleanup and duplicate checks in TaskList.add for every caller.",
-        "pending() should return self.items.copy(), not the internal list itself.",
-    ),
-    project=True,
-    files=(
-        {
-            ("lesson.py"): (
-                code("""
-                    from tasks import TaskList
-
-                    def build_report(titles):
-                        tasks = TaskList()
-                        for title in titles:
-                            tasks.add(title)
-                        return tasks.pending()
-                """)
-            ),
-            ("tasks.py"): (
-                code("""
-                    class TaskList:
-                        def __init__(self):
-                            self.items = []
-
-                        def add(self, title):
-                            clean = title.strip()
-                            if clean != "" and clean not in self.items:
-                                self.items.append(clean)
-
-                        def pending(self):
-                            return self.items.copy()
-                """)
-            ),
-        },
     ),
 )
 
@@ -1361,146 +1174,6 @@ add(
     (
         "Open the destination with xb, not wb.",
         "Catch FileExistsError and return False; return True only after copying finishes.",
-    ),
-)
-
-add(
-    "notes-archiver",
-    "Project: a careful notes archiver",
-    "Preview a multi-file automation tool before it writes",
-    "b-automation",
-    (
-        code("""
-            from pathlib import Path
-            import shutil
-            from selection import eligible
-
-            def archive_notes(source, destination, dry_run=True):
-                source = Path(source)
-                destination = Path(destination)
-                names = []
-                for name in eligible(source):
-                    target = destination / name
-                    if target.exists():
-                        continue
-                    if not dry_run:
-                        destination.mkdir(parents=True, exist_ok=True)
-                        with open(source / name, "rb") as input_file:
-                            try:
-                                with open(target, "xb") as output_file:
-                                    shutil.copyfileobj(input_file, output_file)
-                            except FileExistsError:
-                                continue
-                    names.append(name)
-                return names
-        """)
-    ),
-    (""),
-    (
-        case(
-            "Dry run creates nothing",
-            (
-                "(__import__('pathlib').Path('inbox').mkdir(), __import__('pathlib"
-                "').Path('inbox/b.txt').write_text('B'), __import__('pathlib').Pat"
-                "h('inbox/a.txt').write_text('A'), __import__('pathlib').Path('inb"
-                "ox/image.png').write_text('PNG'), [archive_notes('inbox', 'archiv"
-                "e'), __import__('pathlib').Path('archive').exists()])[4]"
-            ),
-            [["a.txt", "b.txt"], False],
-        ),
-        case(
-            "Copy and preserve original",
-            (
-                "(__import__('pathlib').Path('inbox').mkdir(), __import__('pathlib"
-                "').Path('inbox/a.txt').write_text('café', encoding='utf-8'), [arc"
-                "hive_notes('inbox', 'archive', dry_run=False), __import__('pathli"
-                "b').Path('archive/a.txt').read_text(encoding='utf-8'), __import__"
-                "('pathlib').Path('inbox/a.txt').read_text(encoding='utf-8')])[2]"
-            ),
-            [["a.txt"], "café", "café"],
-        ),
-        case(
-            "Existing archive file survives",
-            (
-                "(__import__('pathlib').Path('inbox').mkdir(), __import__('pathlib"
-                "').Path('archive').mkdir(), __import__('pathlib').Path('inbox/a.t"
-                "xt').write_text('new'), __import__('pathlib').Path('archive/a.txt"
-                "').write_text('keep'), [archive_notes('inbox', 'archive', dry_run"
-                "=False), __import__('pathlib').Path('archive/a.txt').read_text()]"
-                ")[4]"
-            ),
-            [[], "keep"],
-        ),
-        case(
-            "Empty source",
-            "(__import__('pathlib').Path('inbox').mkdir(), archive_notes('inbox', 'archive'))[1]",
-            [],
-        ),
-        _scenario_check(
-            "Select only immediate lowercase text files",
-            """
-            from pathlib import Path
-            Path('inbox').mkdir()
-            Path('inbox/folder.txt').mkdir()
-            Path('inbox/CAPS.TXT').write_text('skip')
-            Path('inbox/note.txt').write_text('keep')
-            with __symlink_fixtures__({'inbox/link.txt': 'note.txt'}):
-                result = eligible('inbox')
-            """,
-            ["note.txt"],
-            description="Select immediate lowercase text files, excluding directories and links.",
-            nudge="Check file type, symbolic links, and suffix before including a name.",
-        ),
-    ),
-    (
-        (
-            "Implement eligible first, then let archive_notes use that selecti"
-            "on without duplicating it."
-        ),
-        "Keep mkdir and copying inside if not dry_run; return planned names in either mode.",
-    ),
-    project=True,
-    files=(
-        {
-            ("lesson.py"): (
-                code("""
-                    from pathlib import Path
-                    import shutil
-                    from selection import eligible
-
-                    def archive_notes(source, destination, dry_run=True):
-                        source = Path(source)
-                        destination = Path(destination)
-                        names = []
-                        for name in eligible(source):
-                            target = destination / name
-                            if target.exists():
-                                continue
-                            if not dry_run:
-                                destination.mkdir(parents=True, exist_ok=True)
-                                with open(source / name, "rb") as input_file:
-                                    try:
-                                        with open(target, "xb") as output_file:
-                                            shutil.copyfileobj(input_file, output_file)
-                                    except FileExistsError:
-                                        continue
-                            names.append(name)
-                        return names
-                """)
-            ),
-            ("selection.py"): (
-                code("""
-                    from pathlib import Path
-
-                    def eligible(source):
-                        paths = []
-                        for path in Path(source).iterdir():
-                            if path.is_file() and not path.is_symlink() and path.suffix == ".txt":
-                                paths.append(path.name)
-                        return sorted(paths)
-                """)
-            ),
-        },
     ),
 )
 
@@ -1867,114 +1540,6 @@ _FOUNDATION_STAGES = {
             "3\n",
         ),
     ),
-    "ticket-desk": (
-        stage_contract(
-            "Read an integer age and a ticket type. Ages under 12 cost 5, ages 65 and over "
-            "cost 7, and all other ages cost 10. Double the price for a `return` ticket, "
-            "then print `Price: N`.",
-            """
-            age = int(input("Age: "))
-            kind = input("Ticket type: ")
-            if age < 12:
-                price = 5
-            elif age >= 65:
-                price = 7
-            else:
-                price = 10
-            if kind == "return":
-                price = price * 2
-            print(f"Price: {price}")
-            """,
-            "",
-            tuple(
-                case(
-                    f"Age {age}, {kind}",
-                    "price",
-                    price,
-                    stdin=f"{age}\n{kind}\n",
-                    output=f"Price: {price}",
-                    nudge=(
-                        "Check both age boundaries, then apply the return adjustment after "
-                        "choosing the base price."
-                    ),
-                )
-                for age, kind, price in (
-                    (4, "single", 5),
-                    (12, "return", 20),
-                    (65, "single", 7),
-                    (64, "single", 10),
-                    (80, "return", 14),
-                )
-            ),
-            (
-                "Write and test the age price chain before adding the ticket-type adjustment.",
-                'After the chain, multiply price by 2 only when kind == "return".',
-            ),
-            "12\nreturn\n",
-        ),
-        stage_contract(
-            "Repair a parcel-pricing tool. Read `zone`, an integer `weight`, and `express`. "
-            "Use base prices 4 for `local`, 8 for `regional`, and 12 otherwise. Add 3 only "
-            "when weight is over 5, add 5 only when express is `yes`, and print `Charge: N`.",
-            """
-            zone = input("Zone: ")
-            weight = int(input("Weight: "))
-            express = input("Express? ")
-            if zone == "local":
-                price = 4
-            elif zone == "regional":
-                price = 8
-            else:
-                price = 12
-            if weight > 5:
-                price = price + 3
-            if express == "yes":
-                price = price + 5
-            print(f"Charge: {price}")
-            """,
-            """
-            zone = input("Zone: ")
-            weight = int(input("Weight: "))
-            express = input("Express? ")
-            if zone == "local":
-                price = 4
-            elif zone == "regional":
-                price = 12
-            else:
-                price = 8
-            if weight >= 5:
-                price = price + 3
-            if express == "yes":
-                price = price + 3
-            print(f"Charge: {price}")
-            """,
-            tuple(
-                case(
-                    f"{zone}, {weight} kg, {express}",
-                    "price",
-                    expected,
-                    stdin=f"{zone}\n{weight}\n{express}\n",
-                    output=f"Charge: {expected}",
-                    nudge=(
-                        "Check the regional base price, the strict over-5 boundary, and the "
-                        "express addition."
-                    ),
-                )
-                for zone, weight, express, expected in (
-                    ("local", 2, "no", 4),
-                    ("regional", 5, "no", 8),
-                    ("regional", 6, "yes", 16),
-                    ("international", 2, "yes", 17),
-                    ("local", 8, "yes", 12),
-                )
-            ),
-            (
-                "Build the zone chain first, including the default for every other zone.",
-                "Use > 5 for the weight surcharge and add 5, not 3, for express service.",
-            ),
-            "regional\n6\nyes\n",
-        ),
-    ),
 }
 
 
@@ -1984,49 +1549,37 @@ _FOUNDATION_METADATA = {
         "Strings, integers, and output",
         8,
         ("Values & output",),
-        False,
     ),
     "names-and-voices": (
         "Variables and input",
         "Store values and ask the user a question",
         10,
         ("Variables & strings",),
-        False,
     ),
     "numbers-from-input": (
         "Numbers from input",
         "Convert text and calculate whole-number results",
         15,
         ("Numbers & arithmetic",),
-        False,
     ),
     "decimal-measurements": (
         "Decimal measurements",
         "Read decimal input and format a calculated measurement",
         15,
         ("Numbers & arithmetic",),
-        False,
     ),
     "choose-a-door": (
         "Making decisions",
         "Comparisons, booleans, if, elif, and else",
         15,
         ("Conditions",),
-        False,
-    ),
-    "ticket-desk": (
-        "Project: the ticket desk",
-        "Combine input, arithmetic, and decisions",
-        35,
-        ("Conditions",),
-        True,
     ),
 }
 
 
 def foundation_lesson(identifier):
     build, repair = _FOUNDATION_STAGES[identifier]
-    title, subtitle, minutes, concepts, project = _FOUNDATION_METADATA[identifier]
+    title, subtitle, minutes, concepts = _FOUNDATION_METADATA[identifier]
     legacy = next((lesson for lesson in LEGACY if lesson.id == identifier), None)
     return Lesson(
         identifier,
@@ -2044,7 +1597,6 @@ def foundation_lesson(identifier):
         legacy.answer if legacy else 0,
         legacy.explanation if legacy else "",
         build.reference_files["lesson.py"],
-        project=project,
         revision=5,
         chapter_id="b-foundations",
         files=build.files,
@@ -2070,16 +1622,6 @@ LESSONS = tuple(
     replace(
         lesson,
         prerequisites=(_units[index - 1].id,) if index else (),
-        concepts=tuple(
-            dict.fromkeys(
-                concept
-                for prerequisite in _units[:index]
-                if prerequisite.chapter_id == lesson.chapter_id and not prerequisite.project
-                for concept in prerequisite.concepts
-            )
-        )
-        if lesson.project
-        else lesson.concepts,
     )
     for index, lesson in enumerate(_units)
 )
