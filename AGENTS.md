@@ -29,7 +29,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Make blank-editor exercises solvable: specify names, signatures, input handling, output, and edge cases.
 - Prefer natural explanations and worked examples distinct from the required solution.
 - Distinguish variables/values, print/return, and user input/prompt text.
-- Verify correct reference programs pass and broken Repair programs fail meaningfully.
+- Verify correct reference programs pass and broken Repair programs fail meaningfully; each mutation check breaks exactly one behavior.
 - Accept valid alternative implementations; test observable behavior rather than source spelling.
 - Keep prose, hints, checks, repair code, and references synchronized; preserve full contracts when moving prose, and bump revisions when stage behavior changes.
 
@@ -65,6 +65,7 @@ Stay near 100 lines and 1,000 words; put details in `docs/`, never secrets or te
 - Stage contracts live in `content/` chapter modules and the five Foundation records; see [the authoring guide](docs/authoring.md) and [challenge criteria](docs/teaching-criteria.md).
 - `lesson_screen.py` owns stage/editor/console execution; `file_tree.py` renders workspace files; `screens.py` owns chapter navigation; `setup.py` owns onboarding.
 - `learning_tools.py` owns file and reference dialogs; `app.py`, `ui.py`, `dialogs.py`, `theme.tcss` handle shell/shared UI.
+- A new chapter needs a milestone, `briefs.py` entry, review session, prediction checkpoint, and `repair_pacing.py` focus; tests enforce each.
 - `course_map.py` defines chapter order; `project_catalog.py` assembles game content from `content/lantern/`; `syllabus.py` lists chapters by section.
 - `project_workspace.py` owns immutable checkpoints and continuation; keep extra inherited capability checks via its active contract and never replace learner source silently.
 - `project_screen.py` owns game history, explicit supplied bases, restoration, temporary checkpoint play, and portable exports.

@@ -105,11 +105,13 @@ def test_collection_repairs_use_only_the_syntax_taught_so_far():
     for identifier in (
         "pack-your-bag",
         "list-positions",
+        "summary-builtins",
         "tuples-and-sets",
         "comparing-sets",
         "loop-helpers",
         "nested-collections",
         "word-counts",
+        "dictionary-pairs",
         "editing-collections",
         "repeat-until-done",
     ):
@@ -133,6 +135,7 @@ def test_collection_repairs_use_only_the_syntax_taught_so_far():
             if identifier in (
                 "pack-your-bag",
                 "list-positions",
+                "summary-builtins",
                 "tuples-and-sets",
                 "comparing-sets",
                 "loop-helpers",

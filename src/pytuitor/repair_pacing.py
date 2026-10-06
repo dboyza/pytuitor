@@ -40,6 +40,7 @@ CHAPTER_FOCUS = {
     "async-work": "Trace results, cancellation, and cleanup around each await.",
     "distributable-tools": "Check imports and explicit command arguments independently.",
     "python-machinery": "Trace lookup and binding at the class and instance levels.",
+    "packages-and-web": "Compare a success, an error status, and a missing response.",
 }
 
 

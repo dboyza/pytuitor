@@ -728,20 +728,20 @@ BUILD_INSTRUCTIONS = {
         "r read input.\n"
     ).strip(),
     "logging-basics": (
-        "Write `load_counts(lines)`, a reusable function that reads lines such as "
-        "`rope,3` and returns a dictionary such as `{'rope': 3}`.\n\n"
-        "- Use the text before the first comma as the name, with surrounding spaces removed, "
-        "and the text after it as a whole-number count. A later line with the same name "
-        "replaces the earlier count.\n"
-        "- Skip blank lines silently.\n"
-        "- For a count that `int()` rejects, including a missing comma, skip the line and log "
-        "a WARNING with exactly `Skipping line N: bad count 'TEXT'`. `N` counts lines from 1, "
-        "including blank ones. `'TEXT'` is the representation (`%r`) of the count text with "
-        "surrounding spaces removed.\n"
-        "- After the last line, log INFO `Loaded K items`, where `K` is the number of names "
-        "returned.\n\n"
-        "Send every record through the logger named `inventory`. This is library code: do not "
-        "print, call `logging.basicConfig`, or add handlers."
+        "Define `load_counts(lines)`, a reusable function that reads lines such as `rope,3` and "
+        "returns a dictionary such as `{'rope': 3}`.\n"
+        "The name is the text before the first comma, with surrounding spaces removed, and the "
+        "count is the whole number after it.\n"
+        "A later line with the same name replaces the earlier count, and blank lines are "
+        "skipped silently.\n"
+        "When `int()` rejects a count, including a line without a comma, skip the line and log "
+        "a WARNING with exactly `Skipping line N: bad count 'TEXT'`.\n"
+        "`N` counts lines from 1, including blank lines, and `'TEXT'` is the representation "
+        "(`%r`) of the count text with surrounding spaces removed.\n"
+        "After the last line, log INFO `Loaded K items`, where `K` is the number of names "
+        "returned.\n"
+        "Send every record through the logger named `inventory`.\n"
+        "This is library code, so do not print, call `logging.basicConfig`, or add handlers."
     ),
 }
 
@@ -1592,13 +1592,13 @@ REPAIR_STAGES = {
         ],
     ),
     "logging-basics": _repair(
-        "Repair `settle(amounts)` in this reusable payments module.\n\n"
-        "`amounts` is a list of strings. Add each whole number to a running total. For an "
-        "amount that `int()` rejects, log at ERROR level with the exception attached, using "
-        "the message `Payment N failed`, where `N` counts from 1.\n\n"
-        "After processing every amount, log INFO `Total: T` and return the total.\n\n"
-        "Send every record through the logger named `payments`, and do not configure logging "
-        "in this module.",
+        "Repair `settle(amounts)` in this reusable payments module.\n"
+        "`amounts` is a list of strings, and each whole number is added to a running total.\n"
+        "For an amount that `int()` rejects, log at ERROR level with the exception attached, "
+        "using the message `Payment N failed`, where `N` counts from 1.\n"
+        "After processing every amount, log INFO `Total: T` and return the total.\n"
+        "Send every record through the logger named `payments`, and do not configure logging in "
+        "this module.",
         """
         import logging
 

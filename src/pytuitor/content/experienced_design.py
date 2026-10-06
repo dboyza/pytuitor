@@ -633,19 +633,20 @@ BUILD_INSTRUCTIONS = {
         "ccess.\n"
     ).strip(),
     "sqlite-records": (
-        "Write four functions that keep supplies in an SQLite database.\n\n"
-        '- `open_store(path)` connects to `path`, which may be a file name or `":memory:"`, '
-        "creates a table named `supplies` with a unique text column `name` and a required "
-        "integer column `amount` if it does not already exist, and returns the connection.\n"
-        "- `add_supply(connection, name, amount)` stores a new supply and commits it. Raise "
-        "`ValueError` for a negative amount or a name that is already stored, leaving the "
-        "existing row unchanged.\n"
-        "- `supply_amount(connection, name)` returns the stored amount, or `None` when the "
-        "name is not stored.\n"
-        "- `low_supplies(connection, limit)` returns the names whose amount is below `limit`, "
-        "sorted by name.\n\n"
-        "Names may contain any text, including quotes. Use `?` placeholders for every value; "
-        "never build SQL text from a value."
+        "Define four functions that keep supplies in an SQLite database.\n"
+        '`open_store(path)` connects to `path`, which may be a file name or `":memory:"`, and '
+        "returns the connection.\n"
+        "It creates a table named `supplies`, with a unique text column `name` and a required "
+        "integer column `amount`, if the table does not already exist.\n"
+        "`add_supply(connection, name, amount)` stores a new supply and commits it.\n"
+        "It raises `ValueError` for a negative amount or a name that is already stored, leaving "
+        "the existing row unchanged.\n"
+        "`supply_amount(connection, name)` returns the stored amount, or `None` when the name "
+        "is not stored.\n"
+        "`low_supplies(connection, limit)` returns the names whose amount is below `limit`, "
+        "sorted by name.\n"
+        "Names may contain any text, including quotes.\n"
+        "Use `?` placeholders for every value, and never build SQL text from a value."
     ),
 }
 
@@ -1358,13 +1359,13 @@ REPAIR_STAGES = {
         ],
     ),
     "sqlite-records": _repair(
-        "Repair the visit log.\n\n"
-        "The `visits` table already exists with text columns `visitor` and `place`.\n\n"
-        "- `record_visit(connection, visitor, place)` saves one row permanently, so it is "
-        "still there after the connection closes. Visitor and place may contain any text, "
-        "including apostrophes.\n"
-        "- `visits_to(connection, place)` returns the visitors recorded for that place, "
-        "sorted by name, or `[]` when there are none.\n\n"
+        "Repair the visit log.\n"
+        "The `visits` table already exists, with text columns `visitor` and `place`.\n"
+        "`record_visit(connection, visitor, place)` saves one row permanently, so it is still "
+        "there after the connection closes.\n"
+        "Visitor and place may contain any text, including apostrophes.\n"
+        "`visits_to(connection, place)` returns the visitors recorded for that place, sorted by "
+        "name, or `[]` when there are none.\n"
         "Never insert values into the SQL text itself.",
         """
         def record_visit(connection, visitor, place):

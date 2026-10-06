@@ -10,7 +10,10 @@ _MISSING = "no-such-package-for-pytuitor"
 
 
 def _mutant_script(module, name, mutant, result):
-    """Swap in a deliberately broken function and report whether the learner's tests fail."""
+    """Swap in a broken function and report whether the learner's tests fail.
+
+    Each mutant breaks exactly one documented behavior, so only a test aimed at it can fail.
+    """
     return (
         f"import {module}\n\n"
         + code(mutant)
@@ -221,6 +224,8 @@ LESSONS = (
                     "apply_discount",
                     """
                     def mutant(price, percent):
+                        if price < 0 or not 0 <= percent <= 100:
+                            raise ValueError("invalid")
                         return price
                     """,
                     "__probe_result__",
@@ -422,64 +427,68 @@ LESSONS = (
 
 BUILD_INSTRUCTIONS = {
     "installing-packages": (
-        "Write three functions that read a requirements file's lines and report what is "
-        "installed.\n\n"
-        "- `parse_requirement(line)` ignores everything after `#` and surrounding spaces. A "
-        "line left empty returns `None`. Otherwise it returns a tuple `(name, specifier)`: "
-        "the name is the text before the first `=`, `<`, `>`, `!`, or `~` character, without "
-        "surrounding spaces, and the specifier is the rest with every space removed, or `''` "
-        "when there is none. For example, `'pytest >= 8 , < 9  # tests'` gives "
-        "`('pytest', '>=8,<9')`.\n"
-        "- `installed_version(name)` returns the installed version of the distribution named "
-        "`name` as a string, or `None` when it is not installed. Use `importlib.metadata`; do "
-        "not import the package.\n"
-        "- `requirement_report(lines)` returns one string per requirement, in order, skipping "
-        "blank and comment lines: `NAME: VERSION` when installed, or `NAME: missing`.\n\n"
-        "Pytuitor includes `requests` and `pytest`, so they report as installed. Nothing in "
+        "Define three functions that read a requirements file's lines and report what is "
+        "installed.\n"
+        "`parse_requirement(line)` ignores everything after `#` and surrounding spaces, and "
+        "returns `None` for a line left empty.\n"
+        "Otherwise it returns a tuple `(name, specifier)`.\n"
+        "The name is the text before the first `=`, `<`, `>`, `!`, or `~` character, without "
+        "surrounding spaces.\n"
+        "The specifier is the rest with every space removed, or `''` when there is none.\n"
+        "For example, `'pytest >= 8 , < 9  # tests'` gives `('pytest', '>=8,<9')`.\n"
+        "`installed_version(name)` returns the installed version of the distribution `name` as "
+        "a string, or `None` when it is not installed.\n"
+        "Use `importlib.metadata` rather than importing the package.\n"
+        "`requirement_report(lines)` returns one string per requirement in order, skipping "
+        "blank and comment lines: `NAME: VERSION` when installed, or `NAME: missing`.\n"
+        "Pytuitor includes `requests` and `pytest`, so they report as installed; nothing in "
         "this exercise downloads or installs packages."
     ),
     "pytest-basics": (
-        "Create two files.\n\n"
-        "**`shop.py`** defines `apply_discount(price, percent)`. It returns `price` reduced by "
-        "`percent` percent, rounded to 2 decimal places with `round()`. It raises `ValueError` "
-        "when `price` is negative or when `percent` is outside 0 to 100, inclusive.\n\n"
-        "**`test_shop.py`** contains pytest tests that import `apply_discount` from `shop`. "
-        "Include:\n\n"
-        "- one test decorated with `@pytest.mark.parametrize` with at least three "
-        "`(price, percent, expected)` rows, including a row whose result needs rounding, such "
-        "as `19.99` at `10` percent giving `17.99`;\n"
-        "- at least one test using `pytest.raises(ValueError)` for a percent above 100.\n\n"
-        "Check runs your tests with pytest. They must pass against your `shop.py`, and each "
-        "must play its part in failing against three deliberately broken versions: one that "
-        "ignores the discount, one that accepts a percent above 100, and one that skips "
-        "rounding. Run executes `shop.py`."
+        "Create two files.\n"
+        "In `shop.py`, define `apply_discount(price, percent)`, which returns `price` reduced "
+        "by `percent` percent, rounded to 2 decimal places with `round()`.\n"
+        "It raises `ValueError` when `price` is negative or when `percent` is outside 0 to 100, "
+        "inclusive.\n"
+        "In `test_shop.py`, write pytest tests that import `apply_discount` from `shop`.\n"
+        "Include one test decorated with `@pytest.mark.parametrize` with at least three "
+        "`(price, percent, expected)` rows.\n"
+        "One row must need rounding, such as `19.99` at `10` percent giving `17.99`.\n"
+        "Include at least one test using `pytest.raises(ValueError)` for a percent above 100.\n"
+        "Check runs your tests with pytest, and they must pass against your `shop.py`.\n"
+        "They must also fail against three deliberately broken versions: one that ignores the "
+        "discount, one that accepts a percent above 100, and one that skips rounding.\n"
+        "Run executes `shop.py`."
     ),
     "web-requests": (
-        "Write two functions that talk to a weather API. `base_url` is the server's address "
-        "without a trailing slash, such as `http://127.0.0.1:8000`; checks supply a practice "
-        "server on your own computer, so no internet is needed.\n\n"
-        "- `fetch_forecast(base_url, city)` sends a GET request to `BASE_URL/forecast` with "
-        "the city as the `city` query value. For status 404, return `None`. For any other "
-        "error status, raise `requests.HTTPError`. Otherwise the reply is JSON such as "
-        "`{'city': 'Oslo', 'low': 3, 'high': 9}`; return `CITY: LOW to HIGH`, such as "
-        "`Oslo: 3 to 9`.\n"
-        "- `post_sighting(base_url, animal, count)` sends a POST request to "
-        "`BASE_URL/sightings` with the JSON body `{'animal': ANIMAL, 'count': COUNT}`. For an "
-        "error status, raise `requests.HTTPError`. Otherwise return the `id` value from the "
-        "JSON reply.\n\n"
-        "Every request must set a timeout of at most 10 seconds. City names can contain "
-        "spaces and symbols such as `&`."
+        "Define two functions that talk to a weather API.\n"
+        "`base_url` is the server's address without a trailing slash, such as "
+        "`http://127.0.0.1:8000`.\n"
+        "Checks supply a practice server on your own computer, so no internet is needed.\n"
+        "`fetch_forecast(base_url, city)` sends a GET request to `BASE_URL/forecast` with the "
+        "city as the `city` query value.\n"
+        "For status 404 it returns `None`, and for any other error status it raises "
+        "`requests.HTTPError`.\n"
+        "Otherwise the reply is JSON such as `{'city': 'Oslo', 'low': 3, 'high': 9}`, and it "
+        "returns `CITY: LOW to HIGH`, such as `Oslo: 3 to 9`.\n"
+        "`post_sighting(base_url, animal, count)` sends a POST request to `BASE_URL/sightings` "
+        "with the JSON body `{'animal': ANIMAL, 'count': COUNT}`.\n"
+        "For an error status it raises `requests.HTTPError`; otherwise it returns the `id` "
+        "value from the JSON reply.\n"
+        "Every request must set a timeout of at most 10 seconds.\n"
+        "City names can contain spaces and symbols such as `&`."
     ),
 }
 
 REPAIR_STAGES = {
     "installing-packages": _repair(
-        "Repair `missing_packages(names)`.\n\n"
-        "`names` is a list of distribution names, the names you would give to pip. Return "
-        "the names that are not installed, in their original order.\n\n"
-        "Check installed distributions with `importlib.metadata`. Do not import the packages: "
-        "a distribution's import name can differ from its distribution name, and importing "
-        "runs the package's code.",
+        "Repair `missing_packages(names)`.\n"
+        "`names` is a list of distribution names, the names you would give to pip.\n"
+        "Return the names that are not installed, in their original order.\n"
+        "Check installed distributions with `importlib.metadata` rather than importing the "
+        "packages.\n"
+        "A distribution's import name can differ from its distribution name, and importing runs "
+        "the package's code.",
         """
         from importlib.metadata import PackageNotFoundError, version
 
@@ -530,12 +539,12 @@ REPAIR_STAGES = {
         ),
     ),
     "pytest-basics": _repair(
-        "Repair the tests in `test_shop.py`. `shop.py` is correct: `total(prices)` returns "
-        "the sum rounded to 2 decimal places, returns `0` for an empty list, and raises "
-        "`ValueError` for a negative price.\n\n"
-        "Fix the tests, not `shop.py`, so pytest discovers and runs at least three tests "
-        "that all pass. Together they must fail against broken versions of `total` that add "
-        "up the wrong prices, return `None` for an empty cart, or accept a negative price.",
+        "Repair the tests in `test_shop.py`, not `shop.py`.\n"
+        "`shop.py` is correct: `total(prices)` returns the sum rounded to 2 decimal places, "
+        "returns `0` for an empty list, and raises `ValueError` for a negative price.\n"
+        "pytest must discover and run at least three tests, and they must all pass.\n"
+        "Together, the tests must fail against broken versions of `total` that add up the wrong "
+        "prices, return `None` for an empty cart, or accept a negative price.",
         "",
         "",
         [
@@ -552,6 +561,8 @@ REPAIR_STAGES = {
                     "total",
                     """
                     def mutant(prices):
+                        if any(price < 0 for price in prices):
+                            raise ValueError("negative")
                         return round(sum(prices[1:]), 2)
                     """,
                     "result",
@@ -566,6 +577,8 @@ REPAIR_STAGES = {
                     "total",
                     """
                     def mutant(prices):
+                        if any(price < 0 for price in prices):
+                            raise ValueError("negative")
                         if not prices:
                             return None
                         return round(sum(prices), 2)
@@ -653,12 +666,13 @@ REPAIR_STAGES = {
         ),
     ),
     "web-requests": _repair(
-        "Repair `trail_status(base_url, trail_id)`.\n\n"
-        "It sends a GET request to `BASE_URL/trails/TRAIL_ID`. For status 404, it returns "
-        "`None`. For any other error status, it raises `requests.HTTPError`. Otherwise it "
-        "returns the `status` value from the JSON reply, such as `open`.\n\n"
-        "The request must set a timeout of at most 10 seconds. Checks use a practice server "
-        "on your own computer.",
+        "Repair `trail_status(base_url, trail_id)`, which sends a GET request to "
+        "`BASE_URL/trails/TRAIL_ID`.\n"
+        "For status 404 it returns `None`, and for any other error status it raises "
+        "`requests.HTTPError`.\n"
+        "Otherwise it returns the `status` value from the JSON reply, such as `open`.\n"
+        "The request must set a timeout of at most 10 seconds.\n"
+        "Checks use a practice server on your own computer.",
         """
         import requests
 

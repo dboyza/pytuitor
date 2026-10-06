@@ -1,6 +1,7 @@
 # Test with pytest
 
-> Internet use: The exercise and its checks run offline with the copy of pytest included in Pytuitor. Installing pytest in your own projects downloads it from the internet.
+> Internet use: The exercise and its checks run offline with the copy of pytest included in Pytuitor.
+> Installing pytest in your own projects downloads it from the internet.
 
 **pytest** is the most widely used third-party test runner for Python.
 It runs the same kind of checks as `unittest`, with less code: plain functions and plain `assert` statements.

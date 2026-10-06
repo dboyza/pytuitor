@@ -192,19 +192,17 @@ BUILD_INSTRUCTIONS = {
         " iterator.\nDo not mutate the input or print.\n"
     ).strip(),
     "pattern-matching": (
-        "Write `handle(command)`, where `command` is a list or tuple of lowercase words.\n"
-        "Return exactly these strings; a `match` statement is recommended, but an equivalent "
-        "`if` chain is valid:\n\n"
-        "- No words: `Say something`.\n"
-        "- Exactly `look`: `You look around`.\n"
-        "- `go` and one more word that is `north`, `south`, `east`, or `west`: "
-        "`You go DIRECTION`.\n"
-        "- `go` and any other single word: `You can't go that way`.\n"
-        "- Exactly `take`: `Take what?`.\n"
-        "- `take` followed by one or more items: `Taken: ` and the items joined with "
-        "`, ` in order, such as `Taken: rope, lamp`.\n"
-        "- Exactly `quit` or exactly `exit`: `Goodbye`.\n"
-        "- Anything else, including `go` alone or a word after `look`: `Unknown command`.\n\n"
+        "Define `handle(command)`, where `command` is a list or tuple of lowercase words, and "
+        "return exactly these strings.\n"
+        "No words return `Say something`, and exactly `look` returns `You look around`.\n"
+        "`go` followed by `north`, `south`, `east`, or `west` returns `You go DIRECTION`; `go` "
+        "followed by any other single word returns `You can't go that way`.\n"
+        "Exactly `take` returns `Take what?`, and `take` followed by items returns `Taken: ` "
+        "and the items joined with `, `, such as `Taken: rope, lamp`.\n"
+        "Exactly `quit` or exactly `exit` returns `Goodbye`.\n"
+        "Anything else, including `go` alone or a word after `look`, returns `Unknown "
+        "command`.\n"
+        "A `match` statement is recommended, but an equivalent `if` chain is valid.\n"
         "Do not change `command`."
     ),
 }
@@ -427,13 +425,14 @@ REPAIR_STAGES = {
         ],
     ),
     "pattern-matching": _repair(
-        "Repair `route(message)`, which receives one message.\n\n"
-        "- A dictionary whose `kind` is `move` and that has a `to` key: `Moving to PLACE`.\n"
-        "- A dictionary whose `kind` is `move` without a `to` key: `Where to?`.\n"
-        "- A dictionary whose `kind` is `say` and that has a `text` key: that text.\n"
-        "- Anything else, including other kinds, missing keys, or a value that is not a "
-        "dictionary: `Ignored`.\n\n"
-        "Messages may contain extra keys, which do not change the result.",
+        "Repair `route(message)`, which receives one message.\n"
+        "A dictionary whose `kind` is `move` and that has a `to` key returns `Moving to "
+        "PLACE`.\n"
+        "A dictionary whose `kind` is `move` without a `to` key returns `Where to?`.\n"
+        "A dictionary whose `kind` is `say` and that has a `text` key returns that text.\n"
+        "Anything else, including other kinds, missing keys, or a value that is not a "
+        "dictionary, returns `Ignored`.\n"
+        "Extra keys in a message do not change the result.",
         """
         def route(message):
             match message:

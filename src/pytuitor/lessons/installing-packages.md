@@ -1,6 +1,7 @@
 # Install and inspect packages
 
-> Internet use: The exercise and its checks run offline. The "Try it in your own terminal" steps download packages from the internet.
+> Internet use: The exercise and its checks run offline.
+> The "Try it in your own terminal" steps download packages from the internet.
 
 Python's **standard library** is the set of modules included with Python, such as `json` and `pathlib`.
 A **third-party package** is code from someone else that you download separately, usually from **PyPI**, the Python Package Index, using **pip**, Python's package installer.

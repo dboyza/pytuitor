@@ -1,6 +1,7 @@
 # Call a web API with requests
 
-> Internet use: The exercise and its checks run offline: each check starts a practice server on your own computer at `127.0.0.1`, an address that always means "this computer". Calling a real web API, as in the last section, needs an internet connection.
+> Internet use: The exercise and its checks run offline: each check starts a practice server on your own computer at `127.0.0.1`, an address that always means "this computer".
+> Calling a real web API, as in the last section, needs an internet connection.
 
 ## How a web request works
 
