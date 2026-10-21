@@ -7,6 +7,8 @@ name = "pytuitor"
 version = "1.0.0rc1"
 description = "An offline Python apprenticeship in your terminal"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 dependencies = [
     "textual[syntax]>=8.2.8,<9",

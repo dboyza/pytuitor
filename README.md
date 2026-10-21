@@ -134,3 +134,7 @@ See the [release checklist](docs/release-checklist.md) for installed-wheel valid
 - **Keep learning:** explore the [curriculum](docs/curriculum.md) and choose your next chapter.
 - **Contribute:** start with [development](#development), then use the [release checklist](docs/release-checklist.md) to validate a change.
 - **Get help:** [open an issue](https://github.com/dboyza/pytuitor/issues) with your launch command, terminal, and the error or lesson involved.
+
+## License
+
+Pytuitor is available under the [MIT License](LICENSE).
